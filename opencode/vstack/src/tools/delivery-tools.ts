@@ -12,7 +12,7 @@ export const deliveryTool: VstackTool = {
     properties: {
       action: { 
         type: "string", 
-        enum: ["create", "get", "list", "update"],
+        enum: ["create", "get", "list", "update", "can-complete"],
         description: "Action to perform" 
       },
       deliveryId: { type: "string", description: "Delivery ID (for get/update)" },
@@ -30,7 +30,7 @@ export const deliveryTool: VstackTool = {
   },
   execute: async (input, context) => {
     const { vstack } = context;
-    const { deliveryStore } = vstack;
+    const { deliveryStore, enforcementService } = vstack;
     
     switch (input.action) {
       case "create": {
@@ -65,12 +65,35 @@ export const deliveryTool: VstackTool = {
       
       case "update": {
         if (!input.deliveryId) return { content: JSON.stringify({ error: "deliveryId required" }) };
+        
+        // Enforcement: check if delivery can be completed
+        if (input.status === "completed") {
+          const enforcement = await enforcementService.canCompleteDelivery(input.deliveryId);
+          if (!enforcement.allowed) {
+            return { content: JSON.stringify({ 
+              error: "Delivery cannot be completed", 
+              reasons: enforcement.reasons 
+            }) };
+          }
+        }
+        
+        // Enforcement: blocked status requires reason
+        if (input.status === "blocked" && !input.blockedReason) {
+          return { content: JSON.stringify({ error: "Blocked status requires a reason (blockedReason)" }) };
+        }
+        
         const updates: any = {};
         if (input.status) updates.status = input.status;
         if (input.blockedReason) updates.blockedReason = input.blockedReason;
         if (input.title) updates.title = input.title;
         const delivery = await deliveryStore.updateDelivery(input.deliveryId, updates);
         return { content: JSON.stringify({ delivery }) };
+      }
+      
+      case "can-complete": {
+        if (!input.deliveryId) return { content: JSON.stringify({ error: "deliveryId required" }) };
+        const enforcement = await enforcementService.canCompleteDelivery(input.deliveryId);
+        return { content: JSON.stringify({ enforcement }) };
       }
       
       default:

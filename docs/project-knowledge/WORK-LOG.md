@@ -141,3 +141,37 @@
 
 ### Time Spent
 ~3 hours (store creation, tool creation, type fixing, testing)
+
+## 2026-11-01 — Phase 4: Agent Coordination & Enforcement
+
+**Session:** Integrated agent dispatch with new stores, added enforcement rules
+
+### Actions
+1. **Updated agent-dispatch** to use agentRunStore for persistence instead of direct filesystem writes
+2. **Created Enforcement Service** (`enforcement/enforcement-service.ts`) with 5 rules:
+   - Delivery cannot complete while required tasks incomplete
+   - Task cannot complete with incomplete dependencies or failed evidence
+   - Blocked status requires a reason
+   - Protected actions require approval (stub)
+   - Completion checks before protected transitions
+3. **Updated task/delivery tools** to enforce completion rules and blocked reason requirement
+4. **Integrated agent dispatch** with agentRunStore in plugin index.ts
+5. **Fixed TypeScript issues** in agent-dispatch, task-tools, index.ts
+6. **Verified typecheck PASS** and **tests 25/25 PASS**
+
+### Discoveries
+- Agent dispatch already had proper structure, just needed to use new stores
+- Enforcement rules are simple but effective - no complex policy engine needed
+- Task/delivery completion checks work well with existing evidence system
+- All existing tests still pass after integration
+
+### Decisions Made
+- Enforcement rules kept minimal (5 rules) per plan Section 6.12
+- Approval recording is stubbed; real implementation needs OpenCode permission API
+- No generic workflow engine or scheduler introduced
+
+### Next Actions
+1. Phase 5: OpenChamber visualization — read-only dashboard from projections
+
+### Time Spent
+~2 hours (enforcement, dispatch integration, type fixing, testing)

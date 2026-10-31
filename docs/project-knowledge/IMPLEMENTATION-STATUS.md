@@ -10,8 +10,8 @@
 | **Phase 1: Playbook Foundation** | **COMPLETE** | 2026-11-01 | 2026-11-01 | 15 skills, 3 roles, 3 workflows, validation, cross-harness install verified |
 | **Phase 2: OpenCode Integration** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Plugin loads Playbook skills, provisions native agents via adapters |
 | **Phase 3: Runtime Foundation** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Memory, delivery/task stores, history, check service, ~7 tools |
-| **Phase 4: Agent Coordination & Enforcement** | **IN PROGRESS** | 2026-11-01 | — | Agent dispatch, evidence, enforcement, dashboard |
-| Phase 5: OpenChamber Visualization | NOT STARTED | — | — | Depends on Phase 4 |
+| **Phase 4: Agent Coordination & Enforcement** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Agent dispatch, evidence, enforcement, ~7 tools |
+| **Phase 5: OpenChamber Visualization** | **IN PROGRESS** | 2026-11-01 | — | Read-only dashboard from projections |
 | Phase 6: E2E Validation | NOT STARTED | — | — | Final phase |
 
 ## Phase 0 Checklist
@@ -61,6 +61,16 @@
 - [x] Test restart continuity, concurrent writes, migration
 - [x] Create ~7 cohesive tools (status, memory, history, delivery, task, agent, check)
 - [x] All tests pass (25/25), typecheck passes
+
+## Phase 4 Checklist
+
+- [x] Agent dispatch integrated with agentRunStore
+- [x] Evidence/check recording integration
+- [x] Basic completion checks (required evidence, blocking findings)
+- [x] Explicit approval requirements for protected actions
+- [x] Blocked status requires reason enforcement
+- [x] Dashboard projection updated for OpenChamber
+- [x] Tests 25/25 PASS, typecheck PASS
 
 ## Milestones
 

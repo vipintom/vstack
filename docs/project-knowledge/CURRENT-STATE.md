@@ -1,6 +1,6 @@
 # Current State
 
-**Last updated:** 2026-11-01 (Phase 3 complete)
+**Last updated:** 2026-11-01 (Phase 4 complete)
 
 ## What Exists
 
@@ -9,32 +9,22 @@
 vstack/
 ├── package.json                    # pnpm workspace root
 ├── playbook/                       # Portable playbook package
-│   ├── package.json                # @vstack/playbook v0.1.0
-│   ├── README.md
-│   ├── principles/index.md
-│   ├── agents/roles/{lead,builder,reviewer}.md
-│   ├── agents/adapters/{opencode,codex,claude-code}/
-│   ├── skills/vstack-{mode,principles,help,sharpen,discovery,blueprint,plan-loop,blast-radius,tdd,debugging,verify-loop,unstick,review-loop,context-reset,lessons}/SKILL.md
-│   ├── workflows/{feature-delivery,bug-fixing,refactoring}.md
-│   ├── resources/rubrics/ (6 lenses)
-│   ├── resources/templates/ (4 templates)
-│   ├── resources/references/quick-ref.md
-│   └── scripts/validate-content.js
 ├── agents-skills/                  # Legacy portable skills (to be migrated)
 ├── opencode/vstack/                # OpenCode plugin (workspace)
 │   ├── src/
-│   │   ├── memory/memory-store.ts        # NEW: Project memory store
-│   │   ├── deliveries/delivery-store.ts  # NEW: Simplified delivery store
-│   │   ├── tasks/task-store.ts           # NEW: Simplified task store (decoupled from lifecycle)
-│   │   ├── agents/agent-run-store.ts     # NEW: Agent run tracking
-│   │   ├── history/history-service.ts    # NEW: History querying
-│   │   ├── quality/check-service.ts      # NEW: Check execution & evidence
-│   │   ├── tools/                        # NEW: ~7 cohesive tools
+│   │   ├── memory/memory-store.ts        # Project memory store
+│   │   ├── deliveries/delivery-store.ts  # Simplified delivery store
+│   │   ├── tasks/task-store.ts           # Simplified task store
+│   │   ├── agents/agent-run-store.ts     # Agent run tracking
+│   │   ├── history/history-service.ts    # History querying
+│   │   ├── quality/check-service.ts      # Check execution & evidence
+│   │   ├── enforcement/enforcement-service.ts  # Basic enforcement rules
+│   │   ├── orchestration/agent-dispatch.ts     # Agent dispatch
+│   │   ├── tools/                        # ~7 cohesive tools
 │   │   ├── persistence/                  # File store, locks, event log, repo root
-│   │   ├── orchestration/agent-dispatch  # Agent dispatch
 │   │   ├── skills/skill-loader           # Playbook skill loading
 │   │   ├── agents/agent-installer        # Agent provisioning
-│   │   ├── lifecycle/                    # Legacy lifecycle engine (kept for compat)
+│   │   ├── lifecycle/                    # Legacy lifecycle engine
 │   │   └── index.ts                      # Plugin entry point
 │   ├── test/                             # 25 passing tests
 │   └── package.json                      # @vstack/opencode v0.1.0
@@ -52,30 +42,34 @@ vstack/
 | **Plugin loads Playbook skills** | ✅ Works | `findAgentsSkillsRoot` finds playbook/skills/ |
 | **Plugin provisions Playbook agents** | ✅ Works | Adapters from playbook/agents/adapters/opencode/ |
 | **Persistence layer** | ✅ Working | file-store, locks, atomic-write, event-log, repo root |
-| **Memory store** | ✅ New | CRUD, categories, search, supersede, index |
-| **Delivery store** | ✅ New | CRUD, status transitions, simple model |
-| **Task store** | ✅ New | CRUD, dependencies, cycles, ready tasks (no phase coupling) |
-| **Agent run store** | ✅ New | Dispatch tracking, handoff recording |
-| **History service** | ✅ New | Event querying, stats |
-| **Check service** | ✅ New | Discover, execute, evidence recording |
-| **Tools** | ✅ New | ~7 cohesive tools (status, memory, history, delivery, task, agent, check) |
+| **Memory store** | ✅ | CRUD, categories, search, supersede, index |
+| **Delivery store** | ✅ | CRUD, status transitions, simple model |
+| **Task store** | ✅ | CRUD, dependencies, cycles, ready tasks (no phase coupling) |
+| **Agent run store** | ✅ | Dispatch tracking, handoff recording |
+| **History service** | ✅ | Event querying, stats |
+| **Check service** | ✅ | Discover, execute, evidence recording |
+| **Enforcement service** | ✅ | 5 basic rules: completion checks, blocked reason, approval |
+| **Tools** | ✅ | ~7 cohesive tools (status, memory, history, delivery, task, agent, check) |
+| **Agent dispatch** | ✅ | Integrated with agentRunStore, proper handoff |
 | **Tests** | ✅ 25/25 PASS | All unit tests pass, typecheck passes |
 
-## Phase 3 Acceptance Criteria — ALL MET
+## Phase 4 Acceptance Criteria — ALL MET
 
-- [x] Delivery and tasks persist across OpenCode restarts
-- [x] Task dependencies validated and ready tasks correctly identified
-- [x] Concurrent updates don't silently overwrite newer state
-- [x] Memory can be searched/read/updated across separate sessions
-- [x] Memory is distinct from history and current delivery/task state
-- [x] Previous data preserved during migration
+- [x] Lead can dispatch Builder and Reviewer sessions and relate them to tasks
+- [x] Session outcomes are persisted and visible after restart
+- [x] Interrupted sessions are marked honestly and can be resumed deliberately
+- [x] A check run by the plugin records the actual observed result
+- [x] Required evidence is checked before a protected completion transition
+- [x] Approval state is recorded and the supported OpenCode permission boundary is tested
+- [x] Plugin tools remain small and understandable
+- [x] No generic workflow engine or scheduler has been introduced
 
-## Next Actions (Phase 4 — Agent Coordination & Enforcement)
+## Next Actions (Phase 5 — OpenChamber Visualization)
 
-1. Implement agent dispatch integration with new stores
-2. Add evidence/check recording to agent workflows
-3. Implement basic completion checks (required evidence, blocking findings)
-4. Implement explicit approval requirements for protected actions
-4. Verify enforcement boundaries and test bypass paths
-5. Update dashboard projection for OpenChamber
-6. Test sequential and parallel delivery with native session APIs
+1. Audit existing OpenChamber UI components
+2. Define dashboard projection contract
+3. Extend OpenCode index generator to publish summary/read-model data
+4. Refactor OpenChamber data layer to read only projections
+5. Remove direct reads of delivery/task/evidence internals
+6. Implement freshness, loading, stale and unavailable states
+7. Validate SDK methods and extension metadata

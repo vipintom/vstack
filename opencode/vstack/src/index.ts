@@ -17,6 +17,7 @@ import { createTaskStore } from "./tasks/task-store.js";
 import { createAgentRunStore } from "./agents/agent-run-store.js";
 import { createHistoryService } from "./history/history-service.js";
 import { createCheckService } from "./quality/check-service.js";
+import { createEnforcementService } from "./enforcement/enforcement-service.js";
 import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
@@ -40,21 +41,22 @@ export default Plugin.define({
     console.log(`[vstack] Dashboard index initialized: revision ${initialIndex.revision}`);
     
     // Initialize core services (simplified runtime)
+    // New simplified stores
+    const memoryStore = await createMemoryStore(vstackRoot);
+    const deliveryStore = await createDeliveryStore(vstackRoot);
+    const taskStore = await createTaskStore(vstackRoot);
+    const historyService = await createHistoryService(vstackRoot);
+    const checkService = await createCheckService(vstackRoot);
+    const enforcementService = await createEnforcementService(vstackRoot);
+    const agentRunStore = await createAgentRunStore(vstackRoot);
+    
     const agentDispatchConfig = {
       defaultModel: null,
       maxSteps: { default: 50 },
       defaultPermissions: ["read", "glob", "grep", "edit", "shell", "tool", "subagent", "skill"],
       enableWorktrees: false,
     };
-    const agentDispatch = createAgentDispatch(vstackRoot, agentDispatchConfig, ctx);
-    
-    // New simplified stores
-    const memoryStore = await createMemoryStore(vstackRoot);
-    const deliveryStore = await createDeliveryStore(vstackRoot);
-    const taskStore = await createTaskStore(vstackRoot);
-    const agentRunStore = await createAgentRunStore(vstackRoot);
-    const historyService = await createHistoryService(vstackRoot);
-    const checkService = await createCheckService(vstackRoot);
+    const agentDispatch = createAgentDispatch(vstackRoot, agentDispatchConfig, ctx, agentRunStore);
     
     // Legacy services (kept for compatibility during transition)
     const lifecycleEngine = await import("./lifecycle/lifecycle-engine.js").then(m => m.createLifecycleEngine(vstackRoot));
@@ -123,6 +125,7 @@ export default Plugin.define({
                 agentRunStore,
                 historyService,
                 checkService,
+                enforcementService,
                 agentDispatch,
                 // Legacy services (for compatibility)
                 lifecycleEngine,

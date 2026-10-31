@@ -33,7 +33,7 @@ export const agentTool: VstackTool = {
   },
   execute: async (input, context) => {
     const { vstack } = context;
-    const { agentRunStore, agentDispatch } = vstack;
+    const { agentRunStore, agentDispatch, taskStore, deliveryStore } = vstack;
     
     switch (input.action) {
       case "dispatch": {
@@ -41,33 +41,26 @@ export const agentTool: VstackTool = {
           return { content: JSON.stringify({ error: "deliveryId, agentId, sessionId, objective required" }) };
         }
         
-        // Extract role from agentId
-        const role = input.agentId.replace("vstack-", "") as "lead" | "builder" | "reviewer";
+        // Get delivery and task if provided
+        const delivery = await deliveryStore.getDelivery(input.deliveryId);
+        if (!delivery) return { content: JSON.stringify({ error: "Delivery not found" }) };
+        
+        let task = null;
+        if (input.taskId) {
+          task = await taskStore.getTask(input.taskId);
+        }
         
         // Use the agent dispatch to start the session
         const dispatchResult = await agentDispatch.dispatchAgent({
-          deliveryId: input.deliveryId,
-          taskId: input.taskId || null,
+          delivery,
+          task,
           agentId: input.agentId,
-          sessionId: input.sessionId,
-          objective: input.objective,
-          contextReferences: input.contextReferences || [],
           worktreePath: input.worktreePath || null,
+          customPrompt: input.objective,
+          contextFiles: input.contextReferences || [],
         });
         
-        // Record the agent run
-        const agentRun = await agentRunStore.createAgentRun({
-          deliveryId: input.deliveryId,
-          taskId: input.taskId || null,
-          agentId: input.agentId,
-          sessionId: input.sessionId,
-          role,
-          objective: input.objective,
-          contextReferences: input.contextReferences || [],
-          worktreePath: input.worktreePath || null,
-        });
-        
-        return { content: JSON.stringify({ agentRun, dispatchResult }) };
+        return { content: JSON.stringify({ dispatchResult }) };
       }
       
       case "get": {

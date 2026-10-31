@@ -3,6 +3,8 @@
  */
 
 import { VstackTool } from "./index.js";
+import { resolve } from "node:path";
+import { listFiles, readJsonFile } from "../persistence/file-store.js";
 
 export const taskTool: VstackTool = {
   name: "vstack_task",
@@ -12,7 +14,7 @@ export const taskTool: VstackTool = {
     properties: {
       action: { 
         type: "string", 
-        enum: ["create", "get", "list", "update", "add-dependency", "remove-dependency", "ready", "dependencies", "dependents"],
+        enum: ["create", "get", "list", "update", "add-dependency", "remove-dependency", "ready", "dependencies", "dependents", "can-complete"],
         description: "Action to perform" 
       },
       deliveryId: { type: "string", description: "Delivery ID (required for create/list/ready)" },
@@ -33,12 +35,13 @@ export const taskTool: VstackTool = {
       resultSummary: { type: "string", description: "Result summary (for update)" },
       evidenceIds: { type: "array", items: { type: "string" }, description: "Evidence IDs (for update)" },
       dependsOnTaskId: { type: "string", description: "Dependency to add/remove (for add-dependency/remove-dependency)" },
+      blockedReason: { type: "string", description: "Reason for blocking (for update when status=blocked)" },
     },
     required: ["action"],
   },
   execute: async (input, context) => {
     const { vstack } = context;
-    const { taskStore } = vstack;
+    const { taskStore, deliveryStore, enforcementService, vstackRoot } = vstack;
     
     switch (input.action) {
       case "create": {
@@ -81,6 +84,37 @@ export const taskTool: VstackTool = {
       
       case "update": {
         if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        
+        // Enforcement: check if task can be completed
+        if (input.status === "completed") {
+          // Find delivery for task
+          const deliveryDirs = listFiles(vstackRoot, resolve(vstackRoot.deliveries));
+          let foundDeliveryId: string | null = null;
+          
+          for (const dir of deliveryDirs) {
+            const t = await readJsonFile(vstack, resolve(vstackRoot.deliveries, dir, "tasks", `${input.taskId}.json`));
+            if (t) {
+              foundDeliveryId = dir;
+              break;
+            }
+          }
+          
+          if (foundDeliveryId) {
+            const enforcement = await enforcementService.canCompleteTask(foundDeliveryId, input.taskId);
+            if (!enforcement.allowed) {
+              return { content: JSON.stringify({ 
+                error: "Task cannot be completed", 
+                reasons: enforcement.reasons 
+              }) };
+            }
+          }
+        }
+        
+        // Enforcement: blocked status requires reason
+        if (input.status === "blocked" && !input.blockedReason) {
+          return { content: JSON.stringify({ error: "Blocked status requires a reason (blockedReason)" }) };
+        }
+        
         const updates: any = {};
         if (input.status) updates.status = input.status;
         if (input.resultSummary) updates.resultSummary = input.resultSummary;
@@ -88,6 +122,7 @@ export const taskTool: VstackTool = {
         if (input.assignedAgentId) updates.assignedAgentId = input.assignedAgentId;
         if (input.title) updates.title = input.title;
         if (input.description) updates.description = input.description;
+        if (input.blockedReason) updates.blocker = { type: "technical", message: input.blockedReason, details: {}, at: new Date().toISOString(), blockingTaskIds: [] };
         const task = await taskStore.updateTask(input.taskId, updates);
         return { content: JSON.stringify({ task }) };
       }
@@ -122,11 +157,30 @@ export const taskTool: VstackTool = {
       
       case "dependents": {
         if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
-        // Need deliveryId for this
         const task = await taskStore.getTask(input.taskId);
         if (!task) return { content: JSON.stringify({ error: "Task not found" }) };
         const deps = await taskStore.getTaskDependents(task.deliveryId, input.taskId);
         return { content: JSON.stringify({ dependents: deps }) };
+      }
+      
+      case "can-complete": {
+        if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        // Find delivery for task
+        const deliveryDirs = listFiles(vstackRoot, resolve(vstackRoot.deliveries));
+        let foundDeliveryId: string | null = null;
+        
+        for (const dir of deliveryDirs) {
+          const t = await readJsonFile(vstack, resolve(vstackRoot.deliveries, dir, "tasks", `${input.taskId}.json`));
+          if (t) {
+            foundDeliveryId = dir;
+            break;
+          }
+        }
+        
+        if (!foundDeliveryId) return { content: JSON.stringify({ error: "Task not found" }) };
+        
+        const enforcement = await enforcementService.canCompleteTask(foundDeliveryId, input.taskId);
+        return { content: JSON.stringify({ enforcement }) };
       }
       
       default:
