@@ -1,195 +1,138 @@
 /**
- * Task tools
- * Manage task creation, assignment, and tracking
+ * vstack_task - Create, get, list, update tasks, add dependencies, identify ready tasks
  */
 
-import type { VstackTool } from "./index.js";
+import { VstackTool } from "./index.js";
 
-export const taskTools: VstackTool[] = [
-  {
-    name: "vstack_plan_set",
-    description: "Record plan metadata and artifact path",
-    input: {
-      type: "object",
-      properties: {
-        deliveryId: { type: "string" },
-        phaseRunId: { type: "string" },
-        planPath: { type: "string" },
-        steps: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              stepId: { type: "string" },
-              title: { type: "string" },
-              description: { type: "string" },
-              acceptanceCriteria: { type: "array", items: { type: "string" } },
-              dependsOn: { type: "array", items: { type: "string" } },
-            },
-            required: ["stepId", "title", "description"],
-          },
-        },
+export const taskTool: VstackTool = {
+  name: "vstack_task",
+  description: "Manage tasks: create, get, list, update, add/remove dependencies, get ready tasks",
+  input: {
+    type: "object",
+    properties: {
+      action: { 
+        type: "string", 
+        enum: ["create", "get", "list", "update", "add-dependency", "remove-dependency", "ready", "dependencies", "dependents"],
+        description: "Action to perform" 
       },
-      required: ["deliveryId", "phaseRunId", "planPath", "steps"],
-      additionalProperties: false,
+      deliveryId: { type: "string", description: "Delivery ID (required for create/list/ready)" },
+      taskId: { type: "string", description: "Task ID (for get/update/dependencies)" },
+      title: { type: "string", description: "Title (for create)" },
+      description: { type: "string", description: "Description (for create)" },
+      type: { type: "string", enum: ["discovery", "design", "planning", "implementation", "testing", "review", "documentation", "release", "deployment", "operations", "other"], description: "Task type (for create)" },
+      priority: { type: "string", enum: ["low", "medium", "high", "critical"], description: "Priority (for create)" },
+      dependencies: { type: "array", items: { type: "string" }, description: "Dependency task IDs (for create/add-dependency)" },
+      acceptanceCriteria: { type: "array", items: { type: "string" }, description: "Acceptance criteria (for create)" },
+      expectedOutputs: { type: "array", items: { type: "string" }, description: "Expected outputs (for create)" },
+      requiredSkills: { type: "array", items: { type: "string" }, description: "Required skills (for create)" },
+      workScope: { type: "string", description: "Work scope/files (for create)" },
+      worktreePath: { type: "string", description: "Worktree path (for create)" },
+      maxAttempts: { type: "number", description: "Max attempts (for create, default 3)" },
+      assignedAgentId: { type: "string", description: "Assigned agent ID (for create/update)" },
+      status: { type: "string", enum: ["pending", "ready", "assigned", "in_progress", "review", "completed", "blocked", "failed", "cancelled", "skipped", "needs_rework"], description: "New status (for update)" },
+      resultSummary: { type: "string", description: "Result summary (for update)" },
+      evidenceIds: { type: "array", items: { type: "string" }, description: "Evidence IDs (for update)" },
+      dependsOnTaskId: { type: "string", description: "Dependency to add/remove (for add-dependency/remove-dependency)" },
     },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ success: true, stepsCreated: input.steps.length }) };
-    },
+    required: ["action"],
   },
-  
-  {
-    name: "vstack_task_create",
-    description: "Create a task with owner, phase, acceptance criteria",
-    input: {
-      type: "object",
-      properties: {
-        deliveryId: { type: "string" },
-        phaseRunId: { type: "string" },
-        title: { type: "string" },
-        description: { type: "string" },
-        type: { type: "string", enum: ["discovery", "design", "planning", "implementation", "testing", "review", "documentation", "release", "deployment", "operations", "other"] },
-        priority: { type: "string", enum: ["low", "medium", "high", "critical"] },
-        dependencies: { type: "array", items: { type: "string" } },
-        acceptanceCriteria: { type: "array", items: { type: "string" } },
-        expectedOutputs: { type: "array", items: { type: "string" } },
-        requiredSkills: { type: "array", items: { type: "string" } },
-        workScope: { type: "string" },
-        maxAttempts: { type: "number", default: 3 },
-        ownerAgentId: { type: "string" },
-      },
-      required: ["deliveryId", "phaseRunId", "title", "description", "type"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ taskId: "tsk_123", status: "created" }) };
-    },
+  execute: async (input, context) => {
+    const { vstack } = context;
+    const { taskStore } = vstack;
+    
+    switch (input.action) {
+      case "create": {
+        if (!input.deliveryId || !input.title || !input.description) {
+          return { content: JSON.stringify({ error: "deliveryId, title, description required" }) };
+        }
+        const task = await taskStore.createTask({
+          deliveryId: input.deliveryId,
+          title: input.title,
+          description: input.description,
+          type: (input.type as any) || "implementation",
+          priority: (input.priority as any) || "medium",
+          dependencies: input.dependencies || [],
+          acceptanceCriteria: input.acceptanceCriteria || [],
+          expectedOutputs: input.expectedOutputs || [],
+          requiredSkills: input.requiredSkills || [],
+          workScope: input.workScope || "",
+          worktreePath: input.worktreePath || null,
+          maxAttempts: input.maxAttempts || 3,
+          assignedAgentId: input.assignedAgentId || null,
+        });
+        return { content: JSON.stringify({ task }) };
+      }
+      
+      case "get": {
+        if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        const task = await taskStore.getTask(input.taskId);
+        return { content: JSON.stringify({ task }) };
+      }
+      
+      case "list": {
+        if (!input.deliveryId) return { content: JSON.stringify({ error: "deliveryId required" }) };
+        const tasks = await taskStore.listTasks(input.deliveryId, {
+          status: input.status as any,
+          type: input.type as any,
+          assignedAgentId: input.assignedAgentId,
+        });
+        return { content: JSON.stringify({ tasks }) };
+      }
+      
+      case "update": {
+        if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        const updates: any = {};
+        if (input.status) updates.status = input.status;
+        if (input.resultSummary) updates.resultSummary = input.resultSummary;
+        if (input.evidenceIds) updates.evidenceIds = input.evidenceIds;
+        if (input.assignedAgentId) updates.assignedAgentId = input.assignedAgentId;
+        if (input.title) updates.title = input.title;
+        if (input.description) updates.description = input.description;
+        const task = await taskStore.updateTask(input.taskId, updates);
+        return { content: JSON.stringify({ task }) };
+      }
+      
+      case "add-dependency": {
+        if (!input.taskId || !input.dependsOnTaskId) {
+          return { content: JSON.stringify({ error: "taskId and dependsOnTaskId required" }) };
+        }
+        const task = await taskStore.addDependency(input.taskId, input.dependsOnTaskId);
+        return { content: JSON.stringify({ task }) };
+      }
+      
+      case "remove-dependency": {
+        if (!input.taskId || !input.dependsOnTaskId) {
+          return { content: JSON.stringify({ error: "taskId and dependsOnTaskId required" }) };
+        }
+        const task = await taskStore.removeDependency(input.taskId, input.dependsOnTaskId);
+        return { content: JSON.stringify({ task }) };
+      }
+      
+      case "ready": {
+        if (!input.deliveryId) return { content: JSON.stringify({ error: "deliveryId required" }) };
+        const tasks = await taskStore.getReadyTasks(input.deliveryId);
+        return { content: JSON.stringify({ tasks }) };
+      }
+      
+      case "dependencies": {
+        if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        const deps = await taskStore.getTaskDependencies(input.taskId);
+        return { content: JSON.stringify({ dependencies: deps }) };
+      }
+      
+      case "dependents": {
+        if (!input.taskId) return { content: JSON.stringify({ error: "taskId required" }) };
+        // Need deliveryId for this
+        const task = await taskStore.getTask(input.taskId);
+        if (!task) return { content: JSON.stringify({ error: "Task not found" }) };
+        const deps = await taskStore.getTaskDependents(task.deliveryId, input.taskId);
+        return { content: JSON.stringify({ dependents: deps }) };
+      }
+      
+      default:
+        return { content: JSON.stringify({ error: "Invalid action" }) };
+    }
   },
-  
-  {
-    name: "vstack_task_update",
-    description: "Change task state through validated transitions",
-    input: {
-      type: "object",
-      properties: {
-        taskId: { type: "string" },
-        status: { type: "string", enum: ["pending", "ready", "assigned", "in_progress", "review", "completed", "blocked", "failed", "cancelled", "skipped", "needs_rework"] },
-        priority: { type: "string", enum: ["low", "medium", "high", "critical"] },
-        workScope: { type: "string" },
-        acceptanceCriteria: { type: "array", items: { type: "string" } },
-        expectedOutputs: { type: "array", items: { type: "string" } },
-        resultSummary: { type: "string" },
-      },
-      required: ["taskId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ success: true, taskId: input.taskId }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_assign",
-    description: "Assign an agent/session to a task",
-    input: {
-      type: "object",
-      properties: {
-        taskId: { type: "string" },
-        agentId: { type: "string" },
-        sessionId: { type: "string" },
-      },
-      required: ["taskId", "agentId", "sessionId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ success: true, taskId: input.taskId }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_ready",
-    description: "Return eligible tasks whose dependencies are satisfied",
-    input: {
-      type: "object",
-      properties: {
-        deliveryId: { type: "string" },
-        phaseRunId: { type: "string" },
-      },
-      required: ["deliveryId", "phaseRunId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ readyTasks: [] }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_get",
-    description: "Retrieve task detail",
-    input: {
-      type: "object",
-      properties: {
-        taskId: { type: "string" },
-      },
-      required: ["taskId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ task: { id: input.taskId } }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_list",
-    description: "List tasks by delivery/phase/status/owner",
-    input: {
-      type: "object",
-      properties: {
-        deliveryId: { type: "string" },
-        phaseRunId: { type: "string" },
-        status: { type: "array", items: { type: "string" } },
-        ownerAgentId: { type: "string" },
-      },
-      required: ["deliveryId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ tasks: [] }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_dependency_add",
-    description: "Add a validated dependency (rejects cycles)",
-    input: {
-      type: "object",
-      properties: {
-        taskId: { type: "string" },
-        dependsOnTaskId: { type: "string" },
-      },
-      required: ["taskId", "dependsOnTaskId"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ success: true }) };
-    },
-  },
-  
-  {
-    name: "vstack_task_complete",
-    description: "Complete task with required result/evidence references",
-    input: {
-      type: "object",
-      properties: {
-        taskId: { type: "string" },
-        resultSummary: { type: "string" },
-        evidenceIds: { type: "array", items: { type: "string" } },
-      },
-      required: ["taskId", "resultSummary", "evidenceIds"],
-      additionalProperties: false,
-    },
-    execute: async (input: any, context: any) => {
-      return { content: JSON.stringify({ success: true, taskId: input.taskId }) };
-    },
-  },
-];
+};
+
+export const taskTools = [taskTool];

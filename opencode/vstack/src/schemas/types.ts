@@ -343,6 +343,7 @@ export interface AgentRun {
   completedAt: string | null;
   resultSummary: string | null;
   error: string | null;
+  handoffSummary: string | null;
   revision: number;
 }
 

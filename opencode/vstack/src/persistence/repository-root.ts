@@ -15,6 +15,7 @@ export interface VstackPaths {
   events: string;         // .vstack/state/events.jsonl
   index: string;          // .vstack/state/index.json
   manifest: string;       // .vstack/manifest.json
+  memory: string;         // .vstack/memory/
 }
 
 export class VstackPathError extends Error {
@@ -68,6 +69,7 @@ export async function resolveVstackRoot(projectRoot: string): Promise<VstackPath
     events: resolve(vstackRoot, "state", "events.jsonl"),
     index: resolve(vstackRoot, "state", "index.json"),
     manifest: resolve(vstackRoot, "manifest.json"),
+    memory: resolve(vstackRoot, "memory"),
   };
 }
 
@@ -83,6 +85,7 @@ export async function ensureVstackDirs(paths: VstackPaths): Promise<void> {
     paths.config,
     paths.reports,
     paths.locks,
+    paths.memory,
   ];
 
   for (const dir of dirs) {

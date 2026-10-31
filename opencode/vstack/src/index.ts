@@ -5,24 +5,20 @@
 
 import { Plugin } from "@opencode/plugin";
 import { vstackTools } from "./tools/index.js";
-import { createLifecycleEngine } from "./lifecycle/lifecycle-engine.js";
-import { createTaskService } from "./tasks/task-service.js";
-import { createSessionTracker } from "./orchestration/session-tracker.js";
 import { createAgentDispatch } from "./orchestration/agent-dispatch.js";
-import { GateRegistry } from "./quality/gates.js";
-import { createReviewOrchestrator } from "./reviews/review-orchestrator.js";
-import { createReleaseManager } from "./release/release-preparation.js";
-import { createDeploymentManager } from "./release/deployment.js";
-import { createRollbackManager } from "./release/rollback.js";
-import { createPostReleaseManager } from "./release/post-release.js";
-import { createPolicyManager } from "./policy/permissions.js";
-import { performRecovery } from "./recovery/recovery-manager.js";
 import { resolveVstackRoot, ensureVstackDirs } from "./persistence/repository-root.js";
 import { initializeEventLog } from "./persistence/event-log.js";
 import { initializeRuntimeState, refreshRuntimeState } from "./runtime/state.js";
 import { loadSkillsFromDirectory, findAgentsSkillsRoot } from "./skills/skill-loader.js";
 import { installAgents } from "./agents/agent-installer.js";
+import { createMemoryStore } from "./memory/memory-store.js";
+import { createDeliveryStore } from "./deliveries/delivery-store.js";
+import { createTaskStore } from "./tasks/task-store.js";
+import { createAgentRunStore } from "./agents/agent-run-store.js";
+import { createHistoryService } from "./history/history-service.js";
+import { createCheckService } from "./quality/check-service.js";
 import { join, resolve } from "node:path";
+import { existsSync } from "node:fs";
 
 export default Plugin.define({
   id: "vstack",
@@ -43,10 +39,7 @@ export default Plugin.define({
     const initialIndex = await initializeRuntimeState(vstackRoot);
     console.log(`[vstack] Dashboard index initialized: revision ${initialIndex.revision}`);
     
-    // Initialize core services
-    const lifecycleEngine = await createLifecycleEngine(vstackRoot);
-    const taskService = await createTaskService(vstackRoot);
-    const sessionTracker = await createSessionTracker(vstackRoot);
+    // Initialize core services (simplified runtime)
     const agentDispatchConfig = {
       defaultModel: null,
       maxSteps: { default: 50 },
@@ -54,15 +47,20 @@ export default Plugin.define({
       enableWorktrees: false,
     };
     const agentDispatch = createAgentDispatch(vstackRoot, agentDispatchConfig, ctx);
-    const qualityGates = new GateRegistry();
-    const reviewOrchestrator = createReviewOrchestrator(vstackRoot);
-    const releaseManager = createReleaseManager(vstackRoot);
-    const deploymentManager = createDeploymentManager(vstackRoot);
-    const rollbackManager = createRollbackManager(vstackRoot);
-    const postReleaseManager = createPostReleaseManager(vstackRoot);
-    const policyManager = createPolicyManager(vstackRoot);
     
-    // Load skills from agents-skills package
+    // New simplified stores
+    const memoryStore = await createMemoryStore(vstackRoot);
+    const deliveryStore = await createDeliveryStore(vstackRoot);
+    const taskStore = await createTaskStore(vstackRoot);
+    const agentRunStore = await createAgentRunStore(vstackRoot);
+    const historyService = await createHistoryService(vstackRoot);
+    const checkService = await createCheckService(vstackRoot);
+    
+    // Legacy services (kept for compatibility during transition)
+    const lifecycleEngine = await import("./lifecycle/lifecycle-engine.js").then(m => m.createLifecycleEngine(vstackRoot));
+    const legacyTaskService = await import("./tasks/task-service.js").then(m => m.createTaskService(vstackRoot));
+    
+    // Load skills from playbook package (preferred) or agents-skills (legacy)
     const skillsRoot = findAgentsSkillsRoot(projectRoot, vstackRoot.root);
     if (skillsRoot) {
       const skills = await loadSkillsFromDirectory(join(skillsRoot, "skills"));
@@ -82,9 +80,14 @@ export default Plugin.define({
       });
     }
     
-    // Install agent definitions from agents-skills
+    // Install agent definitions from playbook adapters (preferred) or agents-skills (legacy)
     if (skillsRoot) {
-      const agentSourceDir = join(skillsRoot, "agents", "opencode-v2");
+      // Try playbook adapters first
+      let agentSourceDir = join(skillsRoot, "agents", "adapters", "opencode");
+      if (!existsSync(agentSourceDir)) {
+        // Fallback to legacy agents-skills
+        agentSourceDir = join(skillsRoot, "agents", "opencode-v2");
+      }
       const agentTargetDir = join(projectRoot, ".opencode", "agents");
       const statePath = join(vstackRoot.root, "agents.json");
       
@@ -113,17 +116,17 @@ export default Plugin.define({
             const result = await tool.execute(input, { 
               ...context, 
               vstack: {
-                lifecycleEngine,
-                taskService,
-                sessionTracker,
+                // New simplified services
+                memoryStore,
+                deliveryStore,
+                taskStore,
+                agentRunStore,
+                historyService,
+                checkService,
                 agentDispatch,
-                qualityGates,
-                reviewOrchestrator,
-                releaseManager,
-                deploymentManager,
-                rollbackManager,
-                postReleaseManager,
-                policyManager,
+                // Legacy services (for compatibility)
+                lifecycleEngine,
+                legacyTaskService,
                 vstackRoot,
               }
             });
@@ -205,6 +208,7 @@ export default Plugin.define({
     });
     
     // Run recovery on startup
+    const { performRecovery } = await import("./recovery/recovery-manager.js");
     const recoveryResults = await performRecovery(vstackRoot);
     if (recoveryResults.length > 0) {
       console.log(`[vstack] Recovery completed: ${recoveryResults.length} deliveries recovered`);

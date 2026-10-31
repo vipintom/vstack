@@ -99,6 +99,7 @@ export async function createOrchestrator(
         completedAt: null,
         resultSummary: null,
         error: null,
+        handoffSummary: null,
         revision: 1,
       };
       

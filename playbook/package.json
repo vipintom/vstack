@@ -1,0 +1,35 @@
+{
+  "name": "@vstack/playbook",
+  "version": "0.1.0",
+  "description": "vstack Engineering Playbook — portable principles, roles, skills, and workflows for AI-assisted software development",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "principles",
+    "agents",
+    "skills",
+    "workflows",
+    "resources"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate-content.js",
+    "test:install": "node scripts/test-install.js"
+  },
+  "keywords": [
+    "vstack",
+    "playbook",
+    "engineering",
+    "ai-agents",
+    "skills",
+    "workflows"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

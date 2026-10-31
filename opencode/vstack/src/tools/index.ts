@@ -1,55 +1,45 @@
 /**
  * vstack Tools - Main export
- * Registers all tools under vstack_* namespace
+ * Registers ~7 cohesive tools under vstack_* namespace
  */
 
-// Local tool definition type (matches what ctx.tool.transform editor.add expects)
 export interface VstackTool {
   name: string;
   description: string;
-  input: Record<string, unknown>; // JSON Schema
+  input: Record<string, unknown>;
   execute: (input: any, context: any) => Promise<{ content: string }>;
 }
 
+import { statusTools } from "./status-tools.js";
+import { memoryTools } from "./memory-tools.js";
+import { historyTools } from "./history-tools.js";
 import { deliveryTools } from "./delivery-tools.js";
-import { workflowTools } from "./workflow-tools.js";
 import { taskTools } from "./task-tools.js";
 import { agentTools } from "./agent-tools.js";
-import { qualityTools } from "./quality-tools.js";
-import { reviewTools } from "./review-tools.js";
-import { releaseTools } from "./release-tools.js";
+import { checkTools } from "./check-tools.js";
 
 export const vstackTools: VstackTool[] = [
+  ...statusTools,
+  ...memoryTools,
+  ...historyTools,
   ...deliveryTools,
-  ...workflowTools,
   ...taskTools,
   ...agentTools,
-  ...qualityTools,
-  ...reviewTools,
-  ...releaseTools,
+  ...checkTools,
 ];
 
-/**
- * Get all tools grouped by namespace
- */
 export const toolsByNamespace = {
+  status: statusTools,
+  memory: memoryTools,
+  history: historyTools,
   delivery: deliveryTools,
-  workflow: workflowTools,
   task: taskTools,
   agent: agentTools,
-  quality: qualityTools,
-  review: reviewTools,
-  release: releaseTools,
+  check: checkTools,
 };
 
-/**
- * Get tool by name
- */
 export function getToolByName(name: string) {
   return vstackTools.find(t => t.name === name);
 }
 
-/**
- * Get all tool names
- */
 export const allToolNames = vstackTools.map(t => t.name);

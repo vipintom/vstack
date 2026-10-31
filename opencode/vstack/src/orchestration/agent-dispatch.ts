@@ -92,6 +92,7 @@ export async function createAgentDispatch(
         completedAt: null,
         resultSummary: null,
         error: null,
+        handoffSummary: null,
         revision: 1,
       };
       

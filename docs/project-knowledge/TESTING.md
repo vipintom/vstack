@@ -68,6 +68,8 @@ Tests  25 passed (25)
 | 2026-11-01 | openchamber/vstack-panel | pnpm typecheck | PASS | No TS errors |
 | 2026-11-01 | openchamber/vstack-panel | pnpm build | FAIL | @openchamber/sdk unavailable |
 | 2026-11-01 | root | pnpm build | FAIL | Two packages fail |
+| **2026-11-01** | **opencode/vstack** | **pnpm typecheck** | **PASS** | **After Evidence revision fix (ADR-0001)** |
+| **2026-11-01** | **opencode/vstack** | **pnpm test** | **25/25 PASS** | **Post-fix regression check** |
 
 ## Required Test Additions (Per Plan Section 11)
 

@@ -96,14 +96,17 @@ export async function loadSkillsFromDirectory(skillsRoot: string): Promise<Loade
 }
 
 /**
- * Locate the agents-skills package. Checks an explicit override, the
+ * Locate the agents-skills package or playbook. Checks an explicit override, the
  * project's node_modules, then the monorepo sibling layout used in development.
  */
 export function findAgentsSkillsRoot(projectRoot: string, pluginRoot?: string): string | null {
   const candidates = [
     process.env.VSTACK_AGENTS_SKILLS,
+    process.env.VSTACK_PLAYBOOK,
     join(projectRoot, "node_modules", "@vstack", "agents-skills"),
+    join(projectRoot, "node_modules", "@vstack", "playbook"),
     pluginRoot ? join(pluginRoot, "..", "..", "agents-skills") : undefined,
+    pluginRoot ? join(pluginRoot, "..", "..", "playbook") : undefined,
   ].filter((candidate): candidate is string => Boolean(candidate));
 
   for (const candidate of candidates) {

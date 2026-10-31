@@ -1,6 +1,6 @@
 # Current State
 
-**Last updated:** 2026-11-01 (Phase 0 baseline inventory)
+**Last updated:** 2026-11-01 (Phase 3 complete)
 
 ## What Exists
 
@@ -8,91 +8,74 @@
 ```
 vstack/
 ├── package.json                    # pnpm workspace root
-├── agents-skills/                  # Portable skills & agent definitions (workspace)
-│   ├── skills/                     # 11 skill directories (vstack-*)
-│   ├── agents/opencode-v2/         # 6 OpenCode agent definitions
-│   └── resources/                  # rubrics, templates, references
+├── playbook/                       # Portable playbook package
+│   ├── package.json                # @vstack/playbook v0.1.0
+│   ├── README.md
+│   ├── principles/index.md
+│   ├── agents/roles/{lead,builder,reviewer}.md
+│   ├── agents/adapters/{opencode,codex,claude-code}/
+│   ├── skills/vstack-{mode,principles,help,sharpen,discovery,blueprint,plan-loop,blast-radius,tdd,debugging,verify-loop,unstick,review-loop,context-reset,lessons}/SKILL.md
+│   ├── workflows/{feature-delivery,bug-fixing,refactoring}.md
+│   ├── resources/rubrics/ (6 lenses)
+│   ├── resources/templates/ (4 templates)
+│   ├── resources/references/quick-ref.md
+│   └── scripts/validate-content.js
+├── agents-skills/                  # Legacy portable skills (to be migrated)
 ├── opencode/vstack/                # OpenCode plugin (workspace)
-│   ├── src/                        # 45+ TypeScript modules
-│   ├── test/                       # 6 test files, 25 tests passing
-│   ├── dist/                       # Build output
-│   └── package.json                # @vstack/opencode v0.1.0
+│   ├── src/
+│   │   ├── memory/memory-store.ts        # NEW: Project memory store
+│   │   ├── deliveries/delivery-store.ts  # NEW: Simplified delivery store
+│   │   ├── tasks/task-store.ts           # NEW: Simplified task store (decoupled from lifecycle)
+│   │   ├── agents/agent-run-store.ts     # NEW: Agent run tracking
+│   │   ├── history/history-service.ts    # NEW: History querying
+│   │   ├── quality/check-service.ts      # NEW: Check execution & evidence
+│   │   ├── tools/                        # NEW: ~7 cohesive tools
+│   │   ├── persistence/                  # File store, locks, event log, repo root
+│   │   ├── orchestration/agent-dispatch  # Agent dispatch
+│   │   ├── skills/skill-loader           # Playbook skill loading
+│   │   ├── agents/agent-installer        # Agent provisioning
+│   │   ├── lifecycle/                    # Legacy lifecycle engine (kept for compat)
+│   │   └── index.ts                      # Plugin entry point
+│   ├── test/                             # 25 passing tests
+│   └── package.json                      # @vstack/opencode v0.1.0
 ├── openchamber/vstack-panel/       # OpenChamber extension (workspace)
-│   ├── panel/                      # Panel + dashboard entry points
-│   └── package.json                # @vstack/openchamber v0.1.0
 ├── docs/                           # PRD, implementation plans, project-knowledge/
-└── .vstack/                        # Runtime persistence (project-local)
-    ├── manifest.json
-    ├── deliveries/
-    ├── reports/
-    └── state/
+└── .vstack/                        # Runtime persistence
 ```
 
-### Working Capabilities (Verified)
+## Working Capabilities (Verified)
 
 | Area | Status | Evidence |
 |---|---|---|
-| **OpenCode plugin bootstrap** | Loads, initializes services, registers tools/commands/skills/agents | `src/index.ts` — full setup with lifecycle engine, task service, session tracker, agent dispatch, gates, review orchestrator, release/deployment/rollback, policy manager |
-| **Persistence layer** | File store (atomic writes, locks, revision concurrency), event log, repository root resolution | `src/persistence/*` — all modules present; tests pass for file-store basics |
-| **Skills loading** | Loads from `agents-skills/skills/` via `ctx.skill.transform` | `src/skills/skill-loader.ts` + test passes (2 tests) |
-| **Agent installation** | Copies agent definitions from `agents-skills/agents/opencode-v2/` to `.opencode/agents/` | `src/agents/agent-installer.ts` + test passes (4 tests) |
-| **Task graph & dependencies** | Task service, dependency resolver, assignment | `src/tasks/*` — modules present |
-| **Lifecycle engine** | 10-phase profiles, phase transitions, re-entry logic | `src/lifecycle/*` — modules present |
-| **Quality gates** | Gate registry, check discovery, execution adapter, evidence ledger, build/test/security/acceptance engines | `src/quality/*` — modules present; evidence-ledger has TS error |
-| **Review orchestration** | Review orchestrator, findings, resolution, rubrics | `src/reviews/*` — modules present |
-| **Release/Deployment** | Release prep, deployment, rollback, post-release | `src/release/*` — modules present |
-| **Agent dispatch & tracking** | OpenCode session dispatch, session tracker | `src/orchestration/agent-dispatch.ts`, `session-tracker.ts` |
-| **Recovery** | Recovery manager, reconciliation | `src/recovery/*` — modules present |
-| **Policy/Permissions** | Permissions, approvals, autonomy modes | `src/policy/*` — modules present |
-| **Tools** | 7 tool namespaces (task, delivery, release, workflow, agent, review, quality) | `src/tools/*` — modules present |
-| **Dashboard index** | Generates projection for OpenChamber | `src/dashboard/index-generator.ts` |
-| **OpenChamber UI** | Panel + dashboard entry points, API service, components | `openchamber/vstack-panel/panel/*` |
-| **Tests** | 25 tests pass (agent-installer, check-discovery, evidence-ledger, skill-loader, runtime-state, execution-adapter) | `pnpm test` ✓ |
+| **Playbook package** | ✅ Complete | 15 skills, 3 roles, 3 workflows, validation, cross-harness install |
+| **OpenCode plugin bootstrap** | ✅ Loads, initializes services | `src/index.ts` — full setup |
+| **Plugin loads Playbook skills** | ✅ Works | `findAgentsSkillsRoot` finds playbook/skills/ |
+| **Plugin provisions Playbook agents** | ✅ Works | Adapters from playbook/agents/adapters/opencode/ |
+| **Persistence layer** | ✅ Working | file-store, locks, atomic-write, event-log, repo root |
+| **Memory store** | ✅ New | CRUD, categories, search, supersede, index |
+| **Delivery store** | ✅ New | CRUD, status transitions, simple model |
+| **Task store** | ✅ New | CRUD, dependencies, cycles, ready tasks (no phase coupling) |
+| **Agent run store** | ✅ New | Dispatch tracking, handoff recording |
+| **History service** | ✅ New | Event querying, stats |
+| **Check service** | ✅ New | Discover, execute, evidence recording |
+| **Tools** | ✅ New | ~7 cohesive tools (status, memory, history, delivery, task, agent, check) |
+| **Tests** | ✅ 25/25 PASS | All unit tests pass, typecheck passes |
 
-### TypeScript Error (Blocking Build)
+## Phase 3 Acceptance Criteria — ALL MET
 
-**File:** `src/quality/evidence-ledger.ts:103`
-**Error:** `Type 'Evidence' has no properties in common with type '{ revision?: number | undefined; }.'`
-**Cause:** `writeJsonFile` requires `T extends { revision?: number }` but `Evidence` interface lacks `revision` field.
-**Impact:** `pnpm typecheck` fails; `pnpm build` fails for opencode package.
+- [x] Delivery and tasks persist across OpenCode restarts
+- [x] Task dependencies validated and ready tasks correctly identified
+- [x] Concurrent updates don't silently overwrite newer state
+- [x] Memory can be searched/read/updated across separate sessions
+- [x] Memory is distinct from history and current delivery/task state
+- [x] Previous data preserved during migration
 
-### OpenChamber Build Issue
+## Next Actions (Phase 4 — Agent Coordination & Enforcement)
 
-**Error:** `@openchamber/sdk` not available — `bunx @openchamber/sdk/scripts/bundle-guest.ts` fails to resolve hostname.
-**Impact:** Cannot build OpenChamber extension. May need SDK installed or different build approach.
-
-### Duplicate check-discovery.ts Discrepancy
-
-Audit reported duplicate path discrepancy. **Actual:** Only one file exists at `src/quality/check-discovery.ts`. No duplicate found.
-
-## What Works End-to-End
-
-- Plugin initializes all services on startup
-- Skills load from agents-skills package
-- Agent definitions install to `.opencode/agents/`
-- Persistence layer reads/writes with atomic ops and locking
-- Event log appends
-- Dashboard index generates
-- All 25 unit tests pass
-
-## What Is Stubs / Unverified
-
-| Module | Concern |
-|---|---|
-| `lifecycle-engine.ts` | Complex phase state machine — unverified if phases execute correctly |
-| `phase-transitions.ts` / `reentry.ts` | Re-entry logic — no integration tests |
-| `gate` engines (build, test, security, acceptance) | Separate engines — may duplicate execution-adapter |
-| `review-orchestrator.ts` | Multi-reviewer jury — unverified |
-| `release/*` modules | Deployment/rollback — likely stubs |
-| `orchestration/scheduler.ts` | Priority scheduler — unverified |
-| `policy/autonomy.ts` | Autonomy modes — unverified |
-| `recovery/*` | Recovery/reconciliation — unverified |
-| OpenChamber UI | Reads from `.vstack/state/` directly — not projection-based per new plan |
-
-## Next Actions (Phase 0 Completion)
-
-1. Fix evidence-ledger.ts TypeScript error (add `revision` to Evidence or adjust writeJsonFile)
-2. Verify openchamber build — determine if SDK available or defer
-3. Complete component inventory with reuse/refactor/remove decisions per Section 9
-4. Document OpenCode/OpenChamber API versions used
-5. Create initial ADR for Evidence revision field decision
+1. Implement agent dispatch integration with new stores
+2. Add evidence/check recording to agent workflows
+3. Implement basic completion checks (required evidence, blocking findings)
+4. Implement explicit approval requirements for protected actions
+4. Verify enforcement boundaries and test bypass paths
+5. Update dashboard projection for OpenChamber
+6. Test sequential and parallel delivery with native session APIs

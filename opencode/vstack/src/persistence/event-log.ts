@@ -5,6 +5,7 @@
 
 import { VstackPaths, validateVstackPath, ensureVstackDirs } from "./repository-root.js";
 import { Event, EventId, eventId } from "../schemas/types.js";
+export type { Event, EventId, eventId } from "../schemas/types.js";
 import { v4 as uuidv4 } from "uuid";
 
 let eventSequence = 0;
@@ -267,7 +268,7 @@ export const EventPayloads = {
     timestamp: new Date().toISOString(),
   }),
   
-  checkCompleted: (deliveryId: string, evidenceId: string, checkId: string, status: "passed" | "failed", actor: Event["actor"] = { type: "plugin", id: "system" }, entity: Event["entity"] = { type: "evidence", id: evidenceId }, source: Event["source"] = { sessionId: null, toolId: null }) => ({
+  checkCompleted: (deliveryId: string, evidenceId: string, checkId: string, status: "passed" | "failed" | "timeout" | "error" | "cancelled", actor: Event["actor"] = { type: "plugin", id: "system" }, entity: Event["entity"] = { type: "evidence", id: evidenceId }, source: Event["source"] = { sessionId: null, toolId: null }) => ({
     deliveryId: deliveryId as any,
     eventType: "check_completed" as const,
     payload: { deliveryId, evidenceId, checkId, status },
