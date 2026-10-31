@@ -44,6 +44,7 @@ export async function resolveVstackRoot(projectRoot) {
         events: resolve(vstackRoot, "state", "events.jsonl"),
         index: resolve(vstackRoot, "state", "index.json"),
         manifest: resolve(vstackRoot, "manifest.json"),
+        memory: resolve(vstackRoot, "memory"),
     };
 }
 /**
@@ -58,6 +59,7 @@ export async function ensureVstackDirs(paths) {
         paths.config,
         paths.reports,
         paths.locks,
+        paths.memory,
     ];
     for (const dir of dirs) {
         if (!fs.existsSync(dir)) {

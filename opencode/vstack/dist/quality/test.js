@@ -171,6 +171,7 @@ export async function createTestManager(paths) {
                     failedTests: counts.failed,
                     skippedTests: counts.skipped,
                 },
+                revision: 0,
             };
             return {
                 suiteId: suite.id,

@@ -4,6 +4,7 @@
  */
 import { VstackPaths } from "./repository-root.js";
 import { Event } from "../schemas/types.js";
+export type { Event, EventId, eventId } from "../schemas/types.js";
 /**
  * Initialize event sequence from existing log
  */
@@ -220,14 +221,14 @@ export declare const EventPayloads: {
         };
         timestamp: string;
     };
-    checkCompleted: (deliveryId: string, evidenceId: string, checkId: string, status: "passed" | "failed", actor?: Event["actor"], entity?: Event["entity"], source?: Event["source"]) => {
+    checkCompleted: (deliveryId: string, evidenceId: string, checkId: string, status: "passed" | "failed" | "timeout" | "error" | "cancelled", actor?: Event["actor"], entity?: Event["entity"], source?: Event["source"]) => {
         deliveryId: any;
         eventType: "check_completed";
         payload: {
             deliveryId: string;
             evidenceId: string;
             checkId: string;
-            status: "failed" | "passed";
+            status: "cancelled" | "failed" | "passed" | "error" | "timeout";
         };
         actor: {
             type: "plugin" | "agent" | "human" | "system";

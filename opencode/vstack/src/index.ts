@@ -9,6 +9,7 @@ import { createAgentDispatch } from "./orchestration/agent-dispatch.js";
 import { resolveVstackRoot, ensureVstackDirs } from "./persistence/repository-root.js";
 import { initializeEventLog } from "./persistence/event-log.js";
 import { initializeRuntimeState, refreshRuntimeState } from "./runtime/state.js";
+import { publishProjections } from "./dashboard/projection-publisher.js";
 import { loadSkillsFromDirectory, findAgentsSkillsRoot } from "./skills/skill-loader.js";
 import { installAgents } from "./agents/agent-installer.js";
 import { createMemoryStore } from "./memory/memory-store.js";
@@ -201,6 +202,8 @@ export default Plugin.define({
       if (event.tool.startsWith("vstack_") && event.status === "completed") {
         // Refresh dashboard index so OpenChamber sees the update
         await refreshRuntimeState(vstackRoot);
+        // Publish comprehensive projections for OpenChamber
+        await publishProjections(vstackRoot);
       }
     });
     

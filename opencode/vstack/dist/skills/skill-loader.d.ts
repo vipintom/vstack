@@ -15,7 +15,7 @@ export interface LoadedSkill {
 }
 export declare function loadSkillsFromDirectory(skillsRoot: string): Promise<LoadedSkill[]>;
 /**
- * Locate the agents-skills package. Checks an explicit override, the
+ * Locate the agents-skills package or playbook. Checks an explicit override, the
  * project's node_modules, then the monorepo sibling layout used in development.
  */
 export declare function findAgentsSkillsRoot(projectRoot: string, pluginRoot?: string): string | null;

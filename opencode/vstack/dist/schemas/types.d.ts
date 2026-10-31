@@ -159,6 +159,7 @@ export interface AgentRun {
     completedAt: string | null;
     resultSummary: string | null;
     error: string | null;
+    handoffSummary: string | null;
     revision: number;
 }
 export interface ReviewRun {
@@ -237,6 +238,7 @@ export interface Evidence {
     sessionId: string | null;
     agentRunId: AgentRunId | null;
     metadata: Record<string, unknown>;
+    revision: number;
 }
 export interface Approval {
     schemaVersion: 1;

@@ -12,6 +12,7 @@ export interface VstackPaths {
     events: string;
     index: string;
     manifest: string;
+    memory: string;
 }
 export declare class VstackPathError extends Error {
     readonly code: "NOT_FOUND" | "PATH_TRAVERSAL" | "NOT_CANONICAL" | "INVALID_PROJECT_ROOT";

@@ -213,6 +213,7 @@ async function createSecurityEvidence(results, deliveryId, taskId, phaseRunId, c
         sessionId: null,
         agentRunId: null,
         metadata: { vulnerabilities: results.dependencyVulnerabilities },
+        revision: 0,
     };
     // Similar for secrets, licenses, SAST
 }

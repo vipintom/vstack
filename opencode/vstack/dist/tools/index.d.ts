@@ -1,6 +1,6 @@
 /**
  * vstack Tools - Main export
- * Registers all tools under vstack_* namespace
+ * Registers ~7 cohesive tools under vstack_* namespace
  */
 export interface VstackTool {
     name: string;
@@ -11,24 +11,15 @@ export interface VstackTool {
     }>;
 }
 export declare const vstackTools: VstackTool[];
-/**
- * Get all tools grouped by namespace
- */
 export declare const toolsByNamespace: {
+    status: VstackTool[];
+    memory: VstackTool[];
+    history: VstackTool[];
     delivery: VstackTool[];
-    workflow: VstackTool[];
     task: VstackTool[];
     agent: VstackTool[];
-    quality: VstackTool[];
-    review: VstackTool[];
-    release: VstackTool[];
+    check: VstackTool[];
 };
-/**
- * Get tool by name
- */
 export declare function getToolByName(name: string): VstackTool | undefined;
-/**
- * Get all tool names
- */
 export declare const allToolNames: string[];
 //# sourceMappingURL=index.d.ts.map

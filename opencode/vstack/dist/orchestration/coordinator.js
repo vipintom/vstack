@@ -48,6 +48,7 @@ export async function createOrchestrator(paths, config) {
                 completedAt: null,
                 resultSummary: null,
                 error: null,
+                handoffSummary: null,
                 revision: 1,
             };
             // Save agent run

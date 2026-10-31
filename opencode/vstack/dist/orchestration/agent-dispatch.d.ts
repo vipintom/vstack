@@ -2,7 +2,7 @@
  * Agent dispatch manager
  * Handles OpenCode session creation, agent assignment, and lifecycle
  */
-import { AgentRunId, AgentRunStatus, Delivery, Task } from "../schemas/types.js";
+import { AgentRun, AgentRunId, AgentRunStatus, Delivery, Task } from "../schemas/types.js";
 import { VstackPaths } from "../persistence/repository-root.js";
 export interface AgentDispatchConfig {
     defaultModel: string | null;
@@ -35,10 +35,31 @@ export interface AgentSessionInfo {
     lastActivity: string;
     worktreePath: string | null;
 }
+export interface AgentRunStoreLike {
+    createAgentRun(params: {
+        deliveryId: string;
+        taskId: string | null;
+        agentId: string;
+        sessionId: string;
+        role: "lead" | "builder" | "reviewer";
+        objective: string;
+        contextReferences: string[];
+        worktreePath: string | null;
+    }): Promise<AgentRun>;
+    getAgentRun(agentRunId: AgentRunId): Promise<AgentRun | null>;
+    updateAgentRun(agentRunId: AgentRunId, updates: {
+        status?: AgentRunStatus;
+        resultSummary?: string;
+        error?: string;
+        completedAt?: string;
+        handoffSummary?: string;
+    }): Promise<AgentRun>;
+}
 /**
  * Create agent dispatch manager
  */
-export declare function createAgentDispatch(paths: VstackPaths, config: AgentDispatchConfig, opencodeContext: any): Promise<{
+export declare function createAgentDispatch(paths: VstackPaths, config: AgentDispatchConfig, opencodeContext: any, // OpenCode plugin context
+agentRunStore?: AgentRunStoreLike): Promise<{
     /**
      * Dispatch a new agent for a task
      */

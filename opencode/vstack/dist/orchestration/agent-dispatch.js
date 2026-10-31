@@ -10,8 +10,8 @@ import { resolve } from "node:path";
 /**
  * Create agent dispatch manager
  */
-export async function createAgentDispatch(paths, config, opencodeContext // OpenCode plugin context
-) {
+export async function createAgentDispatch(paths, config, opencodeContext, // OpenCode plugin context
+agentRunStore) {
     const activeSessions = new Map();
     return {
         /**
@@ -31,29 +31,48 @@ export async function createAgentDispatch(paths, config, opencodeContext // Open
             if (!prompt) {
                 throw new Error("Either task or customPrompt must be provided");
             }
-            const agentRun = {
-                schemaVersion: 1,
-                id: agentRunId,
-                deliveryId: delivery.id,
-                taskId: task?.id ?? null,
-                agentId,
-                sessionId,
-                worktreePath: worktreePath ?? null,
-                status: "dispatched",
-                dispatchPrompt: prompt,
-                contextReferences: contextFiles ?? [],
-                startedAt: now,
-                completedAt: null,
-                resultSummary: null,
-                error: null,
-                revision: 1,
-            };
-            // Save agent run
-            const agentRunPath = resolve(paths.deliveries, delivery.id, "agent-runs", `${agentRunId}.json`);
-            await writeJsonFile(paths, agentRunPath, agentRun);
+            // Extract role from agentId
+            const role = agentId.replace("vstack-", "");
+            // Use agentRunStore if available, otherwise write directly
+            let agentRun;
+            if (agentRunStore) {
+                agentRun = await agentRunStore.createAgentRun({
+                    deliveryId: delivery.id,
+                    taskId: task?.id ?? null,
+                    agentId,
+                    sessionId,
+                    role,
+                    objective: prompt,
+                    contextReferences: contextFiles ?? [],
+                    worktreePath: worktreePath ?? null,
+                });
+            }
+            else {
+                agentRun = {
+                    schemaVersion: 1,
+                    id: agentRunId,
+                    deliveryId: delivery.id,
+                    taskId: task?.id ?? null,
+                    agentId,
+                    sessionId,
+                    worktreePath: worktreePath ?? null,
+                    status: "dispatched",
+                    dispatchPrompt: prompt,
+                    contextReferences: contextFiles ?? [],
+                    startedAt: now,
+                    completedAt: null,
+                    resultSummary: null,
+                    error: null,
+                    handoffSummary: null,
+                    revision: 1,
+                };
+                // Save agent run
+                const agentRunPath = resolve(paths.deliveries, delivery.id, "agent-runs", `${agentRunId}.json`);
+                await writeJsonFile(paths, agentRunPath, agentRun);
+            }
             // Track active session
             const sessionInfo = {
-                sessionId,
+                sessionId: agentRun.sessionId,
                 agentId,
                 taskId: task?.id ?? null,
                 deliveryId: delivery.id,
@@ -75,9 +94,13 @@ export async function createAgentDispatch(paths, config, opencodeContext // Open
             const simulatedSessionId = sessionId;
             // Update agent run with session ID
             agentRun.sessionId = simulatedSessionId;
-            await writeJsonFile(paths, agentRunPath, agentRun);
-            // Update status to running
-            await this.updateAgentRunStatus(agentRunId, delivery.id, "running");
+            if (agentRunStore) {
+                await agentRunStore.updateAgentRun(agentRunId, { status: "running" });
+            }
+            else {
+                const agentRunPath = resolve(paths.deliveries, delivery.id, "agent-runs", `${agentRunId}.json`);
+                await writeJsonFile(paths, agentRunPath, { ...agentRun, sessionId: simulatedSessionId, status: "running" });
+            }
             // Log event
             await appendEvent(paths, EventPayloads.agentDispatched(delivery.id, agentRunId, agentId, task?.id ?? null));
             return {
@@ -123,21 +146,34 @@ Follow the vstack-${task.type} skill for this task. Use workflow tools to record
          * Update agent run status
          */
         async updateAgentRunStatus(agentRunId, deliveryId, status, resultSummary, error) {
-            const agentRunPath = resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`);
-            const agentRun = await readJsonFile(paths, agentRunPath);
-            if (!agentRun)
-                throw new Error(`Agent run ${agentRunId} not found`);
-            const updated = {
-                ...agentRun,
-                status,
-                completedAt: ["completed", "failed", "cancelled"].includes(status) ? new Date().toISOString() : agentRun.completedAt,
-                resultSummary: resultSummary ?? agentRun.resultSummary,
-                error: error ?? agentRun.error,
-                revision: agentRun.revision + 1,
-            };
-            await writeJsonFile(paths, agentRunPath, updated);
+            if (agentRunStore) {
+                await agentRunStore.updateAgentRun(agentRunId, {
+                    status,
+                    completedAt: ["completed", "failed", "cancelled"].includes(status) ? new Date().toISOString() : undefined,
+                    resultSummary,
+                    error,
+                });
+            }
+            else {
+                const agentRunPath = resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`);
+                const agentRun = await readJsonFile(paths, agentRunPath);
+                if (!agentRun)
+                    throw new Error(`Agent run ${agentRunId} not found`);
+                const updated = {
+                    ...agentRun,
+                    status,
+                    completedAt: ["completed", "failed", "cancelled"].includes(status) ? new Date().toISOString() : agentRun.completedAt,
+                    resultSummary: resultSummary ?? agentRun.resultSummary,
+                    error: error ?? agentRun.error,
+                    revision: agentRun.revision + 1,
+                };
+                await writeJsonFile(paths, agentRunPath, updated);
+            }
             // Update active session
-            if (activeSessions.has(agentRun.sessionId)) {
+            const agentRun = agentRunStore
+                ? await agentRunStore.getAgentRun(agentRunId)
+                : await readJsonFile(paths, resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`));
+            if (agentRun && activeSessions.has(agentRun.sessionId)) {
                 const info = activeSessions.get(agentRun.sessionId);
                 info.status = status;
                 info.lastActivity = new Date().toISOString();
@@ -147,17 +183,16 @@ Follow the vstack-${task.type} skill for this task. Use workflow tools to record
          * Send prompt to agent session
          */
         async sendPrompt(agentRunId, deliveryId, prompt, opencodeContext) {
-            const agentRunPath = resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`);
-            const agentRun = await readJsonFile(paths, agentRunPath);
-            if (!agentRun)
-                throw new Error(`Agent run ${agentRunId} not found`);
             // In real implementation:
             // await opencodeContext.session.prompt({
             //   sessionId: agentRun.sessionId,
             //   prompt: prompt,
             // });
             // Update last activity
-            if (activeSessions.has(agentRun.sessionId)) {
+            const agentRun = agentRunStore
+                ? await agentRunStore.getAgentRun(agentRunId)
+                : await readJsonFile(paths, resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`));
+            if (agentRun && activeSessions.has(agentRun.sessionId)) {
                 activeSessions.get(agentRun.sessionId).lastActivity = new Date().toISOString();
             }
         },
@@ -165,12 +200,6 @@ Follow the vstack-${task.type} skill for this task. Use workflow tools to record
          * Interrupt agent session
          */
         async interruptAgent(agentRunId, deliveryId, opencodeContext) {
-            const agentRunPath = resolve(paths.deliveries, deliveryId, "agent-runs", `${agentRunId}.json`);
-            const agentRun = await readJsonFile(paths, agentRunPath);
-            if (!agentRun)
-                throw new Error(`Agent run ${agentRunId} not found`);
-            // In real implementation:
-            // await opencodeContext.session.interrupt({ sessionId: agentRun.sessionId });
             await this.updateAgentRunStatus(agentRunId, deliveryId, "cancelled", undefined, "Interrupted by orchestrator");
         },
         /**
@@ -226,11 +255,8 @@ export const DEFAULT_AGENT_DISPATCH_CONFIG = {
     defaultModel: null, // Use session default
     maxSteps: {
         "vstack-lead": 50,
-        "vstack-architect": 30,
-        "vstack-developer": 40,
-        "vstack-test-engineer": 30,
+        "vstack-builder": 40,
         "vstack-reviewer": 30,
-        "vstack-operator": 30,
     },
     defaultPermissions: [],
     enableWorktrees: false,
