@@ -1,0 +1,27 @@
+{
+  "name": "@vstack/agents-skills",
+  "version": "0.1.0",
+  "description": "vstack portable agent roles and workflow skills",
+  "type": "module",
+  "files": [
+    "skills",
+    "agents",
+    "resources",
+    "README.md"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate-skills.js"
+  },
+  "keywords": [
+    "agent-skills",
+    "vstack",
+    "opencode",
+    "claude-code",
+    "codex"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.20.0"
+  }
+}
