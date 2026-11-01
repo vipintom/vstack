@@ -1,6 +1,6 @@
 # Work Log
 
-**Last updated:** 2026-11-01 (Phase 3 complete)
+**Last updated:** 2026-11-01 (Phase 6 complete)
 
 ## 2026-11-01 — Phase 0 Baseline Inventory
 
@@ -175,3 +175,85 @@
 
 ### Time Spent
 ~2 hours (enforcement, dispatch integration, type fixing, testing)
+
+## 2026-11-01 — Phase 5: OpenChamber Visualization
+
+**Session:** Built projection publisher and refactored OpenChamber API to read projections
+
+### Actions
+1. **Created modular projection publisher** (`dashboard/projections/`) with separate modules:
+   - Types (`types.ts`) — shared interfaces for all projections
+   - Paths (`paths.ts`) — centralized path resolution
+   - Loaders (`loaders.ts`) — data loading from .vstack/
+   - Delivery reports (`delivery-reports.ts`) — delivery detail with tasks, agents, evidence
+   - Activity reports (`activity-reports.ts`) — event timeline from event log
+   - Memory reports (`memory-reports.ts`) — searchable memory index
+   - Quality reports (`quality-reports.ts`) — check counts by type
+   - Main publisher (`projection-publisher.ts`) — orchestrates all projections
+2. **Refactored OpenChamber API** (`panel/src/services/api.ts`) to read ONLY published projections:
+   - `readManifest()` — project manifest
+   - `readDashboardIndex()` — active deliveries from index
+   - `readDeliveryReport()` — delivery detail from published report
+   - `readActivityReport()` — activity timeline
+   - `readMemoryIndex()` — searchable memory catalogue
+   - `readQualitySummary()` — check statistics
+   - `listReports()` — available delivery reports
+3. **Updated OpenChamber types** (`panel/src/types/index.ts`) for projection-based data
+4. **Integrated projection publishing** into plugin tool hook — publishes after every tool execution
+5. **Fixed all TypeScript errors** in projection modules
+6. **Verified typecheck PASS**, **build PASS**, **tests 25/25 PASS**
+
+### Discoveries
+- Modular projection architecture works well — each report type is independently generated
+- OpenChamber API is now truly read-only — no direct access to delivery/task/evidence internals
+- Revision tracking on all projections enables stale detection in UI
+- Projection publishing after tool execution keeps UI in sync without polling overhead
+
+### Decisions Made
+- Projections published to `.vstack/reports/` separate from authoritative data in `.vstack/deliveries/`
+- Memory index published as searchable catalogue with categories
+- Quality summaries include check counts by type for quick assessment
+- Activity reports use event log with 500-event limit for performance
+- Projection publishing triggered after tool execution (not on timer)
+
+### Next Actions
+1. Phase 6: E2E Validation — end-to-end feature delivery demo
+
+### Time Spent
+~2 hours (projection publisher, OpenChamber API refactor, type fixing, testing)
+
+## 2026-11-01 — Phase 6: E2E Validation
+
+**Session:** Completed end-to-end feature delivery workflow test
+
+### Actions
+1. **Fixed directory creation bugs** in delivery-store, task-store, agent-run-store, and memory-store to ensure parent directories exist before writing files
+2. **Fixed delivery ID prefix inconsistency** — unified on "dlv_" prefix across delivery-store, lifecycle-engine, index-generator, and projection loaders
+3. **Created comprehensive E2E test** (`test/e2e-workflow.test.ts`) covering:
+   - Delivery creation with acceptance criteria
+   - Task creation with dependencies (5 tasks with dependency chain)
+   - Agent dispatch for builder and reviewer roles
+   - Check execution with evidence recording
+   - Task completion with proper status transitions (pending → ready → in_progress → completed)
+   - Enforcement validation before delivery completion
+   - Memory item creation (architecture, lessons)
+   - Projection publishing (delivery reports, activity, memory index, quality summaries)
+   - Dashboard index refresh showing active deliveries
+4. **Fixed all TypeScript errors** and ensured all tests pass
+
+### Discoveries
+- Directory creation was missing in multiple stores causing ENOENT errors in test environment
+- Delivery ID prefix mismatch between lifecycle engine ("del_") and other stores ("dlv_") caused index/projection loaders to miss deliveries
+- Dashboard index only shows "active" deliveries (not completed), so E2E test verifies index before completing delivery
+- Projection publisher works correctly when loadDeliveries finds deliveries with correct prefix
+
+### Decisions Made
+- All stores now create parent directories with `mkdirSync(dir, { recursive: true })` before writing
+- Delivery ID prefix standardized to "dlv_" across all components
+- E2E test demonstrates full workflow: delivery → tasks → agents → checks → evidence → memory → projections → dashboard
+
+### Next Actions
+1. Project complete — all phases implemented and verified
+
+### Time Spent
+~2 hours (bug fixes, E2E test creation, type fixing, testing)

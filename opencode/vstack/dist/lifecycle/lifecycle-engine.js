@@ -13,7 +13,7 @@ export async function createLifecycleEngine(paths) {
         async createDelivery(params) {
             const profile = getProfile(params.profile);
             const now = new Date().toISOString();
-            const newDeliveryId = deliveryId(`del_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`);
+            const newDeliveryId = deliveryId(`dlv_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`);
             // Create first phase run (intake)
             const firstPhase = profile.phases[0]?.phase ?? "intake";
             const firstPhaseRun = {

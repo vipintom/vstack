@@ -6,7 +6,7 @@
  */
 
 import { VstackPaths } from "../persistence/repository-root.js";
-import { readJsonFile, writeJsonFile, listFiles, fileExists, deleteFile } from "../persistence/file-store.js";
+import { readJsonFile, writeJsonFile, listFiles, listDirs, fileExists, deleteFile } from "../persistence/file-store.js";
 import { Task, TaskId, TaskStatus, TaskType, TaskId as TaskIdType, deliveryId } from "../schemas/types.js";
 import { resolve } from "node:path";
 import { v4 as uuidv4 } from "uuid";
@@ -141,7 +141,7 @@ async function getAllTasksImpl(paths: VstackPaths, deliveryId: string): Promise<
 }
 
 async function findTaskImpl(paths: VstackPaths, taskId: TaskId): Promise<{ task: Task; taskPath: string } | null> {
-  const deliveryDirs = listFiles(paths, resolve(paths.deliveries));
+  const deliveryDirs = listDirs(paths, resolve(paths.deliveries));
   for (const dir of deliveryDirs) {
     const taskPath = resolve(paths.deliveries, dir, "tasks", `${taskId}.json`);
     const task = await readJsonFile<Task>(paths, taskPath);
@@ -230,6 +230,11 @@ export async function createTaskStore(paths: VstackPaths): Promise<TaskStore> {
         startedAt: null,
       };
       
+      // Ensure task directory exists
+      const { mkdirSync } = await import("node:fs");
+      const taskDirPath = taskDir(paths, params.deliveryId);
+      mkdirSync(taskDirPath, { recursive: true });
+      
       await writeJsonFile(paths, taskFile(paths, params.deliveryId, newTaskId), task);
       return task;
     },
@@ -263,7 +268,7 @@ export async function createTaskStore(paths: VstackPaths): Promise<TaskStore> {
       } else {
         // Find the task first
         const found = await (async () => {
-          const deliveryDirs = listFiles(paths, resolve(paths.deliveries));
+          const deliveryDirs = listDirs(paths, resolve(paths.deliveries));
           for (const dir of deliveryDirs) {
             const t = await readJsonFile<Task>(paths, taskFile(paths, dir, taskId));
             if (t) return { task: t, deliveryId: dir };

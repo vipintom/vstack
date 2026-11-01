@@ -17,7 +17,7 @@ export async function loadDeliveries(paths: VstackPaths) {
   
   const deliveries = [];
   for (const entry of readdirSync(paths.deliveries, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !entry.name.startsWith("del_")) continue;
+    if (!entry.isDirectory() || !entry.name.startsWith("dlv_")) continue;
     try {
       const { readJsonFile } = await import("../../persistence/file-store.js");
       const delivery = await readJsonFile<any>(paths, resolve(paths.deliveries, entry.name, "delivery.json"));

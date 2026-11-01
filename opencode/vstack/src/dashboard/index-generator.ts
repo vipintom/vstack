@@ -67,7 +67,7 @@ async function loadDeliveries(paths: VstackPaths): Promise<Delivery[]> {
 
   const deliveries: Delivery[] = [];
   for (const entry of readdirSync(paths.deliveries, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !entry.name.startsWith("del_")) continue;
+    if (!entry.isDirectory() || !entry.name.startsWith("dlv_")) continue;
     const deliveryPath = resolve(paths.deliveries, entry.name, "delivery.json");
     if (!existsSync(deliveryPath)) continue;
 

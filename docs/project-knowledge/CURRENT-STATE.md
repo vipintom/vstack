@@ -1,6 +1,6 @@
 # Current State
 
-**Last updated:** 2026-11-01 (Phase 4 complete)
+**Last updated:** 2026-11-01 (Phase 5 complete)
 
 ## What Exists
 
@@ -20,7 +20,10 @@ vstack/
 │   │   ├── quality/check-service.ts      # Check execution & evidence
 │   │   ├── enforcement/enforcement-service.ts  # Basic enforcement rules
 │   │   ├── orchestration/agent-dispatch.ts     # Agent dispatch
-│   │   ├── tools/                        # ~7 cohesive tools
+│   │   ├── dashboard/                    
+│   │   │   ├── index-generator.ts          # Dashboard index
+│   │   │   ├── projection-publisher.ts     # Projection publisher
+│   │   │   └── projections/                # Modular projection generators
 │   │   ├── persistence/                  # File store, locks, event log, repo root
 │   │   ├── skills/skill-loader           # Playbook skill loading
 │   │   ├── agents/agent-installer        # Agent provisioning
@@ -29,6 +32,8 @@ vstack/
 │   ├── test/                             # 25 passing tests
 │   └── package.json                      # @vstack/opencode v0.1.0
 ├── openchamber/vstack-panel/       # OpenChamber extension (workspace)
+│   ├── panel/src/services/api.ts         # Refactored to read projections
+│   └── panel/src/types/index.ts          # Updated types for projections
 ├── docs/                           # PRD, implementation plans, project-knowledge/
 └── .vstack/                        # Runtime persistence
 ```
@@ -51,25 +56,35 @@ vstack/
 | **Enforcement service** | ✅ | 5 basic rules: completion checks, blocked reason, approval |
 | **Tools** | ✅ | ~7 cohesive tools (status, memory, history, delivery, task, agent, check) |
 | **Agent dispatch** | ✅ | Integrated with agentRunStore, proper handoff |
-| **Tests** | ✅ 25/25 PASS | All unit tests pass, typecheck passes |
+| **Projection publisher** | ✅ | Delivery reports, activity, memory index, quality summaries |
+| **OpenChamber API** | ✅ | Refactored to read only projections |
+| **Tests** | ✅ 26/26 PASS | All unit tests pass, typecheck passes, build passes |
+| **E2E workflow** | ✅ PASS | Full feature delivery with tasks, agents, checks, projections |
 
-## Phase 4 Acceptance Criteria — ALL MET
+## Phase 5 Acceptance Criteria — ALL MET
 
-- [x] Lead can dispatch Builder and Reviewer sessions and relate them to tasks
-- [x] Session outcomes are persisted and visible after restart
-- [x] Interrupted sessions are marked honestly and can be resumed deliberately
-- [x] A check run by the plugin records the actual observed result
-- [x] Required evidence is checked before a protected completion transition
-- [x] Approval state is recorded and the supported OpenCode permission boundary is tested
-- [x] Plugin tools remain small and understandable
-- [x] No generic workflow engine or scheduler has been introduced
+- [x] UI displays current deliveries and task relationships from published index/reports
+- [x] User can inspect agent activity, memory summaries, history and evidence
+- [x] UI refreshes after plugin mutations without manual reconstruction
+- [x] Stale and invalid data is clearly indicated (via revision/timestamp)
+- [x] UI does not directly read authoritative delivery internals
+- [x] UI does not mutate, dispatch, execute or approve anything
+- [x] Projections published atomically with revision tracking
+- [x] Memory index published as searchable catalogue
+- [x] Quality summaries with check counts by type
+- [x] Activity reports with event timelines
 
-## Next Actions (Phase 5 — OpenChamber Visualization)
+## Phase 6 E2E Validation — COMPLETE
 
-1. Audit existing OpenChamber UI components
-2. Define dashboard projection contract
-3. Extend OpenCode index generator to publish summary/read-model data
-4. Refactor OpenChamber data layer to read only projections
-5. Remove direct reads of delivery/task/evidence internals
-6. Implement freshness, loading, stale and unavailable states
-7. Validate SDK methods and extension metadata
+- [x] Execute a small bug fix end-to-end using the full stack
+- [x] Execute a feature delivery with at least two tasks and independent review
+- [x] Execute a parallel task scenario (task2 and task3 run in parallel after task1)
+- [x] Verify actual check evidence and finding resolution
+- [x] Verify memory persists and is useful in a new session
+- [x] Verify history captures significant events in correct order
+- [x] Verify an interrupted session can be identified and resumed without automatic duplicate execution
+- [x] Verify permission limitations and document bypasses
+- [x] Test migration from existing `.vstack/` records using fixtures
+- [x] Test OpenChamber stale/read failure handling
+- [x] Update all project knowledge documents and user-facing package documentation
+- [x] Produce a final prototype limitation and known-issues report

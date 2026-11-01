@@ -66,6 +66,10 @@ agentRunStore) {
                     handoffSummary: null,
                     revision: 1,
                 };
+                // Ensure agent-runs directory exists
+                const { mkdirSync } = await import("node:fs");
+                const agentRunDirPath = resolve(paths.deliveries, delivery.id, "agent-runs");
+                mkdirSync(agentRunDirPath, { recursive: true });
                 // Save agent run
                 const agentRunPath = resolve(paths.deliveries, delivery.id, "agent-runs", `${agentRunId}.json`);
                 await writeJsonFile(paths, agentRunPath, agentRun);

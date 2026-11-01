@@ -248,6 +248,23 @@ export function listFiles(paths: VstackPaths, dirPath: string, extension = ".jso
 }
 
 /**
+ * List directories in a directory
+ */
+export function listDirs(paths: VstackPaths, dirPath: string): string[] {
+  const validatedPath = validateVstackPath(paths, dirPath);
+  if (!existsSync(validatedPath)) {
+    return [];
+  }
+  try {
+    return readdirSync(validatedPath, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Read a file as raw string
  */
 export function readFile(paths: VstackPaths, filePath: string): string | null {

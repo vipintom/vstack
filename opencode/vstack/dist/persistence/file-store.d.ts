@@ -38,6 +38,10 @@ export declare function deleteFile(paths: VstackPaths, filePath: string): void;
  */
 export declare function listFiles(paths: VstackPaths, dirPath: string, extension?: string): string[];
 /**
+ * List directories in a directory
+ */
+export declare function listDirs(paths: VstackPaths, dirPath: string): string[];
+/**
  * Read a file as raw string
  */
 export declare function readFile(paths: VstackPaths, filePath: string): string | null;

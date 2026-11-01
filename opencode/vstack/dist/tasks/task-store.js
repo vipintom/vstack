@@ -4,7 +4,7 @@
  * CRUD + dependencies for tasks without phase coupling.
  * Works with simplified delivery model.
  */
-import { readJsonFile, writeJsonFile, listFiles, deleteFile } from "../persistence/file-store.js";
+import { readJsonFile, writeJsonFile, listFiles, listDirs, deleteFile } from "../persistence/file-store.js";
 import { resolve } from "node:path";
 import { v4 as uuidv4 } from "uuid";
 function taskDir(paths, deliveryId) {
@@ -73,7 +73,7 @@ async function getAllTasksImpl(paths, deliveryId) {
     return tasks;
 }
 async function findTaskImpl(paths, taskId) {
-    const deliveryDirs = listFiles(paths, resolve(paths.deliveries));
+    const deliveryDirs = listDirs(paths, resolve(paths.deliveries));
     for (const dir of deliveryDirs) {
         const taskPath = resolve(paths.deliveries, dir, "tasks", `${taskId}.json`);
         const task = await readJsonFile(paths, taskPath);
@@ -154,6 +154,10 @@ export async function createTaskStore(paths) {
                 completedAt: null,
                 startedAt: null,
             };
+            // Ensure task directory exists
+            const { mkdirSync } = await import("node:fs");
+            const taskDirPath = taskDir(paths, params.deliveryId);
+            mkdirSync(taskDirPath, { recursive: true });
             await writeJsonFile(paths, taskFile(paths, params.deliveryId, newTaskId), task);
             return task;
         },
@@ -186,7 +190,7 @@ export async function createTaskStore(paths) {
             else {
                 // Find the task first
                 const found = await (async () => {
-                    const deliveryDirs = listFiles(paths, resolve(paths.deliveries));
+                    const deliveryDirs = listDirs(paths, resolve(paths.deliveries));
                     for (const dir of deliveryDirs) {
                         const t = await readJsonFile(paths, taskFile(paths, dir, taskId));
                         if (t)

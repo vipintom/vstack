@@ -38,6 +38,10 @@ export async function createDeliveryStore(paths) {
                 references: {},
                 createdBy: params.createdBy,
             };
+            // Ensure delivery directory exists
+            const { mkdirSync } = await import("node:fs");
+            const dir = deliveryFile(paths, id).replace("/delivery.json", "");
+            mkdirSync(dir, { recursive: true });
             await writeJsonFile(paths, deliveryFile(paths, id), delivery);
             return delivery;
         },

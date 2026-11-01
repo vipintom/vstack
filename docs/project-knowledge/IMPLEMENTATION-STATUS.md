@@ -11,8 +11,8 @@
 | **Phase 2: OpenCode Integration** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Plugin loads Playbook skills, provisions native agents via adapters |
 | **Phase 3: Runtime Foundation** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Memory, delivery/task stores, history, check service, ~7 tools |
 | **Phase 4: Agent Coordination & Enforcement** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Agent dispatch, evidence, enforcement, ~7 tools |
-| **Phase 5: OpenChamber Visualization** | **IN PROGRESS** | 2026-11-01 | — | Read-only dashboard from projections |
-| Phase 6: E2E Validation | NOT STARTED | — | — | Final phase |
+| **Phase 5: OpenChamber Visualization** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Projection publisher, delivery/activity/memory/quality reports |
+| **Phase 6: E2E Validation** | **COMPLETE** | 2026-11-01 | 2026-11-01 | End-to-end feature delivery demo — 26 tests pass |
 
 ## Phase 0 Checklist
 

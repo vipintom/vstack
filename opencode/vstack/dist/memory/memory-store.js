@@ -98,6 +98,10 @@ export async function createMemoryStore(paths) {
                 updatedAt: now,
                 revision: 1,
             };
+            // Ensure category directory exists
+            const { mkdirSync } = await import("node:fs");
+            const categoryDirPath = categoryDir(paths, category);
+            mkdirSync(categoryDirPath, { recursive: true });
             await writeJsonFile(paths, itemPath(paths, category, id), memoryItem);
             await updateIndexImpl(paths);
             return memoryItem;

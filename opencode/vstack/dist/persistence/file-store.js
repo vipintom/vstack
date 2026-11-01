@@ -176,6 +176,23 @@ export function listFiles(paths, dirPath, extension = ".json") {
     }
 }
 /**
+ * List directories in a directory
+ */
+export function listDirs(paths, dirPath) {
+    const validatedPath = validateVstackPath(paths, dirPath);
+    if (!existsSync(validatedPath)) {
+        return [];
+    }
+    try {
+        return readdirSync(validatedPath, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+    }
+    catch {
+        return [];
+    }
+}
+/**
  * Read a file as raw string
  */
 export function readFile(paths, filePath) {

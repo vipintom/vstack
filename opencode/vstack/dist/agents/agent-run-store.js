@@ -46,6 +46,10 @@ export async function createAgentRunStore(paths) {
                 handoffSummary: null,
                 revision: 1,
             };
+            // Ensure agent-runs directory exists
+            const { mkdirSync } = await import("node:fs");
+            const agentRunDirPath = agentRunDir(paths, params.deliveryId);
+            mkdirSync(agentRunDirPath, { recursive: true });
             await writeJsonFile(paths, agentRunFile(paths, params.deliveryId, id), agentRun);
             return agentRun;
         },

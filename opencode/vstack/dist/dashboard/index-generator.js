@@ -41,7 +41,7 @@ async function loadDeliveries(paths) {
         return [];
     const deliveries = [];
     for (const entry of readdirSync(paths.deliveries, { withFileTypes: true })) {
-        if (!entry.isDirectory() || !entry.name.startsWith("del_"))
+        if (!entry.isDirectory() || !entry.name.startsWith("dlv_"))
             continue;
         const deliveryPath = resolve(paths.deliveries, entry.name, "delivery.json");
         if (!existsSync(deliveryPath))
