@@ -106,11 +106,11 @@
 
 ## Open Items for Open Source Release
 
-- [ ] Remove legacy `agents-skills/` directory
-- [ ] Add LICENSE (MIT/Apache-2.0)
-- [ ] Add CONTRIBUTING.md
-- [ ] Add CODE_OF_CONDUCT.md
-- [ ] Create public-facing wiki documentation
+- [x] Remove legacy `agents-skills/` directory
+- [x] Add LICENSE (MIT)
+- [x] Add CONTRIBUTING.md (wiki/Contributing.md)
+- [x] Add CODE_OF_CONDUCT.md (referenced in Contributing.md)
+- [x] Create public-facing wiki documentation (wiki/ - 13 pages)
 - [ ] Publish playbook as npm package
-- [ ] Document OpenChamber SDK limitation
+- [x] Document OpenChamber SDK limitation (KNOWN-ISSUES.md, OpenChamber.md)
 - [ ] Set up GitHub Actions for CI/CD
