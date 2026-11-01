@@ -1,6 +1,6 @@
 # Implementation Status
 
-**Last updated:** 2026-11-01 (Phase 3 complete)
+**Last updated:** 2026-11-01 (All phases complete)
 
 ## Phase Progress
 
@@ -14,80 +14,103 @@
 | **Phase 5: OpenChamber Visualization** | **COMPLETE** | 2026-11-01 | 2026-11-01 | Projection publisher, delivery/activity/memory/quality reports |
 | **Phase 6: E2E Validation** | **COMPLETE** | 2026-11-01 | 2026-11-01 | End-to-end feature delivery demo — 26 tests pass |
 
-## Phase 0 Checklist
+## Detailed Completion by Phase
 
-- [x] Create `docs/project-knowledge/` structure
-- [x] Read existing implementation plan, PRD, code, tests
-- [x] Verify build/test commands for each package
-- [x] Run existing tests — **25 tests PASS** (opencode/vstack)
-- [x] Inventory source modules, dependencies, entry points, persistence formats
-- [x] Verify working capabilities vs stubs
-- [x] Resolve check-discovery.ts duplicate — **only one file exists**
-- [x] Verify OpenCode/OpenChamber API versions
-- [x] Preserve known-good baseline (Git tag/branch) — **tag: phase-0-baseline**
-- [x] Create reuse decision records (this file + COMPONENT-INVENTORY.md)
-- [x] Fix evidence-ledger.ts TypeScript error — **DONE** (ADR-0001)
-- [x] Document OpenChamber build issue
+### Phase 0: Baseline & Knowledge Base
+- [x] Read PRD and Implementation Plan
+- [x] Created `docs/project-knowledge/` structure
+- [x] Inventoried all source modules
+- [x] Verified build/test commands
+- [x] Fixed evidence-ledger.ts TypeScript error (ADR-0001)
+- [x] Documented OpenCode API version (2.2.0) and OpenChamber SDK issue
+- [x] Created all knowledge base files
+- [x] Git tag: `phase-0-baseline`
 
-## Phase 1 Checklist
+### Phase 1: Playbook Foundation
+- [x] Created `/playbook/` structure
+- [x] 7 principles as Markdown
+- [x] 3 canonical roles (lead, builder, reviewer)
+- [x] 3 thin OpenCode adapters
+- [x] 15 skills with Agent Skills frontmatter
+- [x] 3 workflow recipes
+- [x] 4 rubrics, 4 templates, references
+- [x] Skills CLI validation (nested `playbook/skills/`)
+- [x] Cross-harness install verified
 
-- [x] Test Skills CLI with proposed `playbook/skills/` structure (Section 4.3 gate)
-- [x] Create `/playbook/` package with distribution metadata
-- [x] Write foundation principles and operating guide
-- [x] Write 3 canonical role definitions: Lead, Builder, Reviewer
-- [x] Write 15 core skills (Section 5.5 table)
-- [x] Write initial workflow recipes (feature, bug fix, refactor)
-- [x] Add content validation for frontmatter, unique names, references
-- [x] Test clean install + selective install into OpenCode, Claude Code
-- [x] Run bug-fix workflow and feature-planning exercise without plugin
+### Phase 2: OpenCode Integration
+- [x] Plugin loads Playbook skills via `findAgentsSkillsRoot`
+- [x] Plugin provisions native agents via filesystem (not `ctx.agent.transform` editor.add)
+- [x] Skills registered via `ctx.skill.transform`
+- [x] Agents installed to `.opencode/agents/`
 
-## Phase 2 Checklist
+### Phase 3: Runtime Foundation
+- [x] Persistence layer: file-store, locks, atomic-write, event-log, repository-root, schema-version
+- [x] Memory store: CRUD, categories, search, supersede, index
+- [x] Delivery store: CRUD, status transitions, simple model
+- [x] Task store: CRUD, dependencies, cycles, ready tasks (no phase coupling)
+- [x] Agent run store: Dispatch tracking, handoff recording
+- [x] History service: Event querying, stats
+- [x] Check service: Discover, execute, evidence recording
+- [x] ~7 cohesive tools: status, memory, history, delivery, task, agent, check
+- [x] Typecheck PASS, tests 25/25 PASS
+- [x] Git tag: `phase-3-complete`
 
-- [x] Adapt skill loader to find Playbook location
-- [x] Register skills via `ctx.skill.transform` (verified API)
-- [x] Create OpenCode adapter agents in Playbook (Lead, Builder, Reviewer)
-- [x] Provision native agent files via filesystem (not `editor.add()`)
-- [x] Make agent provisioning idempotent with provenance tracking
-- [x] Preserve user-customized agent files (existing logic works)
-- [x] Test plugin startup — typecheck PASS, tests 25/25 PASS
-
-## Phase 3 Checklist
-
-- [x] Simplify delivery/task services (remove lifecycle coupling)
-- [x] Implement project memory store (curated knowledge, distinct from history/state)
-- [x] Add delivery/task CRUD with dependency handling
-- [x] Implement activity history recording
-- [x] Add schema migration support (revision fields on all entities)
-- [x] Test restart continuity, concurrent writes, migration
-- [x] Create ~7 cohesive tools (status, memory, history, delivery, task, agent, check)
-- [x] All tests pass (25/25), typecheck passes
-
-## Phase 4 Checklist
-
+### Phase 4: Agent Coordination & Enforcement
 - [x] Agent dispatch integrated with agentRunStore
-- [x] Evidence/check recording integration
-- [x] Basic completion checks (required evidence, blocking findings)
-- [x] Explicit approval requirements for protected actions
-- [x] Blocked status requires reason enforcement
-- [x] Dashboard projection updated for OpenChamber
-- [x] Tests 25/25 PASS, typecheck PASS
+- [x] Evidence recording with revision tracking
+- [x] Enforcement service with 5 rules:
+  - Delivery cannot complete while required tasks incomplete
+  - Task cannot complete with incomplete dependencies or failed evidence
+  - Blocked status requires a reason
+  - Protected actions require approval (stub)
+  - Completion checks before protected transitions
+- [x] Task/delivery tools enforce completion rules
+- [x] Typecheck PASS, tests 25/25 PASS
+- [x] Git tag: `phase-4-complete`
 
-## Milestones
+### Phase 5: OpenChamber Visualization
+- [x] Modular projection publisher with separate modules:
+  - Types, Paths, Loaders
+  - Delivery reports, Activity reports, Memory reports, Quality reports
+- [x] OpenChamber API refactored to read ONLY published projections
+- [x] API methods: readManifest, readDashboardIndex, readDeliveryReport, readActivityReport, readMemoryIndex, readQualitySummary, listReports
+- [x] Projection publishing integrated into tool hook (after every tool execution)
+- [x] Typecheck PASS, build PASS, tests 25/25 PASS
+- [x] Git tag: `phase-5-complete`
 
-| Milestone | Target | Status |
-|---|---|---|
-| Phase 0 complete — baseline documented | 2026-11-01 | **COMPLETE** |
-| Phase 1 complete — Playbook installs & works standalone | 2026-11-01 | **COMPLETE** |
-| Phase 2 complete — Plugin loads Playbook, provisions agents | 2026-11-01 | **COMPLETE** |
-| Phase 3 complete — Memory, delivery/task, history work | 2026-11-01 | **COMPLETE** |
-| Phase 4 complete — Agent dispatch, evidence, enforcement | TBD | PENDING |
-| Phase 5 complete — OpenChamber reads projections | TBD | PENDING |
-| Phase 6 complete — E2E feature delivery demo | TBD | PENDING |
+### Phase 6: E2E Validation
+- [x] Fixed directory creation bugs in all stores
+- [x] Fixed delivery ID prefix inconsistency (unified to `dlv_`)
+- [x] Created comprehensive E2E test (`test/e2e-workflow.test.ts`)
+- [x] Full workflow: delivery to 5 tasks with dependencies to agent dispatch to checks to evidence to memory to projections to dashboard
+- [x] All TypeScript errors fixed
+- [x] All 26 tests pass (25 unit + 1 E2E)
+- [x] Typecheck PASS, build PASS
+- [x] Git tag: `phase-6-complete`
 
-## Blocking Issues
+## Test Results Summary
 
-1. **OpenChamber build fails** — `@openchamber/sdk` not resolvable (deferred — typecheck passes)
+| Package | Typecheck | Build | Tests |
+|---|---|---|---|
+| opencode/vstack | PASS | PASS | 26/26 PASS |
+| openchamber/vstack-panel | PASS | DEFERRED | N/A |
+| Root workspace | PARTIAL | PARTIAL | opencode: 26/26 |
 
-## Next Recommended Task
+## Git Tags
 
-Begin Phase 4: Agent coordination, evidence recording, basic enforcement, and OpenChamber dashboard projection.
+- `phase-0-baseline`
+- `phase-3-complete`
+- `phase-4-complete`
+- `phase-5-complete`
+- `phase-6-complete`
+
+## Open Items for Open Source Release
+
+- [ ] Remove legacy `agents-skills/` directory
+- [ ] Add LICENSE (MIT/Apache-2.0)
+- [ ] Add CONTRIBUTING.md
+- [ ] Add CODE_OF_CONDUCT.md
+- [ ] Create public-facing wiki documentation
+- [ ] Publish playbook as npm package
+- [ ] Document OpenChamber SDK limitation
+- [ ] Set up GitHub Actions for CI/CD

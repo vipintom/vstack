@@ -1,85 +1,71 @@
 # Architecture
 
-**Last updated:** 2026-11-01 (Phase 0 baseline)
+**Last updated:** 2026-11-01 (All phases complete)
 
 ## Current Package Boundaries
 
-### 1. agents-skills (Portable Content)
-- **Purpose:** Harness-independent skills, agent definitions, resources
-- **Location:** `/agents-skills/`
+### 1. playbook/ (Portable Content Package)
+- **Purpose:** Harness-independent principles, roles, skills, workflows, resources
+- **Location:** `/playbook/`
 - **Contents:**
-  - `skills/` — 11 skill directories (vstack-architecture, debugging, discovery, documentation, implementation, operations, planning, release, review, testing)
-  - `agents/opencode-v2/` — 6 OpenCode-specific agent definitions
-  - `resources/` — rubrics, templates, references
-- **Dependencies:** None (pure content)
-- **Distribution:** Intended for `npx skills add` and manual installation
+  - `principles/` — 7 engineering principles (bias to deletion, foundational thinking, domain modeling, boundary discipline, idempotence, root-cause debugging, verifiable sequencing, delegation)
+  - `agents/roles/` — 3 canonical roles: lead.md, builder.md, reviewer.md
+  - `agents/adapters/opencode/` — 3 thin OpenCode agent adapters
+  - `skills/` — 15 skills as Markdown with Agent Skills frontmatter
+  - `workflows/` — 3 workflow recipes: bug-fix.md, feature-delivery.md, context-interruption.md
+  - `resources/` — rubrics (4), templates (4), references
+- **Dependencies:** None (pure Markdown/YAML content)
+- **Distribution:** Skills CLI compatible; works without any plugin
 
-### 2. opencode/vstack (OpenCode Plugin)
-- **Purpose:** Runtime engine for OpenCode — persistence, coordination, enforcement
+### 2. opencode/vstack/ (OpenCode Plugin)
+- **Purpose:** Runtime engine for OpenCode — persistence, coordination, enforcement, projections
 - **Location:** `/opencode/vstack/`
 - **Entry point:** `src/index.ts` (Plugin.define)
 - **Key services initialized at startup:**
-  - Persistence: file-store, locks, atomic-write, event-log, repository-root, schema-version
-  - Runtime: lifecycle-engine, task-service, session-tracker, agent-dispatch, runtime/state
-  - Quality: gates, check-discovery, execution-adapter, evidence-ledger, build/test/security/acceptance
-  - Reviews: review-orchestrator, findings, resolution, rubrics
-  - Release: release-preparation, deployment, rollback, post-release
-  - Policy: permissions, approvals, autonomy
-  - Recovery: recovery-manager, reconciliation
-  - Dashboard: index-generator
-  - Skills: skill-loader, agent-installer
+  - **Persistence:** file-store, locks, atomic-write, event-log, repository-root, schema-version
+  - **Memory:** memory-store (CRUD, categories, search, supersede, index)
+  - **Deliveries:** delivery-store (CRUD, status transitions, simple model)
+  - **Tasks:** task-store (CRUD, dependencies, cycles, ready tasks, no phase coupling)
+  - **Agent Runs:** agent-run-store (dispatch tracking, handoff recording)
+  - **History:** history-service (event querying, stats)
+  - **Quality:** check-service (discover, execute, evidence recording)
+  - **Enforcement:** enforcement-service (5 basic rules: completion checks, blocked reason, approval stub)
+  - **Orchestration:** agent-dispatch (integrated with agentRunStore, proper handoff)
+  - **Dashboard:** projection-publisher (modular: delivery reports, activity, memory index, quality summaries), index-generator
+  - **Skills:** skill-loader (loads Playbook skills via findAgentsSkillsRoot)
+  - **Agents:** agent-installer (provisions native agents via filesystem to `.opencode/agents/`)
 - **OpenCode integrations:**
-  - `ctx.skill.transform` — registers skills
-  - `ctx.tool.transform` — registers 7 tool namespaces
-  - `ctx.command.transform` — registers 6 slash commands
+  - `ctx.skill.transform` — registers Playbook skills
+  - `ctx.tool.transform` — registers ~7 cohesive tools (status, memory, history, delivery, task, agent, check)
+  - `ctx.command.transform` — registers slash commands
   - `ctx.session.hook("context")` — session context injection
-  - `ctx.tool.hook("execute.after")` — dashboard refresh
-  - `ctx.permission.hook("evaluate")` — approval enforcement
+  - `ctx.tool.hook("execute.after")` — projection publishing
+  - `ctx.permission.hook("evaluate")` — approval enforcement (stub)
   - `ctx.agent.reload()` — reload agents after install
 - **Persistence:** Project-local `.vstack/` (manifest, deliveries, state, history, reports)
 
-### 3. openchamber/vstack-panel (OpenChamber Extension)
-- **Purpose:** Read-only visualization of vstack state
+### 3. openchamber/vstack-panel/ (OpenChamber Extension)
+- **Purpose:** Read-only visualization of vstack state via published projections
 - **Location:** `/openchamber/vstack-panel/`
 - **Entry points:** `panel/main.ts` (panel), `panel/dashboard.ts` (dashboard page)
-- **Data access:** `panel/src/services/api.ts` — reads `.vstack/` files directly
+- **Data access:** `panel/src/services/api.ts` — reads ONLY `.vstack/reports/` and `.vstack/state/index.json`
 - **UI components:** `panel/src/components/Dashboard.ts`, `render.ts`
-- **Capabilities declared:** `files` (broad read/write — currently reads delivery internals directly)
-- **Build:** Uses `@openchamber/sdk/scripts/bundle-guest.ts` (currently failing)
+- **Capabilities declared:** `files` (read-only projections)
+- **Build:** Uses `@openchamber/sdk/scripts/bundle-guest.ts` (deferred — SDK unavailable)
 
-## Data Flow (Current)
+## Data Flow (Implemented)
 
 ```
 User Request → OpenCode Lead Agent
     ↓
-Plugin startup → Initialize all services → Load skills → Install agents
+Plugin startup → Initialize all services → Load Playbook skills → Provision native agents
     ↓
-Lead uses vstack tools → Tools call services → Services mutate .vstack/
+Lead uses vstack tools → Tools call services → Services mutate .vstack/ (authoritative)
     ↓
-Tool hook (execute.after) → refreshRuntimeState → Dashboard index updated
+Tool hook (execute.after) → publishProjections() → .vstack/reports/ updated
     ↓
-OpenChamber panel → Reads .vstack/state/index.json + delivery internals → Renders UI
+OpenChamber panel → Reads projections (.vstack/reports/ + .vstack/state/index.json) → Renders UI
 ```
-
-## Target Architecture (Per New Plan)
-
-### Playbook Package (New)
-- **Location:** `/playbook/` (to be created)
-- **Contents:** principles/, agents/roles/, agents/adapters/, skills/, workflows/, resources/
-- **No runtime code** — portable Markdown/YAML only
-- **Distribution:** npm package + Skills CLI compatible
-
-### OpenCode Plugin (Refactored)
-- **Loads Playbook content** instead of agents-skills
-- **Provisions native agents** via filesystem (not `ctx.agent.transform` editor.add)
-- **Simplified services:** persistence, memory, deliveries, tasks, agents, quality, history, dashboard, permissions, ~7 tools
-- **Removes:** lifecycle-engine, phase profiles, coordinator, scheduler, specialized quality engines, release engine, complex review orchestrator, autonomy modes
-
-### OpenChamber (Refactored)
-- **Reads only published projections** (`.vstack/state/index.json`, detail reports)
-- **Never reads delivery internals** directly
-- **Validates projection version/shape** before render
-- **Shows stale/unavailable states** clearly
 
 ## Key Interfaces
 
@@ -89,23 +75,46 @@ OpenChamber panel → Reads .vstack/state/index.json + delivery internals → Re
 - `EventLog` — append-only JSONL
 
 ### Plugin ↔ OpenCode
-- Tools: `vstack_*` namespace
+- Tools: `vstack_*` namespace (~7 tools)
 - Commands: `/vstack*`
-- Skills: via `ctx.skill.transform`
+- Skills: via `ctx.skill.transform` (Playbook skills)
 - Agents: filesystem provision to `.opencode/agents/`
 
-### Plugin → OpenChamber
-- Published: `.vstack/state/index.json` (dashboard projection)
-- Published: `.vstack/reports/deliveries/<id>.json`
-- Published: `.vstack/reports/activity/*.json`
+### Plugin → OpenChamber (Projections Only)
+- `.vstack/state/index.json` — dashboard index (active deliveries)
+- `.vstack/reports/deliveries/<id>.json` — delivery detail with tasks, agents, evidence
+- `.vstack/reports/activity/<id>.json` — activity timeline from event log
+- `.vstack/reports/memory-index.json` — searchable memory catalogue
+- `.vstack/reports/quality/<id>.json` — check counts by type
 
 ## OpenCode API Version
-
 - `@opencode/plugin`: 2.2.0
 - `@opencode/schema`: 2.2.0
-- **Note:** `ctx.agent.transform` does NOT expose `editor.add()` — agent provisioning must use filesystem
+- **Note:** `ctx.agent.transform` does NOT expose `editor.add()` — agent provisioning uses filesystem
 
 ## OpenChamber API Version
-
-- `@openchamber/sdk`: "latest" (build fails — SDK not accessible)
+- `@openchamber/sdk`: "latest" (build deferred — SDK not accessible)
 - Declared engine: `>=1.24.0`
+- Typecheck passes, build deferred per plan
+
+## Simplicity Constraints (Enforced)
+
+- Direct services over registries/frameworks/state machines
+- Module justified only if: owns real responsibility, has reusable behavior, or makes tested boundary safer
+- No wrapper layers just to pass deps or mirror directory tree
+- ~7 cohesive tools max (status, memory, history, delivery, task, agent, check)
+- No generic workflow interpreter, scheduler, deployment platform, policy engine
+- No event sourcing — event log is audit record only
+
+## Responsibility Boundaries (Enforced)
+
+| Concern | Playbook | OpenCode Plugin | OpenChamber |
+|---|---|---|---|
+| Principles/roles/skills/workflows | Defines | Makes available | Displays |
+| Task/delivery state | Explains methodology | Owns runtime records | Reads projections |
+| Agent reasoning | Guides | Does not reimplement | None |
+| Memory methodology | Defines practices | Persists/retrieves | Browses views |
+| History | Defines events | Records actual events | Displays published |
+| Verification | Defines procedures | Executes/records checks | Displays evidence |
+| Enforcement | Describes standards | Enforces 5 minimal rules | Displays gate status |
+| Visualization | None | Publishes read model | Owns presentation |
