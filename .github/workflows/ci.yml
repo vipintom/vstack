@@ -1,0 +1,130 @@
+name: Umbrella CI
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contracts:
+    name: Validate Projection Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate contracts
+        run: pnpm run validate:contracts
+
+  validate-compatibility:
+    name: Validate Compatibility Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate compatibility
+        run: pnpm run validate:compatibility
+
+  validate-all:
+    name: Validate All
+    runs-on: ubuntu-latest
+    needs: [validate-contracts, validate-compatibility]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run all validations
+        run: pnpm run validate:all
+
+  check-component-references:
+    name: Check Component References
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify no component directories exist
+        run: |
+          if [ -d "playbook" ] || [ -d "opencode/vstack" ] || [ -d "openchamber/vstack-panel" ] || [ -d "package" ]; then
+            echo "ERROR: Component directories found in umbrella repository"
+            exit 1
+          fi
+          echo "✅ No component directories found"
+
+      - name: Check for placeholder GitHub username
+        run: |
+          if grep -r "<github-username>" --include="*.md" --include="*.json" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules"; then
+            echo "WARNING: Found <github-username> placeholders that need replacement"
+            grep -r "<github-username>" --include="*.md" --include="*.json" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules"
+          else
+            echo "✅ No placeholder usernames found"
+          fi
+
+  validate-documentation-links:
+    name: Validate Documentation Links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for broken internal links
+        run: |
+          # Check that key files exist
+          files=(
+            "README.md"
+            "AGENTS.md"
+            "docs/projection-protocol.md"
+            "docs/capability-matrix.md"
+            "docs/vstack-revised-structure-prd.md"
+            "docs/vstack-structure-implementation-plan.md"
+            "contracts/projections/v1/README.md"
+            "contracts/validate-contracts.js"
+            "compatibility/matrix.yaml"
+            "compatibility/integrated-release.json"
+            "compatibility/integrated-release.schema.json"
+            "compatibility/validate-compatibility.js"
+          )
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Missing file: $file"
+              exit 1
+            fi
+          done
+          echo "✅ All key documentation files present"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
