@@ -1,9 +1,10 @@
 ---
 import { withBase } from '../utils/urls';
+const baseUrl = withBase('/');
 ---
 
 <!-- Pagefind Search UI -->
-<div id="search-ui" class="search-ui-container"></div>
+<div id="search-ui" class="search-ui-container" data-base-url={baseUrl}></div>
 
 <style>
   .search-ui-container {
@@ -107,27 +108,31 @@ import { withBase } from '../utils/urls';
 </style>
 
 <script>
-  // Initialize Pagefind search
+  // Initialize Pagefind search using PagefindUI (v1.1.0+)
   if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
-      // Load Pagefind JS
+      const searchContainer = document.getElementById('search-ui');
+      const baseUrl = searchContainer?.dataset.baseUrl || '/';
+      
+      // Load Pagefind UI JS
       const script = document.createElement('script');
-      script.src = '/_pagefind/pagefind.js';
+      script.src = baseUrl + '_pagefind/pagefind-ui.js';
       script.async = true;
       script.onload = () => {
-        if (window.pagefind) {
-          const searchContainer = document.getElementById('search-ui');
+        if (window.PagefindUI) {
           if (searchContainer) {
-            new window.pagefind.Search({
+            new window.PagefindUI({
               element: searchContainer,
               showImages: false,
               showSubResults: true,
               resetStyles: true,
+              bundlePath: baseUrl + '_pagefind/',
               translations: {
                 placeholder: 'Search vstack docs…',
-                zeroResults: 'No results for "[SEARCH_TERM]"',
-                manyResults: '[COUNT] results for "[SEARCH_TERM]"',
-                searchLabel: 'Search documentation',
+                zero_results: 'No results for "[SEARCH_TERM]"',
+                many_results: '[COUNT] results for "[SEARCH_TERM]"',
+                one_result: '[COUNT] result for "[SEARCH_TERM]"',
+                search_label: 'Search documentation',
               }
             });
           }

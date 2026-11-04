@@ -2,38 +2,51 @@
 import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import { withBase } from '../utils/urls';
+const baseUrl = withBase('/');
 ---
 
 <Section id="search" gap="l" aria-labelledby="search-title">
   <Container>
     <h2 id="search-title">Search</h2>
-    <div id="search-container"></div>
+    <div id="search-container" data-base-url={baseUrl}></div>
   </Container>
 </Section>
 
 <script is:inline>
-  // Load Pagefind dynamically - using import() with a string to avoid build-time resolution
+  // Load Pagefind dynamically - using window.PagefindUI (Pagefind v1.1.0+)
   async function initSearch() {
     const container = document.getElementById('search-container');
     if (!container) return;
 
     try {
       // Use base URL for production /vstack/ path compatibility
-      const baseUrl = import.meta.env.BASE_URL || '/';
+      const baseUrl = container.dataset.baseUrl || '/';
       const pagefindPath = `${baseUrl}_pagefind/pagefind-ui.js`;
-      const module = await import(pagefindPath);
-      const { PagefindUI } = module;
-      new PagefindUI({
+      
+      // Load script if not already loaded
+      if (!window.PagefindUI) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = pagefindPath;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      
+      new window.PagefindUI({
         element: container,
         showSubResults: true,
         showImages: false,
+        bundlePath: baseUrl + '_pagefind/',
         translations: {
           placeholder: 'Search vstack documentation...',
-          zeroResults: 'No results found for "[SEARCH_TERM]"',
-          manyResults: 'Found [COUNT] results for "[SEARCH_TERM]"',
-          oneResult: 'Found [COUNT] result for "[SEARCH_TERM]"',
-          filterLabel: 'Filters',
-          clearFilters: 'Clear filters',
+          zero_results: 'No results found for "[SEARCH_TERM]"',
+          many_results: 'Found [COUNT] results for "[SEARCH_TERM]"',
+          one_result: 'Found [COUNT] result for "[SEARCH_TERM]"',
+          filter_label: 'Filters',
+          clear_filters: 'Clear filters',
         },
       });
     } catch (e) {

@@ -1,14 +1,4 @@
-# vstack robots.txt
-# Allow all crawlers access to all content
-
 User-agent: *
 Allow: /
 
-# Sitemap location
 Sitemap: https://vipintom.github.io/vstack/sitemap-index.xml
-
-# Crawl-delay for polite crawlers (optional)
-# Crawl-delay: 10
-
-# Host directive for main domain
-Host: vipintom.github.io

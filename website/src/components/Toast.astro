@@ -12,7 +12,7 @@
 <script set:html={`;(() => {
   if (typeof window === 'undefined') return;
   // Global toast function
-  window.showToast = (message: string) => {
+  window.showToast = (message) => {
     const toast = document.getElementById('toast');
     if (toast) {
       toast.textContent = message;

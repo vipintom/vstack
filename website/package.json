@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist --output-path dist/_pagefind",
+    "build": "astro build && pagefind --site dist --output-path dist/_pagefind && node scripts/copy-static-files.js",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .astro,.ts,.js",
