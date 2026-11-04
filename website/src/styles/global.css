@@ -139,6 +139,26 @@
   --chart-4: oklch(60% 0.18 280);  /* Umbrella - purple */
 }
 
+/* ===== FONT FACE DECLARATIONS (font-display: swap prevents FOIT) ===== */
+@font-face {
+  font-family: 'Geist Variable';
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/geistvariable/v2/5Zd5ZfHFiN0uDQvW.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-weight: 400 500 600;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/ibmplexsans/v19/zYXgKVElMYYaJe8bpLHnCwDKhdg.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/jetbrainsmono/v23/tDbD2oWUg0MKZW1lKxFDhCU.woff2') format('woff2');
+}
+
 /* Light mode - derived, not inverted */
 [data-theme="light"] {
   --color-paper: var(--color-paper-light);
