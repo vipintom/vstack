@@ -1,5 +1,9 @@
 name: Umbrella Release
 
+# NO NPM_TOKEN REQUIRED — Umbrella validates component releases only
+# REQUIRED: GITHUB_TOKEN (automatically provided)
+# Component repos (vstack-playbook, vstack-opencode) require their own NPM_TOKEN secrets
+
 on:
   release:
     types: [published]
@@ -78,19 +82,19 @@ jobs:
             "commit": "${{ github.sha }}",
             "components": {
               "playbook": {
-                "repository": "<github-username>/vstack-playbook",
+                "repository": "vipintom/vstack-playbook",
                 "version": "$(jq -r .components.playbook.version compatibility/integrated-release.json)",
                 "tag": "$(jq -r .components.playbook.tag compatibility/integrated-release.json)",
                 "commit": "$(jq -r .components.playbook.commit compatibility/integrated-release.json)"
               },
               "opencode": {
-                "repository": "<github-username>/vstack-opencode",
+                "repository": "vipintom/vstack-opencode",
                 "version": "$(jq -r .components.opencode.version compatibility/integrated-release.json)",
                 "tag": "$(jq -r .components.opencode.tag compatibility/integrated-release.json)",
                 "commit": "$(jq -r .components.opencode.commit compatibility/integrated-release.json)"
               },
               "openchamber": {
-                "repository": "<github-username>/vstack-openchamber",
+                "repository": "vipintom/vstack-openchamber",
                 "version": "$(jq -r .components.openchamber.version compatibility/integrated-release.json)",
                 "tag": "$(jq -r .components.openchamber.tag compatibility/integrated-release.json)",
                 "commit": "$(jq -r .components.openchamber.commit compatibility/integrated-release.json)"

@@ -1,0 +1,313 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vstack.dev/schemas/projections/v1/delivery-report.json",
+  "title": "vstack Delivery Detail Report",
+  "description": "Comprehensive delivery report with all tasks, agent runs, evidence, reviews, decisions, recoveries, checkpoints, lessons, and verification index. Located at .vstack/reports/deliveries/{deliveryId}.json",
+  "allOf": [
+    { "$ref": "projection-envelope.schema.json" },
+    {
+      "type": "object",
+      "required": ["delivery", "tasks", "agentRuns", "evidence", "reviewSessions", "decisions", "recoveries", "checkpoints", "lessons", "generatedAt"],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Report revision number"
+        },
+        "delivery": {
+          "type": "object",
+          "required": ["id", "title", "description", "type", "status", "currentPhase", "profile", "risk", "labels", "acceptanceCriteria", "createdAt", "updatedAt", "createdBy"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^dlv_[a-zA-Z0-9_-]+$" },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "type": { "type": "string", "enum": ["feature", "bugfix", "refactor", "migration", "infrastructure", "documentation", "operations", "release", "other"] },
+            "status": { "type": "string", "enum": ["proposed", "active", "blocked", "completed", "cancelled", "failed"] },
+            "currentPhase": { "type": "string", "enum": ["intake", "discovery", "design", "planning", "implementation", "validation", "review", "release_preparation", "deployment", "post_release", "completed"] },
+            "profile": { "type": "string", "enum": ["bug-fix", "feature", "refactor", "architecture-change", "infrastructure-change", "documentation", "release-only"] },
+            "risk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+            "labels": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" },
+            "createdBy": { "type": "string" }
+          }
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "type", "status", "priority", "dependencies", "acceptanceCriteria", "assignedAgentId", "workScope", "createdAt", "updatedAt", "completedAt"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^tsk_[a-zA-Z0-9_-]+$" },
+              "title": { "type": "string" },
+              "type": { "type": "string", "enum": ["discovery", "design", "planning", "implementation", "testing", "review", "documentation", "release", "deployment", "operations", "other"] },
+              "status": { "type": "string", "enum": ["pending", "ready", "assigned", "in_progress", "review", "completed", "blocked", "failed", "cancelled", "skipped", "needs_rework"] },
+              "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+              "dependencies": { "type": "array", "items": { "type": "string", "pattern": "^tsk_[a-zA-Z0-9_-]+$" } },
+              "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+              "assignedAgentId": { "type": ["string", "null"], "pattern": "^vstack-[a-z-]+$" },
+              "workScope": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" },
+              "completedAt": { "type": ["string", "null"], "format": "date-time" },
+              "contract": {
+                "type": ["object", "null"],
+                "required": ["objective", "scope", "outOfScope", "verification", "expectedOutput", "reportingFormat", "stopConditions", "escalationConditions"],
+                "properties": {
+                  "objective": { "type": "string" },
+                  "scope": { "type": "array", "items": { "type": "string" } },
+                  "outOfScope": { "type": "array", "items": { "type": "string" } },
+                  "verification": { "type": "array", "items": { "type": "string" } },
+                  "expectedOutput": { "type": "array", "items": { "type": "string" } },
+                  "reportingFormat": { "type": "string", "enum": ["structured", "markdown", "json"] },
+                  "stopConditions": { "type": "array", "items": { "type": "string" } },
+                  "escalationConditions": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "assignment": {
+                "type": ["object", "null"],
+                "required": ["agentId", "role", "status", "outcome", "writableScope", "isolationMethod", "changedFiles", "checksRun", "assumptions", "blockers"],
+                "properties": {
+                  "agentId": { "type": "string" },
+                  "role": { "type": "string", "enum": ["lead", "builder", "reviewer"] },
+                  "status": { "type": "string" },
+                  "outcome": { "type": ["string", "null"], "enum": ["PASS", "ISSUES", "BLOCKED"] },
+                  "writableScope": { "type": "array", "items": { "type": "string" } },
+                  "isolationMethod": { "type": "string", "enum": ["worktree", "branch", "directory", "sequential"] },
+                  "changedFiles": { "type": "array", "items": { "type": "string" } },
+                  "checksRun": { "type": "array", "items": { "type": "string" } },
+                  "assumptions": { "type": "array", "items": { "type": "string" } },
+                  "blockers": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "agentRuns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "agentId", "taskId", "role", "status", "startedAt", "completedAt", "resultSummary", "error"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^agrun_[a-zA-Z0-9_-]+$" },
+              "agentId": { "type": "string", "pattern": "^vstack-[a-z-]+$" },
+              "taskId": { "type": ["string", "null"], "pattern": "^tsk_[a-zA-Z0-9_-]+$" },
+              "role": { "type": "string", "enum": ["lead", "builder", "reviewer"] },
+              "status": { "type": "string", "enum": ["dispatched", "running", "completed", "failed", "cancelled"] },
+              "startedAt": { "type": "string", "format": "date-time" },
+              "completedAt": { "type": ["string", "null"], "format": "date-time" },
+              "resultSummary": { "type": ["string", "null"] },
+              "error": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "checkId", "type", "status", "exitCode", "summary", "completedAt", "taskId"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^evd_[a-zA-Z0-9_-]+$" },
+              "checkId": { "type": "string" },
+              "type": { "type": "string", "enum": ["build", "lint", "typecheck", "test:unit", "test:integration", "test:e2e", "coverage", "security:deps", "security:secrets", "security:review", "architecture:review", "acceptance", "release:artifacts", "deploy:health", "manual_attestation", "other"] },
+              "status": { "type": "string", "enum": ["passed", "failed", "skipped", "error", "timeout", "cancelled"] },
+              "exitCode": { "type": ["integer", "null"] },
+              "summary": { "type": "string" },
+              "completedAt": { "type": "string", "format": "date-time" },
+              "taskId": { "type": ["string", "null"], "pattern": "^tsk_[a-zA-Z0-9_-]+$" },
+              "provenance": { "type": ["string", "null"], "enum": ["plugin_observed", "agent_reported", "external_system", "user_supplied"] },
+              "outcome": { "type": ["string", "null"], "enum": ["passed", "failed", "skipped", "not_run", "blocked", "unavailable", "inconclusive"] },
+              "commitRef": { "type": ["string", "null"], "pattern": "^[a-f0-9]{40}$" },
+              "command": { "type": ["array", "null"], "items": { "type": "string" } },
+              "workingDirectory": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "reviewSessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "independence", "reviewerId", "status", "baseCommit", "diffRef", "evidenceConsidered", "findings", "startedAt", "completedAt"],
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string", "enum": ["code", "design", "security", "architecture", "release", "post_mortem", "other"] },
+              "independence": { "type": "string", "enum": ["confirmed", "declared", "not_independent", "unknown"] },
+              "reviewerId": { "type": "string" },
+              "status": { "type": "string", "enum": ["in_progress", "completed", "timed_out", "unavailable", "cancelled"] },
+              "baseCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+              "diffRef": { "type": ["string", "null"] },
+              "evidenceConsidered": { "type": "array", "items": { "type": "string", "pattern": "^evd_[a-zA-Z0-9_-]+$" } },
+              "findings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "severity", "category", "title", "description", "location", "evidenceRefs", "disposition", "rationale", "createdAt", "updatedAt"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "informational"] },
+                    "category": { "type": "string", "enum": ["security", "correctness", "performance", "maintainability", "style", "architecture", "testing", "documentation", "other"] },
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "location": { "type": "string" },
+                    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+                    "disposition": { "type": "string", "enum": ["open", "fixed", "dismissed", "deferred", "accepted_risk"] },
+                    "rationale": { "type": "string" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              },
+              "startedAt": { "type": "string", "format": "date-time" },
+              "completedAt": { "type": ["string", "null"], "format": "date-time" }
+            }
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "phase", "summary", "context", "alternatives", "chosenOption", "rationale", "evidenceReferences", "status", "supersededBy", "createdAt", "updatedAt", "createdBy"],
+            "properties": {
+              "id": { "type": "string" },
+              "phase": { "type": "string" },
+              "summary": { "type": "string" },
+              "context": { "type": "string" },
+              "alternatives": { "type": "array", "items": { "type": "string" } },
+              "chosenOption": { "type": "string" },
+              "rationale": { "type": "string" },
+              "evidenceReferences": { "type": "array", "items": { "type": "string" } },
+              "status": { "type": "string", "enum": ["active", "superseded", "reverted"] },
+              "supersededBy": { "type": ["string", "null"] },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" },
+              "createdBy": { "type": "string" }
+            }
+          }
+        },
+        "recoveries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "failureClass", "symptom", "attempts", "commonAssumption", "diagnosticProbe", "changedApproach", "recoveryRound", "maxRecoveryRounds", "cleanupStatus", "finalOutcome", "stopReason", "createdAt", "updatedAt"],
+            "properties": {
+              "id": { "type": "string" },
+              "failureClass": { "type": "string" },
+              "symptom": { "type": "string" },
+              "attempts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["attemptNumber", "description", "observedResult", "assumptionTested", "timestamp"],
+                  "properties": {
+                    "attemptNumber": { "type": "integer" },
+                    "description": { "type": "string" },
+                    "observedResult": { "type": "string" },
+                    "assumptionTested": { "type": "string" },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                  }
+                }
+              },
+              "commonAssumption": { "type": "string" },
+              "diagnosticProbe": {
+                "type": ["object", "null"],
+                "required": ["description", "command", "result"],
+                "properties": {
+                  "description": { "type": "string" },
+                  "command": { "type": "array", "items": { "type": "string" } },
+                  "result": { "type": "string" }
+                }
+              },
+              "changedApproach": { "type": ["string", "null"] },
+              "recoveryRound": { "type": "integer" },
+              "maxRecoveryRounds": { "type": "integer" },
+              "cleanupStatus": { "type": "string", "enum": ["pending", "completed", "failed"] },
+              "finalOutcome": { "type": "string", "enum": ["resolved", "escalated", "blocked"] },
+              "stopReason": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "checkpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "progressPath", "contentHash", "branch", "commit", "worktreePath", "verifiedWork", "nextAction", "openQuestions", "blockers", "keyFacts", "decisions", "failedApproaches", "verificationStatus", "freshness", "createdAt", "updatedAt"],
+            "properties": {
+              "id": { "type": "string" },
+              "progressPath": { "type": "string" },
+              "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "branch": { "type": "string" },
+              "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+              "worktreePath": { "type": ["string", "null"] },
+              "verifiedWork": { "type": "array", "items": { "type": "string" } },
+              "nextAction": { "type": "string" },
+              "openQuestions": { "type": "array", "items": { "type": "string" } },
+              "blockers": { "type": "array", "items": { "type": "string" } },
+              "keyFacts": { "type": "object", "additionalProperties": { "type": "string" } },
+              "decisions": { "type": "array", "items": { "type": "string" } },
+              "failedApproaches": { "type": "array", "items": { "type": "string" } },
+              "verificationStatus": {
+                "type": "object",
+                "required": ["passed", "failed", "skipped", "remaining"],
+                "properties": {
+                  "passed": { "type": "array", "items": { "type": "string" } },
+                  "failed": { "type": "array", "items": { "type": "string" } },
+                  "skipped": { "type": "array", "items": { "type": "string" } },
+                  "remaining": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "freshness": { "type": "string", "enum": ["current", "stale", "unknown", "mismatch"] },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "failureClass", "occurrences", "recurrenceCount", "impactAssessment", "preventionMechanism", "implementationArtifact", "validationResult", "status", "owner", "createdAt", "updatedAt", "closedAt", "supersededBy"],
+            "properties": {
+              "id": { "type": "string" },
+              "failureClass": { "type": "string" },
+              "occurrences": { "type": "array", "items": { "type": "string" } },
+              "recurrenceCount": { "type": "integer" },
+              "impactAssessment": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+              "preventionMechanism": { "type": "string", "enum": ["structure", "types", "lint", "ci", "test", "skill", "memory"] },
+              "implementationArtifact": { "type": ["string", "null"] },
+              "validationResult": { "type": ["string", "null"], "enum": ["passed", "failed", "pending", "not_tested"] },
+              "status": { "type": "string", "enum": ["candidate", "assessed", "promoted", "verified", "closed", "superseded"] },
+              "owner": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" },
+              "closedAt": { "type": ["string", "null"], "format": "date-time" },
+              "supersededBy": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "verificationIndex": {
+          "type": ["object", "null"],
+          "required": ["id", "projectPath", "harness", "skillPath", "contentHash", "version", "surfaceCoverage", "lastValidated", "validationEvidence", "status", "gaps", "createdAt", "updatedAt"],
+          "properties": {
+            "id": { "type": "string" },
+            "projectPath": { "type": "string" },
+            "harness": { "type": "string", "enum": ["opencode", "codex", "claude-code", "other"] },
+            "skillPath": { "type": "string" },
+            "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "version": { "type": "string" },
+            "surfaceCoverage": { "type": "array", "items": { "type": "string" } },
+            "lastValidated": { "type": "string", "format": "date-time" },
+            "validationEvidence": { "type": "array", "items": { "type": "string" } },
+            "status": { "type": "string", "enum": ["current", "stale", "missing", "unknown"] },
+            "gaps": { "type": "array", "items": { "type": "string" } },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  ]
+}

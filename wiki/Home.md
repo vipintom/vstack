@@ -4,8 +4,9 @@
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)]()
-[![Tests](https://img.shields.io/badge/tests-26%2F26%20PASS-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-103%2F103%20PASS-brightgreen)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Version](https://img.shields.io/badge/version-0.1.0-blue)]()
 
 ---
 
@@ -14,8 +15,10 @@
 vstack is a portable engineering playbook that codifies how effective software teams work. It consists of three packages:
 
 1. **Playbook** (`/playbook/`) — Portable content: principles, roles, skills, workflows (Markdown/YAML). Works without any plugin, harness-independent.
-2. **OpenCode Plugin** (`/opencode/vstack/`) — Runtime engine for OpenCode: persistent memory, delivery/task tracking, agent coordination, evidence, basic enforcement.
+2. **OpenCode Plugin** (`/opencode/vstack/`) — Runtime engine for OpenCode: persistent memory, delivery/task tracking, agent coordination, evidence, enforcement with completion gates.
 3. **OpenChamber Plugin** (`/openchamber/vstack-panel/`) — Read-only visualization of published projections.
+
+---
 
 ## Quick Start
 
@@ -42,7 +45,7 @@ npm link /path/to/vstack/opencode/vstack
 
 ### OpenChamber Extension
 
-Currently deferred — requires `@openchamber/sdk` access.
+Typecheck passes; build deferred — requires `@openchamber/sdk` access.
 
 ---
 
@@ -62,31 +65,37 @@ Currently deferred — requires `@openchamber/sdk` access.
 | **OpenChamber** | [Visualization](OpenChamber.md) |
 | **Architecture** | [Architecture](Architecture.md) |
 | **Contributing** | [Contributing](Contributing.md) |
+| **Capability Matrix** | [Harness Compatibility](https://github.com/vstack/playbook/blob/main/docs/capability-matrix.md) |
 
 ---
 
 ## Key Features
 
 ### 🎯 Playbook (Portable)
-- **7 Engineering Principles** — Bias to deletion, foundational thinking, domain modeling, boundary discipline, idempotence, root-cause debugging, verifiable sequencing, delegation
+- **17 Engineering Principles** — Harness independence, procedures over vague instructions, flexible workflows, loops first-class, small purposeful agent team, evidence before completion, independent challenge, runtime simplicity, clear responsibility, degrade gracefully, understand before changing, route before loading, smallest complete change, challenge assumptions, model domain explicitly, respect boundaries, verifiable increments
 - **3 Canonical Roles** — Lead, Builder, Reviewer
-- **15 Skills** — From architecture to testing, each as standalone Markdown
-- **3 Workflow Recipes** — Bug fix, feature delivery, context interruption
+- **55 Skills** — From architecture to testing, each as standalone Markdown with Agent Skills frontmatter (2 legacy retired, 3 utils added)
+- **18 Workflow Recipes** — Investigation, bug fix, feature delivery, architecture change, infrastructure change, documentation, skill maintenance, refactoring, performance investigation, prototype, multi-phase delivery, autonomous execution, PR preparation/monitoring, worktree cleanup, runtime/trace forensics, visual parity
+- **Resources** — 7 review rubrics, 4 templates, 1 reference, 1 project template (verification skill)
+- **Canonical Manifest** — `playbook/manifest.json` with schemaVersion=2, contentHash (SHA256), all skills/roles/workflows/resources/adapters
+- **Distribution** — npm package `@vstack/playbook@0.1.0`, tarball (257KB), zip (444KB), SHA256 checksums
 
 ### ⚡ OpenCode Plugin
-- **Persistent Memory** — Project knowledge that survives sessions
-- **Delivery/Task Tracking** — Lightweight CRUD with dependencies
-- **Agent Coordination** — Dispatch builders/reviewers with handoff recording
-- **Evidence-Based Checks** — Execute tests, builds, lint with recorded evidence
-- **5 Enforcement Rules** — Completion checks, blocked reasons, approval stubs
-- **~7 Cohesive Tools** — Status, memory, history, delivery, task, agent, check
+- **Persistent Memory** — Project knowledge that survives sessions (CRUD, categories, search, supersede, index)
+- **Delivery/Task Tracking** — Lightweight CRUD with dependencies, task contracts, write-scope isolation
+- **Agent Coordination** — Dispatch builders/reviewers with handoff recording, worktree support
+- **Evidence-Based Checks** — Execute tests, builds, lint with recorded evidence (provenance, outcome, commitRef)
+- **6 Completion Gates** — all_tasks_complete, required_evidence, blocking_findings, approval_required, evidence_freshness, approvals_resolved
+- **Action-Scoped Approvals** — scopeHash reuse prevention, expiration support
+- **23 Cohesive Tools** — Status, memory, history, delivery, task, agent, check, assignment, decision, checkpoint, lesson, recovery, verification, sessionPickup, verificationSkill, skillValidate, verificationMaintain, evaluation, lessonPromotion, review
 
 ### 📊 OpenChamber (Read-Only)
 - **Projection-Driven** — Reads only published reports, never authoritative data
 - **Delivery Dashboard** — Active deliveries with task relationships
+- **Delivery Detail** — Tasks, agents, evidence, review sessions, decisions, recoveries, checkpoints, lessons, verification index
 - **Activity Timeline** — Event log from agent runs and tool executions
 - **Memory Catalogue** — Searchable project knowledge
-- **Quality Summaries** — Check counts by type
+- **Quality Summaries** — Check counts by type, review findings
 
 ---
 
@@ -99,23 +108,24 @@ Currently deferred — requires `@openchamber/sdk` access.
 ├─────────────────┤     ├─────────────────┤     ├─────────────────┤
 │ Principles      │────▶│ Loads skills    │────▶│ Reads projections│
 │ Roles           │     │ Provisions agents│    │ Dashboard       │
-│ Skills          │     │ Persistence     │     │ Activity        │
-│ Workflows       │     │ Tools (7)       │     │ Memory          │
-│ Resources       │     │ Enforcement     │     │ Quality         │
+│ 55 Skills       │     │ Persistence     │     │ Activity        │
+│ 18 Workflows    │     │ 23 Tools        │     │ Memory          │
+│ Resources       │     │ 6 Gates         │     │ Quality         │
+│ Manifest v2     │     │ Projections     │     │                 │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
-                              │
-                              ▼
-                       ┌─────────────────┐
-                       │  .vstack/       │
-                       │  (Authoritative)│
-                       ├─────────────────┤
-                       │ deliveries/     │
-                       │ tasks/          │
-                       │ agent-runs/     │
-                       │ memory/         │
-                       │ state/events    │
-                       │ reports/        │
-                       └─────────────────┘
+                                │
+                                ▼
+                         ┌─────────────────┐
+                         │  .vstack/       │
+                         │  (Authoritative)│
+                         ├─────────────────┤
+                         │ deliveries/     │
+                         │ tasks/          │
+                         │ agent-runs/     │
+                         │ memory/         │
+                         │ state/events    │
+                         │ reports/        │
+                         └─────────────────┘
 ```
 
 ---
@@ -124,8 +134,17 @@ Currently deferred — requires `@openchamber/sdk` access.
 
 | Package | Typecheck | Build | Tests |
 |---|---|---|---|
-| opencode/vstack | ✅ PASS | ✅ PASS | ✅ 26/26 |
-| openchamber/vstack-panel | ✅ PASS | ⏸️ DEFERRED | N/A |
+| opencode/vstack | ✅ PASS | ✅ PASS | ✅ 103/103 |
+| openchamber/vstack-panel | ✅ PASS | ✅ PASS | N/A |
+| playbook (validation) | N/A | N/A | ✅ 0 errors |
+
+---
+
+## Release
+
+**v0.1.0 Released** — 2026-11-02
+
+See [IMPLEMENTATION-STATUS.md](../docs/project-knowledge/IMPLEMENTATION-STATUS.md) for release notes.
 
 ---
 

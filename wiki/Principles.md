@@ -1,77 +1,146 @@
 # Engineering Principles
 
-vstack is built on 8 core principles. These aren't aspirations — they're enforceable standards that shape every design decision.
+vstack is built on 17 core principles. These aren't aspirations — they're enforceable decision rules that shape every design decision. Each principle has a trigger, behavior, and example.
 
-## 1. Bias to Deletion
+## Principles in Order of Application
 
-**Default to removing code.** Every line is a liability. If you can't justify its existence with evidence, delete it.
+Apply these principles in order when making decisions:
 
-- No "just in case" code
-- No commented-out blocks
-- No unused abstractions
-- Dead code is a bug
+### 1. Harness Independence First
 
-## 2. Foundational Thinking
+**Trigger:** Choosing between portable instructions vs. proprietary runtime features.
 
-**Solve the root cause, not the symptom.** Ask "why" five times before writing code.
+**Behavior:** Does this work without proprietary runtime? If not, document fallback.
 
-- Symptoms are signals; causes are leverage points
-- A fix that doesn't address the foundation is debt
-- If you're patching the same area twice, you missed the foundation
+**Example:** Use Skills CLI / Markdown skills instead of OpenCode-only agents.
 
-## 3. Domain Modeling
+### 2. Procedures Over Vague Instructions
 
-**Model the problem domain explicitly.** Code should read like the domain it solves.
+**Trigger:** Writing a skill, playbook, or agent instruction.
 
-- Types mirror domain concepts
-- Functions encode domain operations
-- No primitive obsession (no `string` for UserId)
-- The model is the documentation
+**Behavior:** Is there a concrete step-by-step with Action/Evidence/Decision? If missing → BLOCKED.
 
-## 4. Boundary Discipline
+**Example:** Skill must have numbered Procedure with explicit outputs.
 
-**Clear module boundaries. No leakage.**
+### 3. Flexible Workflows, Not Mandatory Ceremony
 
-- Each module owns one responsibility
-- Dependencies point inward (stable abstractions)
-- No circular dependencies
-- Public API is a contract, not an accident
+**Trigger:** Selecting process rigour for a task.
 
-## 5. Idempotence
+**Behavior:** Match rigour to risk level (Low/Medium/High/Critical). If over-engineered → simplify.
 
-**Operations must be safe to repeat.** Same input → same outcome, every time.
+**Example:** Quick mode for trivial bug fix; Advanced for architecture change.
 
-- Retries don't corrupt state
-- Deployments are re-runnable
-- Migrations are idempotent
-- Tools produce deterministic output
+### 4. Loops Are First-Class
 
-## 6. Root-Cause Debugging
+**Trigger:** Designing any iterative process.
 
-**Fix the cause, not the symptom.**
+**Behavior:** Identify feedback loops (TDD, verify-loop, debug, unstick) with iteration bounds and escalation path.
 
-- Reproduce first, hypothesize second
-- One change at a time
-- Verify the fix eliminates the root cause
-- Add regression test at the cause level
+**Example:** `vstack-unstick` has 3-failure limit, 2-round max, clean restart.
 
-## 7. Verifiable Sequencing
+### 5. Small, Purposeful Agent Team
 
-**Every step has proof.** No "trust me" in engineering.
+**Trigger:** Staffing a delivery.
 
-- Each phase produces evidence
-- Completion requires verification
-- No manual gates without automation
-- The record is the truth
+**Behavior:** Map work to Lead/Builder/Reviewer + skills. If role unclear → BLOCKED.
 
-## 8. Delegation
+**Example:** Feature delivery uses 1 Lead, N Builders, 1 Reviewer.
 
-**Push decisions to the boundary.** The person closest to the work decides.
+### 6. Evidence Before Completion
 
-- Lead sets constraints, Builder chooses approach
-- Reviewer validates, doesn't direct
-- Agents own their scope
-- Escalation is explicit, not default
+**Trigger:** Claiming work is done.
+
+**Behavior:** Require executed verification for each acceptance criterion. No evidence → NOT VERIFIED.
+
+**Example:** `vstack-verify-loop` records VERIFIED/NOT_VERIFIED/INCONCLUSIVE/BLOCKED.
+
+### 7. Independent Challenge
+
+**Trigger:** Reviewing work.
+
+**Behavior:** Ensure review uses fresh context (new session or explicit reset). Same-context = weaker review.
+
+**Example:** Reviewer invoked via `agent` tool with only review package.
+
+### 8. Runtime Simplicity
+
+**Trigger:** Adding plugin services vs. instructions.
+
+**Behavior:** Prefer harness tools over plugin services; instructions first.
+
+**Example:** `vstack-check` tool is just a wrapper; instructions can run checks directly.
+
+### 9. Clear Source of Responsibility
+
+**Trigger:** Ambiguity about who owns a concern.
+
+**Behavior:** Assign ownership: Playbook=methodology, Plugin=runtime, OpenChamber=view.
+
+**Example:** Event log = plugin; Playbook = workflow definition.
+
+### 10. Degrade Gracefully
+
+**Trigger:** Using advanced harness features.
+
+**Behavior:** Test/verify fallback paths (sequential, directory isolation, manual checks).
+
+**Example:** Subagents unavailable → sequential; worktrees unavailable → branches.
+
+### 11. Understand Before Changing
+
+**Trigger:** Modifying unfamiliar code.
+
+**Behavior:** Use `vstack-how`/`vstack-why` to build mental model before changes.
+
+**Example:** Investigation workflow before refactoring.
+
+### 12. Route Before Loading
+
+**Trigger:** Starting non-trivial work.
+
+**Behavior:** Use `vstack-mode` to select playbook; don't assume.
+
+**Example:** "Fix bug" → bug-fixing playbook, not feature-delivery.
+
+### 13. Smallest Complete Change
+
+**Trigger:** Sizing a change.
+
+**Behavior:** Decompose into smallest verifiable units. Each: baseline → change → verify → commit.
+
+**Example:** `vstack-incremental-build` enforces per-step verification.
+
+### 14. Challenge Assumptions
+
+**Trigger:** Stuck on same approach.
+
+**Behavior:** Use `vstack-unstick` after 3 failures: name assumption, cheapest probe, 3 different approaches.
+
+**Example:** If caching fix fails 3×, question "is caching the issue?"
+
+### 15. Model Domain Explicitly
+
+**Trigger:** Designing types, APIs, schemas.
+
+**Behavior:** Types mirror domain concepts. No primitive obsession (no `string` for UserId).
+
+**Example:** `vstack-blueprint` requires interface-first design.
+
+### 16. Respect Boundaries
+
+**Trigger:** Cross-module changes.
+
+**Behavior:** Each module owns one responsibility. Dependencies point inward. No circular deps.
+
+**Example:** Lead owns scope; Builder owns implementation; Reviewer owns findings.
+
+### 17. Verifiable Increments
+
+**Trigger:** Completing a step.
+
+**Behavior:** Every step produces evidence. Completion requires verification. No "trust me."
+
+**Example:** `vstack-verify-loop` per-task + integration; PROGRESS.md checkpoints.
 
 ---
 
@@ -81,11 +150,46 @@ These principles map directly to vstack implementation:
 
 | Principle | Implementation |
 |---|---|
-| Bias to Deletion | ~7 tools max, no lifecycle engine, no scheduler |
-| Foundational Thinking | Evidence-based checks, not assumptions |
-| Domain Modeling | Branded IDs, explicit schemas, typed stores |
-| Boundary Discipline | Playbook/Plugin/OpenChamber separation |
-| Idempotence | Revision-based writes, atomic operations |
-| Root-Cause Debugging | Systematic-debugging skill, event log |
-| Verifiable Sequencing | E2E tests with recorded evidence |
-| Delegation | Lead plans, Builder executes, Reviewer validates |
+| Harness Independence First | Playbook works without plugins; Skills CLI portable |
+| Procedures Over Vague Instructions | All 55 skills have Procedure with Action/Evidence/Decision |
+| Flexible Workflows | 4 modes (Quick/Standard/Advanced/Extended) risk-calibrated |
+| Loops Are First-Class | TDD, verify-loop, debug, unstick all bounded with escalation |
+| Small, Purposeful Agent Team | 3 roles + 55 skills; no generic scheduler/lifecycle engine |
+| Evidence Before Completion | `vstack_check` tool records VERIFIED/NOT_VERIFIED/INCONCLUSIVE/BLOCKED |
+| Independent Challenge | Reviewer fresh session; `disallowedTools` / `sandbox_mode: read-only` |
+| Runtime Simplicity | ~7 tools max; plugin adds only what instructions can't |
+| Clear Responsibility | Playbook/Plugin/OpenChamber separation documented in AGENTS.md |
+| Degrade Gracefully | Sequential fallback, branch isolation, manual checks documented |
+| Understand Before Changing | Investigation workflow; `vstack-how`/`vstack-why` before changes |
+| Route Before Loading | `vstack-mode` 9-phase routing with 21 request shapes |
+| Smallest Complete Change | `vstack-incremental-build` decomposition with per-step verify |
+| Challenge Assumptions | `vstack-unstick` 10-step: assumption → probe → 3 approaches |
+| Model Domain Explicitly | Branded IDs, explicit schemas, typed stores in plugin |
+| Respect Boundaries | Authority matrix per role; no shared mutable state |
+| Verifiable Increments | PROGRESS.md checkpoints; evidence per acceptance criterion |
+
+---
+
+## Principle Files
+
+Each principle has a leaf file in `playbook/principles/`:
+
+1. `harness-independence-first.md`
+2. `procedures-over-vague-instructions.md`
+3. `flexible-workflows-not-mandatory-ceremony.md`
+4. `loops-are-first-class.md`
+5. `small-purposeful-agent-team.md`
+6. `evidence-before-completion.md`
+7. `independent-challenge.md`
+8. `runtime-simplicity.md`
+9. `clear-source-of-responsibility.md`
+10. `degrade-gracefully.md`
+11. `understand-before-changing.md`
+12. `route-before-loading.md`
+13. `smallest-complete-change.md`
+14. `challenge-assumptions.md`
+15. `model-domain-explicitly.md`
+16. `respect-boundaries.md`
+17. `verifiable-increments.md`
+
+Plus `index.md` as compact reference linking to all leaf files.

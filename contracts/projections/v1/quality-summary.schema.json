@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vstack.dev/schemas/projections/v1/quality-summary.json",
+  "title": "vstack Quality Summary Report",
+  "description": "Quality/check summary for a delivery from evidence records. Located at .vstack/reports/quality/{deliveryId}.json",
+  "allOf": [
+    { "$ref": "projection-envelope.schema.json" },
+    {
+      "type": "object",
+      "required": ["deliveryId", "checksTotal", "checksPassed", "checksFailed", "checksSkipped", "checksByType", "reviewFindings", "generatedAt"],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deliveryId": {
+          "type": "string",
+          "pattern": "^dlv_[a-zA-Z0-9_-]+$"
+        },
+        "checksTotal": { "type": "integer", "minimum": 0 },
+        "checksPassed": { "type": "integer", "minimum": 0 },
+        "checksFailed": { "type": "integer", "minimum": 0 },
+        "checksSkipped": { "type": "integer", "minimum": 0 },
+        "checksByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["passed", "failed"],
+            "properties": {
+              "passed": { "type": "integer", "minimum": 0 },
+              "failed": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "reviewFindings": {
+          "type": "object",
+          "required": ["critical", "high", "medium", "low"],
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "high": { "type": "integer", "minimum": 0 },
+            "medium": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  ]
+}

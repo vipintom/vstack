@@ -2,17 +2,19 @@ name: Umbrella CI
 
 on:
   pull_request:
-    branches: [main, master]
+    branches: [master]
   push:
-    branches: [main, master]
+    branches: [master]
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'  # Weekly on Monday 3 AM UTC
 
 permissions:
   contents: read
 
 jobs:
-  validate-contracts:
-    name: Validate Projection Contracts
+  install:
+    name: Install Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,6 +28,27 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Upload node_modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
+          retention-days: 1
+
+  validate-contracts:
+    name: Validate Projection Contracts
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
 
       - name: Validate contracts
         run: pnpm run validate:contracts
@@ -33,48 +56,33 @@ jobs:
   validate-compatibility:
     name: Validate Compatibility Matrix
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          name: node_modules
+          path: node_modules
 
       - name: Validate compatibility
         run: pnpm run validate:compatibility
 
-  validate-all:
-    name: Validate All
-    runs-on: ubuntu-latest
-    needs: [validate-contracts, validate-compatibility]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run all validations
-        run: pnpm run validate:all
-
   check-component-references:
     name: Check Component References
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
 
       - name: Verify no component directories exist
         run: |
@@ -96,9 +104,16 @@ jobs:
   validate-documentation-links:
     name: Validate Documentation Links
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
 
       - name: Check for broken internal links
         run: |

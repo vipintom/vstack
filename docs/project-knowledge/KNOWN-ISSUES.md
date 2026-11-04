@@ -1,115 +1,71 @@
-# Known Issues
-
-**Last updated:** 2026-11-01 (All phases complete)
-
-## Resolved Blocking Issues
-
-### 1. Evidence TypeScript Error — **RESOLVED 2026-11-01**
-- **File:** `opencode/vstack/src/quality/evidence-ledger.ts:103`
-- **Error:** `Type 'Evidence' has no properties in common with type '{ revision?: number | undefined; }.'`
-- **Root cause:** `writeJsonFile<T extends { revision?: number }>` requires revision field; `Evidence` interface lacked it
-- **Resolution:** Added `revision: number` to `Evidence` interface (ADR-0001)
-- **Files changed:** `schemas/types.ts`, `quality/evidence-ledger.ts`, `quality/security.ts`, `quality/test.ts`
-- **Verification:** `pnpm typecheck` PASS, `pnpm test` 26/26 PASS
-
-### 2. Delivery ID Prefix Inconsistency — **RESOLVED 2026-11-01**
-- **Issue:** Lifecycle engine used `del_` prefix while delivery-store, task-store, index-generator, projection loaders used `dlv_`
-- **Impact:** Dashboard index and projection publisher couldn't find deliveries created by lifecycle engine
-- **Resolution:** Unified all components to use `dlv_` prefix
-- **Files changed:** `lifecycle/lifecycle-engine.ts`, `dashboard/index-generator.ts`, `dashboard/projections/loaders.ts`
-
-### 3. Missing Directory Creation in Stores — **RESOLVED 2026-11-01**
-- **Issue:** `createTask`, `createDelivery`, `createAgentRun`, `createMemoryItem` didn't create parent directories before writing
-- **Impact:** ENOENT errors in test environments with fresh temp directories
-- **Resolution:** Added `mkdirSync(dir, { recursive: true })` before all `writeJsonFile` calls
-- **Files changed:** `tasks/task-store.ts`, `deliveries/delivery-store.ts`, `agents/agent-run-store.ts`, `memory/memory-store.ts`, `orchestration/agent-dispatch.ts`
+# Known Issues — vstack v0.1.0
 
 ---
 
-## Deferred Issues (Documented Per Plan)
+## Architecture Constraints (By Design)
 
-### 4. OpenChamber Build Fails
-- **Error:** `@openchamber/sdk` not resolvable — `bunx @openchamber/sdk/scripts/bundle-guest.ts` fails with hostname resolution
-- **Impact:** Cannot build OpenChamber extension
-- **Workaround:** Deferred per plan; typecheck passes
-- **Status:** Documented as prototype limitation; requires SDK access to resolve
-
----
-
-## Architecture Limitations (Documented Per Plan)
-
-### 5. Single-Machine/Local-Filesystem Assumption
-- No multi-host coordination
-- `.vstack/` state not shared across machines
-
-### 6. No Event Compaction/Replay
-- History grows unbounded in `.vstack/state/events.jsonl`
-- No retention policy or compaction implemented
-
-### 7. OpenChamber Polling
-- Dashboard refreshes at 2-5s interval (not real-time)
-- No WebSocket/push notification support
-
-### 8. Enforcement Bounded by OpenCode Permission API
-- Approval stub only — real enforcement requires OpenCode permission API
-- Bypass possible via shell commands
-
-### 9. Memory Curation Manual
-- No auto-promotion from history to memory
-- No decay/archive policies implemented
-
-### 10. No Generic Workflow Engine
-- Workflows are Markdown recipes only (in Playbook)
-- No TypeScript state machine or scheduler
-
-### 11. No Scheduler/Priority Queue
-- Agent dispatch is immediate, not queued
-- No priority-based execution ordering
-
-### 12. No Deployment Platform
-- Release/deployment modules deferred (P2)
-- No rollback automation
-
-### 13. No Cross-Process Concurrency Tests
-- Locks and revision conflicts tested only in single-process unit tests
-- Real multi-session behavior unvalidated
-
-### 14. No Migration Runner Tests
-- Schema version tracking exists but migration execution not tested end-to-end
+| # | Constraint | Impact |
+|---|------------|--------|
+| 1 | Single-machine / local filesystem | No multi-host coordination; `.vstack/` not shared across machines |
+| 2 | No event compaction/replay | History grows unbounded in `.vstack/state/events.jsonl`; no retention policy |
+| 3 | OpenChamber polling (not real-time) | Dashboard refreshes at interval; no WebSocket/SSE |
+| 4 | Enforcement bounded by host API | Approval recording may be stub; bypass possible via shell |
+| 5 | No generic workflow engine | Workflows = Markdown recipes only; no TS state machine/scheduler |
+| 6 | No scheduler/priority queue | Agent dispatch immediate, not queued; no priority ordering |
+| 7 | No deployment platform | Release/deployment modules deferred; no rollback automation |
 
 ---
 
-## Functional Gaps (Future Work)
+## Functional Gaps (v2 Core Scope)
 
-### 15. Memory Auto-Curation
-- Manual `createItem` only
-- No automatic extraction from history/events
-- No relevance scoring or decay
-
-### 16. OpenChamber Real-Time Updates
-- Polling-based only
-- No server-sent events or WebSocket
-
-### 17. Advanced Enforcement
-- Approval is stub only
-- No signed attestations or audit trail beyond event log
-
-### 18. Cross-Harness Portability Validation
-- Playbook validated for OpenCode only
-- Claude Code, Codex, other harnesses not tested
+| # | Gap | Status |
+|---|-----|--------|
+| 8 | Memory curation manual | No auto-promotion from history; no decay/archive policies |
+| 9 | Cross-harness portability | Codex/Claude Code adapters marked unsupported; content re-authoring must produce tested adapters |
 
 ---
 
 ## Test Coverage Gaps
 
-### 19. No Integration Tests (Previously)
-- Now have E2E test covering full workflow
+| # | Gap | Status |
+|---|-----|--------|
+| 10 | No OpenChamber integration tests | No UI/integration tests for panel |
+| 11 | No concurrent session tests | Multi-user/multi-session unvalidated |
+| 12 | No migration tests | N/A (greenfield — no v1 migration) |
 
-### 20. No OpenChamber Tests
-- No UI/integration tests for OpenChamber panel
+---
 
-### 21. No Migration Tests
-- Schema migration not tested end-to-end
+## Known Limitations (Carried Forward)
 
-### 22. No Concurrent Session Tests
-- Multi-user/multi-session behavior unvalidated
+| # | Limitation | Status |
+|---|------------|--------|
+| 1 | OpenChamber SDK | ✅ NOW AVAILABLE — build passes |
+| 2 | Codex/Claude Code adapters | ❌ Not implemented; content re-authoring must produce tested adapters |
+| 3 | No token cost budget | Routing learning uses vstack persistence; no budget enforcement |
+| 4 | Project-specific skills in project | By design per ADR-0010 |
+| 5 | Approval expiry not enforced | Records support `expiresAt` but no auto-expire |
+| 6 | Worktree strategy limited | Only `opencode-native` strategy supported |
+| 7 | Jury procedure is playbook skill only | No runtime jury orchestration; by design |
+| 8 | Extended execution is methodology | Requires manual checkpoints; workflows = Markdown recipes |
+
+---
+
+## Phase 11b Complete — Missing Content Resolved
+
+All previously missing content created:
+- 16 principle leaf files in `principles/`
+- 15 workflow files in `workflows/` (total 18)
+- Playbook validation: 0 errors, 0 warnings
+- E2E tests: 103/103 pass with full manifest
+
+---
+
+## Resolved in v0.1.0 Release
+
+| Issue | Resolution |
+|-------|------------|
+| Evidence TypeScript error | Added `revision` field |
+| Delivery ID prefix inconsistency | Unified to `dlv_` |
+| Missing directory creation | Fixed in stores |
+| OpenChamber SDK build | Now PASS |
+| Manifest duplicate `vstack-ledger` | Fixed; validation PASS |

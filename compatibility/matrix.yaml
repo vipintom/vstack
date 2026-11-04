@@ -1,0 +1,168 @@
+schemaVersion: 1
+updatedAt: "2026-11-02T12:00:00.000Z"
+
+harnesses:
+  opencode:
+    skills:
+      format: "supported"
+      discovery: "tested"
+      execution: "tested-with-limitations"
+      adapter: "available"
+      status: "supported-and-tested"
+      testedVersions:
+        - "2.2.0"
+      limitations:
+        - "No native read-only enforcement (uses instruction + git diff)"
+        - "No native worktree isolation (uses git worktree via bash)"
+        - "No background/long-running tasks"
+        - "No approval API (explicit chat confirmation)"
+      evidence:
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "skills-cli-discovery"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "skills-cli-single-install"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "skills-cli-full-install"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+        - component: "vstack-opencode"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "plugin-load-and-register-tools"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-test-103-103"
+        - component: "vstack-opencode"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "plugin-integration-tests"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-test-103-103"
+        - component: "vstack-opencode"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "projection-producer-validation"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-test-103-103"
+    runtime:
+      status: "supported-and-tested"
+      testedVersions:
+        - "2.2.0"
+      evidence:
+        - component: "vstack-opencode"
+          version: "0.1.0"
+          harness: "opencode@2.2.0"
+          testCase: "103-unit-and-integration-tests"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-test-103-103"
+
+  codex:
+    skills:
+      format: "supported"
+      discovery: "tested"
+      execution: "tested-with-limitations"
+      adapter: "available"
+      status: "supported-with-limitations"
+      testedVersions:
+        - "latest"
+      limitations:
+        - "No plugin skill loader (manual skills field in frontmatter)"
+        - "No native read-only enforcement (uses sandbox_mode: read-only)"
+        - "No native worktree isolation (uses git worktree via bash)"
+        - "No background/long-running tasks"
+        - "Skills config not auto-discovered (manual skills field)"
+      evidence:
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "codex@latest"
+          testCase: "adapter-toml-syntax-validation"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "codex@latest"
+          testCase: "adapter-sandbox-mode-validation"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+    runtime:
+      status: "not-supported"
+      evidence: []
+
+  claude-code:
+    skills:
+      format: "supported"
+      discovery: "tested"
+      execution: "tested-with-limitations"
+      adapter: "available"
+      status: "supported-with-limitations"
+      testedVersions:
+        - "latest"
+      limitations:
+        - "No plugin skill loader (skills field in frontmatter)"
+        - "No native worktree isolation (uses isolation: worktree - native)"
+        - "Background/long-running tasks limited"
+        - "Hot-reload config supported (native)"
+      evidence:
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "claude-code@latest"
+          testCase: "adapter-yaml-syntax-validation"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+        - component: "vstack-playbook"
+          version: "0.1.0"
+          harness: "claude-code@latest"
+          testCase: "adapter-disallowedtools-validation"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-validation"
+    runtime:
+      status: "not-supported"
+      evidence: []
+
+protocol:
+  producer:
+    opencode:
+      status: "supported-and-tested"
+      version: "1"
+      testedVersions:
+        - "0.1.0"
+      evidence:
+        - component: "vstack-opencode"
+          version: "0.1.0"
+          testCase: "publish-projections-all-types"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-test-103-103"
+  consumer:
+    openchamber:
+      status: "supported-and-tested"
+      version: "1"
+      testedVersions:
+        - "0.1.0"
+      evidence:
+        - component: "vstack-openchamber"
+          version: "0.1.0"
+          testCase: "read-projection-protocol-v1"
+          date: "2026-11-02"
+          result: "passed"
+          ciLink: "local-build-typecheck"

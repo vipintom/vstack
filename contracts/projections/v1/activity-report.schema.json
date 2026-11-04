@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vstack.dev/schemas/projections/v1/activity-report.json",
+  "title": "vstack Activity Summary Report",
+  "description": "Activity summary generated from event log for a specific delivery. Located at .vstack/reports/activity/{deliveryId}.json",
+  "allOf": [
+    { "$ref": "projection-envelope.schema.json" },
+    {
+      "type": "object",
+      "required": ["deliveryId", "activities", "generatedAt"],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deliveryId": {
+          "type": "string",
+          "pattern": "^dlv_[a-zA-Z0-9_-]+$"
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["timestamp", "eventType", "actor", "entity", "summary"],
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "eventType": { "type": "string" },
+              "actor": { "type": "string" },
+              "entity": {
+                "type": "object",
+                "required": ["type", "id"],
+                "properties": {
+                  "type": { "type": "string", "enum": ["delivery", "phase", "task", "agent_run", "review", "finding", "evidence", "approval"] },
+                  "id": { "type": "string" }
+                }
+              },
+              "summary": { "type": "string" },
+              "outcome": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  ]
+}

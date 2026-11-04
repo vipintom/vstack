@@ -1,6 +1,0 @@
-packages:
-  - agents-skills
-  - opencode/*
-  - openchamber/*
-allowBuilds:
-  esbuild: true

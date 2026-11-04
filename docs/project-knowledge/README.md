@@ -1,45 +1,65 @@
-# Project Knowledge Base
+# vstack Project Knowledge — Consolidated (Greenfield)
 
-## Purpose
+**Last updated:** 2026-11-02  
+**Status:** v0.1.0 Released + Playbook 2.0 Content Re-authoring Complete
 
-This directory contains the authoritative engineering documentation for vstack itself — how it is built, the decisions made, the current implementation state, tests that have actually run, and the next useful action. It is distinct from runtime project memory (`.vstack/`) which is a product capability vstack provides to projects using it.
+---
 
-## Update Rules
-
-- **Session start:** Read README.md, CURRENT-STATE.md, IMPLEMENTATION-STATUS.md, and relevant architecture/decision pages. Inspect actual repository state.
-- **During work:** Update architecture/decision records when material design decisions are made. Record discoveries, deviations, blockers, compatibility findings as they occur.
-- **Session end:** Update CURRENT-STATE.md, IMPLEMENTATION-STATUS.md, WORK-LOG.md. Record exact test commands and results. Update KNOWN-ISSUES.md. State next recommended task and any blocking question.
-- **Never** wait until milestone to write — documentation is part of definition of done for each substantial task.
-
-## Contents
+## Quick Navigation
 
 | File | Purpose |
-|---|---|
-| `CURRENT-STATE.md` | What exists, what works, what is next |
-| `ARCHITECTURE.md` | Current package boundaries and data flow |
-| `COMPONENT-INVENTORY.md` | Existing modules and reuse/refactor/remove decisions |
-| `IMPLEMENTATION-STATUS.md` | Milestones, completed work, outstanding work |
-| `TESTING.md` | Test commands, prerequisites, verified results |
-| `KNOWN-ISSUES.md` | Confirmed defects, limitations, workarounds |
-| `WORK-LOG.md` | Concise chronological implementation log |
-| `decisions/` | Architecture decision records (ADRs) |
+|------|---------|
+| `CURRENT-STATE.md` | What exists, working capabilities, validation status |
+| `ARCHITECTURE.md` | System boundaries, data flow, responsibility matrix |
+| `DECISIONS.md` | 23 Architectural Decision Records (condensed) |
+| `KNOWN-ISSUES.md` | Technical debt, limitations, functional gaps |
+| `NEXT-ACTIONS.md` | Phase 12 release steps, blockers |
 
-## Project Status
+---
 
-**All 6 implementation phases complete** (2026-11-01)
+## Project Summary
 
-- **Phase 0:** Baseline & Knowledge Base ✅
-- **Phase 1:** Playbook Foundation ✅
-- **Phase 2:** OpenCode Integration ✅
-- **Phase 3:** Runtime Foundation ✅
-- **Phase 4:** Agent Coordination & Enforcement ✅
-- **Phase 5:** OpenChamber Visualization ✅
-- **Phase 6:** E2E Validation ✅
+| Aspect | Status |
+|--------|--------|
+| **Playbook 2.0 Content** | ✅ 55 skills, 18 playbooks, 17 principles, 3 roles, 9 adapters, 7 rubrics |
+| **OpenCode Plugin** | ✅ 23 tools, 7 services, 103/103 tests pass |
+| **OpenChamber Extension** | ✅ Build + typecheck pass, Git/ZIP distribution ready |
+| **Repository Split** | ✅ 4 independent repos ready for GitHub push |
+| **Validation** | ✅ All green (0 errors, 0 warnings) |
 
-**Test Results:** 26/26 PASS (opencode/vstack), Typecheck PASS, Build PASS
+---
 
-**Git Tags:** `phase-0-baseline`, `phase-3-complete`, `phase-4-complete`, `phase-5-complete`, `phase-6-complete`
+## Component Repositories (Ready for Release)
 
-## Open Source Readiness
+| Repo | Version | HEAD | Distribution |
+|------|---------|------|--------------|
+| `vstack-playbook.git` | 0.1.0 | `2143b2e` | GitHub + Skills CLI |
+| `vstack-opencode.git` | 0.1.0 | `2916d84` | npm `@vstack/opencode` |
+| `vstack-openchamber.git` | 0.1.0 | `49412fe` | Git URL / ZIP |
+| `vstack` (umbrella) | meta | `vstack-2026.11.02` | GitHub |
 
-See IMPLEMENTATION-STATUS.md for open items before public release.
+---
+
+## Key Contracts
+
+- **Projection Protocol v1** — `contracts/projections/v1/` (7 JSON schemas)
+- **Compatibility Matrix** — `compatibility/matrix.yaml` (schema v1)
+- **Integrated Release** — `compatibility/integrated-release.json` (validated)
+
+---
+
+## Quick Validation Commands
+
+```bash
+# Umbrella
+cd vstack && node compatibility/validate-compatibility.js
+
+# Playbook
+cd vstack-playbook && node scripts/validate-content.js
+
+# OpenCode
+cd vstack-opencode && pnpm test && pnpm build && pnpm typecheck
+
+# OpenChamber
+cd vstack-openchamber && pnpm build && pnpm typecheck
+```

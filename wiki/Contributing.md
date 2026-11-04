@@ -85,11 +85,21 @@ git push origin feature/your-feature-name
 ```
 vstack/
 ├── playbook/              # Portable content (Markdown/YAML)
-│   ├── principles/
+│   ├── principles/        # 17 principles
 │   ├── agents/
-│   ├── skills/
-│   ├── workflows/
-│   └── resources/
+│   │   ├── roles/         # 3 canonical roles
+│   │   └── adapters/
+│   │       ├── opencode/  # OpenCode adapters (3)
+│   │       ├── codex/     # Codex CLI adapters (3)
+│   │       └── claude-code/ # Claude Code adapters (3)
+│   ├── skills/            # 55 skills
+│   ├── workflows/         # 18 workflows
+│   ├── resources/         # Rubrics, templates, references
+│   ├── project-templates/ # Verification skill template
+│   ├── evaluations/       # Evaluation scenarios
+│   ├── scripts/           # Validation, install, packaging
+│   ├── manifest.json      # Canonical manifest v2 with contentHash
+│   └── package.json       # @vstack/playbook@0.1.0
 ├── opencode/vstack/       # OpenCode plugin
 │   ├── src/
 │   │   ├── persistence/
@@ -108,7 +118,8 @@ vstack/
 ├── openchamber/vstack-panel/  # OpenChamber extension
 │   └── panel/
 ├── docs/                  # Documentation
-└── wiki/                  # This wiki
+├── wiki/                  # This wiki
+└── docs/project-knowledge/  # Project knowledge base
 ```
 
 ## Contribution Types
@@ -117,8 +128,9 @@ vstack/
 
 - Principles, roles, skills, workflows, resources
 - Pure Markdown/YAML — no TypeScript
-- Follow Agent Skills frontmatter format
+- Follow Agent Skills frontmatter format (with `lifecycle`)
 - Test with `npx skills add ./playbook`
+- Validate with `node playbook/scripts/validate-content.js`
 
 ### Plugin Code
 
@@ -150,6 +162,7 @@ vstack/
 | Bug fix | Regression test |
 
 Run all tests before PR:
+
 ```bash
 pnpm test
 ```

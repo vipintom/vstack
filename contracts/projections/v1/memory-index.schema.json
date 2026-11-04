@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vstack.dev/schemas/projections/v1/memory-index.json",
+  "title": "vstack Memory Index Report",
+  "description": "Aggregated memory index across all categories for OpenChamber. Located at .vstack/reports/memory-index.json",
+  "allOf": [
+    { "$ref": "projection-envelope.schema.json" },
+    {
+      "type": "object",
+      "required": ["categories", "generatedAt"],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "categories": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title", "category", "status", "updatedAt", "tags"],
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "category": { "type": "string" },
+                "status": { "type": "string", "enum": ["candidate", "assessed", "promoted", "verified", "closed", "superseded"] },
+                "updatedAt": { "type": "string", "format": "date-time" },
+                "tags": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  ]
+}

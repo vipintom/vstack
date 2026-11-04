@@ -1,6 +1,0 @@
-export const GUEST_STORAGE_KEY_MAX = 128;
-export const GUEST_STORAGE_VALUE_BYTES = 65_536;
-export const GUEST_STORAGE_TOTAL_BYTES = 2_097_152;
-/** Maximum bytes retained across all device-scoped guest storage namespaces. */
-export const GUEST_DEVICE_STORAGE_TOTAL_BYTES = 16_777_216;
-export const GUEST_STORAGE_KEYS_MAX = 2_000;

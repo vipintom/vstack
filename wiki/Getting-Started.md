@@ -14,37 +14,75 @@
 The playbook works with any harness that supports the Agent Skills specification.
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/vstack.git
-cd vstack
+# Install via Skills CLI from npm (recommended, after publish)
+npx skills add @vipintom/vstack --agent opencode
 
-# Install playbook via Skills CLI
-npx skills add ./playbook
+# Or from GitHub (no npm publish needed)
+npx skills add github:vipintom/vstack-playbook --agent opencode
 
-# Or copy manually to your harness skills directory
-cp -r playbook/ ~/.config/opencode/skills/vstack
-cp -r playbook/ ~/.config/claude-code/skills/vstack
-cp -r playbook/ ~/.config/codex/skills/vstack
+# Install all 55 skills
+npx skills add @vipintom/vstack --skill '*' --agent opencode
 ```
 
-### Option 2: OpenCode Plugin
+### Option 2: Cross-Harness Install Script
+
+```bash
+# Clone playbook repo
+git clone https://github.com/vipintom/vstack-playbook.git
+
+# Install for all harnesses
+node vstack-playbook/scripts/install-playbook.js all /path/to/your/project
+
+# Or per harness
+node vstack-playbook/scripts/install-playbook.js opencode /path/to/project
+node vstack-playbook/scripts/install-playbook.js codex /path/to/project
+node vstack-playbook/scripts/install-playbook.js claude-code /path/to/project
+```
+
+### Option 3: OpenCode Plugin
 
 ```bash
 # In your project directory
 cd your-project
 
-# Install from local path (development)
-npm install /path/to/vstack/opencode/vstack
+# Install from npm (when published)
+npm install @vipintom/vstack-opencode
 
-# Or from npm (when published)
-npm install @vstack/opencode
+# Or from GitHub
+# npm install github:vipintom/vstack-opencode
+
+# Development (from local clone)
+npm install /path/to/vstack-opencode
 ```
 
-### Option 3: Full Workspace
+Then register in `opencode.jsonc`:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["@vipintom/vstack-opencode"]
+}
+```
+
+Or via OpenCode CLI:
+```bash
+opencode plugin add @vipintom/vstack-opencode
+# Or from GitHub
+opencode plugin add github:vipintom/vstack-opencode
+```
+
+### Option 4: OpenChamber Extension
+
+```bash
+# Via OpenChamber Extension Manager
+openchamber extension add https://github.com/vipintom/vstack-openchamber.git
+```
+
+### Option 5: Full Workspace
 
 ```bash
 # Clone and install all packages
-git clone https://github.com/your-org/vstack.git
+git clone https://github.com/vipintom/vstack.git
 cd vstack
 pnpm install
 
@@ -74,6 +112,36 @@ The playbook provides 3 canonical roles:
 | Builder | Implementation, testing | `vstack-builder` |
 | Reviewer | Code review, security audit | `vstack-reviewer` |
 
+### Codex CLI
+
+```bash
+# Install playbook via Skills CLI
+npx skills add @vipintom/vstack --agent codex
+# Or
+npx skills add github:vipintom/vstack-playbook --agent codex
+
+# Install agents (TOML format)
+cp vstack-playbook/agents/adapters/codex/vstack-*.toml ~/.codex/agents/
+
+# Or use install script
+node vstack-playbook/scripts/install-playbook.js codex /path/to/project
+```
+
+### Claude Code
+
+```bash
+# Install playbook via Skills CLI
+npx skills add @vipintom/vstack --agent claude-code
+# Or
+npx skills add github:vipintom/vstack-playbook --agent claude-code
+
+# Install agents (YAML format)
+cp vstack-playbook/agents/adapters/claude-code/vstack-*.md ~/.claude/agents/
+
+# Or use install script
+node vstack-playbook/scripts/install-playbook.js claude-code /path/to/project
+```
+
 ## Quick Tutorial
 
 ### Create a Delivery
@@ -89,7 +157,7 @@ vstack_delivery create \
   --labels auth api security
 ```
 
-### Create Tasks
+### Create Tasks with Contracts
 
 ```bash
 vstack_task create \
@@ -97,17 +165,21 @@ vstack_task create \
   --title "Design auth schema" \
   --type design \
   --priority high \
-  --acceptance-criteria "Schema defined" "JWT structure documented"
+  --acceptance-criteria "Schema defined" "JWT structure documented" \
+  --contract-objective "Design JWT token structure and user model" \
+  --contract-scope "src/auth/schema.ts" \
+  --contract-verification "TypeScript compiles" "Schema validated"
 
 vstack_task create \
   --delivery-id dlv_xxx \
   --title "Implement registration" \
   --type implementation \
   --priority high \
-  --dependencies tsk_yyy
+  --dependencies tsk_yyy \
+  --acceptance-criteria "Endpoint returns JWT" "Password hashed" "Email validated"
 ```
 
-### Dispatch Agent
+### Dispatch Agent with Contract
 
 ```bash
 vstack_agent dispatch \
@@ -116,19 +188,30 @@ vstack_agent dispatch \
   --prompt "Implement registration endpoint with bcrypt"
 ```
 
-### Run Checks
+### Run Checks with Evidence
 
 ```bash
 vstack_check execute \
   --check-id test:unit \
   --command "npm test -- registration.test.ts" \
-  --working-directory /path/to/project
+  --working-directory /path/to/project \
+  --commit-ref abc123
 ```
 
 ### View Dashboard
 
 ```bash
 vstack_status dashboard
+```
+
+### Enforcement Gates
+
+```bash
+# Check if delivery can complete
+vstack_check execute --gate all_tasks_complete --delivery-id dlv_xxx
+
+# Check if task can complete
+vstack_check execute --gate required_evidence --delivery-id dlv_xxx --task-id tsk_yyy
 ```
 
 ---
@@ -139,3 +222,4 @@ vstack_status dashboard
 - Read [Tools Reference](Tools.md) for all available commands
 - Read [Workflows](Workflows.md) for recipe usage
 - Read [OpenCode Plugin](OpenCode-Plugin.md) for plugin details
+- Read [Capability Matrix](https://github.com/vstack/playbook/blob/main/docs/capability-matrix.md) for harness compatibility

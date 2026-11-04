@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vstack.dev/schemas/projections/v1/manifest.json",
+  "title": "vstack Manifest",
+  "description": "Project-level manifest identifying the vstack workspace and content version. Located at .vstack/manifest.json",
+  "allOf": [
+    { "$ref": "projection-envelope.schema.json" },
+    {
+      "type": "object",
+      "required": ["vstackVersion", "contentVersion", "projectId", "createdAt", "updatedAt"],
+      "properties": {
+        "vstackVersion": {
+          "type": "string",
+          "description": "Semantic version of the vstack runtime that created this workspace"
+        },
+        "contentVersion": {
+          "type": "string",
+          "description": "Content version identifier for the playbook/content installed in this project"
+        },
+        "projectId": {
+          "type": "string",
+          "pattern": "^prj_[a-z0-9]+$",
+          "description": "Unique project identifier derived from the repository root"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this workspace was first initialized"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of the last workspace update"
+        }
+      }
+    }
+  ]
+}

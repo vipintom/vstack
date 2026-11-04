@@ -31,9 +31,9 @@
 
 | Command | Tool Version | Environment | Expected Output | Clean Checkout Tested | Type |
 |---------|--------------|-------------|-----------------|----------------------|------|
-| `npx skills add <repo> --list` | skills CLI latest | Ubuntu 24.04 | Lists 52 skills | ✅ Yes | End-user |
+| `npx skills add <repo> --list` | skills CLI latest | Ubuntu 24.04 | Lists 55 skills | ✅ Yes | End-user |
 | `npx skills add <repo> --skill vstack-tdd -a opencode` | skills CLI latest | Ubuntu 24.04 | Installs 1 skill to .agents/skills/ | ✅ Yes | End-user |
-| `npx skills add <repo> --skill '*' -a opencode` | skills CLI latest | Ubuntu 24.04 | Installs 52 skills to .agents/skills/ | ✅ Yes | End-user |
+| `npx skills add <repo> --skill '*' -a opencode` | skills CLI latest | Ubuntu 24.04 | Installs 55 skills to .agents/skills/ | ✅ Yes | End-user |
 
 ### Install Script Commands
 
