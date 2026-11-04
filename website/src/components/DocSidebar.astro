@@ -19,7 +19,7 @@ const { title, items, searchPlaceholder = 'Filter…' } = Astro.props;
       <div class="sidebar-section">
         {section.children && section.children.length > 0 ? (
           <>
-            <h4 class="sidebar-section-title">{section.label}</h4>
+            <div class="sidebar-section-title">{section.label}</div>
             <ul class="sidebar-list">
               {section.children.map(item => (
                 <li><a href={item.href} class="sidebar-link {item.active ? 'active' : ''}" aria-current={item.active ? 'page' : undefined}>{item.label}</a></li>
@@ -36,16 +36,13 @@ const { title, items, searchPlaceholder = 'Filter…' } = Astro.props;
 
 <style>
   .doc-sidebar {
-    width: 280px;
     flex-shrink: 0;
-    position: sticky;
-    top: calc(var(--banner-height) + var(--space-lg));
-    max-height: calc(100vh - var(--banner-height) - var(--space-2xl));
-    overflow-y: auto;
+    width: 280px;
     padding: var(--space-md);
     background: var(--color-paper-2);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-rule);
+    height: fit-content;
   }
 
   .sidebar-search { margin-bottom: var(--space-lg); }
@@ -62,60 +59,20 @@ const { title, items, searchPlaceholder = 'Filter…' } = Astro.props;
 
   @media (max-width: 1024px) {
     .doc-sidebar {
-      position: fixed;
-      left: 0;
-      top: var(--banner-height);
-      width: 320px;
-      max-width: 85vw;
-      max-height: calc(100vh - var(--banner-height));
+      position: static;
+      width: 100%;
+      max-width: none;
+      max-height: none;
       border-radius: 0;
-      border-right: 1px solid var(--color-rule);
-      transform: translateX(-100%);
-      transition: transform var(--dur-short) var(--ease-out);
-      z-index: var(--z-dropdown);
+      border: none;
+      border-top: 1px solid var(--color-rule);
+      padding-top: var(--space-lg);
     }
-    .doc-sidebar.open { transform: translateX(0); }
   }
 </style>
 
 <script set:html={`;(() => {
   if (typeof document === 'undefined') return;
-  // Mobile sidebar toggle
-  const sidebar = document.querySelector('.doc-sidebar');
-  if (!sidebar) return;
-  const toggleBtn = document.createElement('button');
-  toggleBtn.className = 'sidebar-toggle btn btn-ghost';
-  toggleBtn.setAttribute('aria-label', 'Toggle sidebar');
-  toggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-  toggleBtn.style.display = 'none';
-
-  // Add toggle to nav (will be inserted by layout)
-  document.addEventListener('DOMContentLoaded', () => {
-    const navActions = document.querySelector('.nav-actions');
-    if (navActions && sidebar) {
-      navActions.insertBefore(toggleBtn, navActions.firstChild);
-      toggleBtn.style.display = 'flex';
-
-      toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-      });
-
-      // Close on link click
-      sidebar.querySelectorAll('.sidebar-link').forEach(link => {
-        link.addEventListener('click', () => {
-          sidebar.classList.remove('open');
-        });
-      });
-
-      // Close on outside click
-      document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
-          sidebar.classList.remove('open');
-        }
-      });
-    }
-  });
-
   // Search filter
   const searchInput = document.querySelector('.sidebar-search .search-input');
   const links = document.querySelectorAll('.sidebar-link');

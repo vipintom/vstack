@@ -20,23 +20,25 @@ const { title, description, sidebarTitle, sidebarItems } = Astro.props;
   <Nav />
   <Toast />
   <div class="doc-layout">
-    {sidebarItems && <DocSidebar title={sidebarTitle || 'Documentation'} items={sidebarItems} />}
     <div class="doc-content">
       <main id="main-content">
         <slot />
       </main>
     </div>
+    {sidebarItems && <DocSidebar title={sidebarTitle || 'Documentation'} items={sidebarItems} />}
   </div>
   <Footer />
 </Layout>
 
 <style>
   .doc-layout { display: flex; gap: var(--gap-columns); max-width: var(--container); margin: 0 auto; padding: var(--space-xl) var(--gutter); }
-  .doc-content { flex: 1; min-width: 0; max-width: 65ch; }
+  .doc-content { flex: 1; min-width: 0; max-width: 65ch; order: 1; }
+  .doc-sidebar { order: 2; flex-shrink: 0; width: 280px; }
   main { width: 100%; }
 
   @media (max-width: 1024px) {
     .doc-layout { flex-direction: column; padding: var(--space-lg) var(--gutter); }
-    .doc-content { max-width: none; }
+    .doc-content { max-width: none; order: 1; }
+    .doc-sidebar { order: 3; width: 100%; position: static; max-height: none; }
   }
 </style>

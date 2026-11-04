@@ -15,7 +15,7 @@ const { title, description, repo, metrics = [], actionLabel, actionHref, badgeLa
 ---
 
 <article class="card {className}">
-  <h3 class="card-title">{title}</h3>
+  <div class="card-title">{title}</div>
   {description && <p class="card-desc">{description}</p>}
   {repo && <p class="card-repo">{repo}</p>}
   {metrics.length > 0 && (
