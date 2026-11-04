@@ -5,31 +5,83 @@ import Section from '@components/Section.astro';
 import Card from '@components/Card.astro';
 import Badge from '@components/Badge.astro';
 import CodeBlock from '@components/CodeBlock.astro';
-
-const installCode = 'npm install @vipintom/vstack-opencode';
-const quickStartCode = '# In your OpenCode session\nvstack_status        # Show system status\nvstack_task create "Implement feature X"  # Create a task\nvstack_agent dispatch builder  # Dispatch builder agent\nvstack_check verify  # Run verification gates';
+import { opencodePluginProduct } from '@data/products';
+import { productIntros } from '@data/editorial';
+import { withBase } from '../../utils/urls';
 ---
 
-<Doc title="OpenCode Plugin">
+<Doc title={opencodePluginProduct.identity.name} description={opencodePluginProduct.identity.shortDescription}>
   <Section id="opencode-plugin" gap="l" aria-labelledby="plugin-title">
     <Container>
-      <h1 id="plugin-title">OpenCode Plugin</h1>
-      <p class="lead">The vstack runtime for OpenCode. 23 tools, persistent stores, quality gates, and specialist agents.</p>
+      <h1 id="plugin-title">{opencodePluginProduct.identity.name}</h1>
+      <p class="lead">{opencodePluginProduct.identity.description}</p>
 
       <div class="plugin-grid">
-        <Card title="Tools (23)" description="Discrete capabilities exposed to the agent: task management, memory, verification, delivery tracking, and more." actionLabel="View Tools" actionHref="/opencode-plugin/tools/" badgeLabels={["Core"]} badgeVariants={["info"]} />
-        <Card title="Stores" description="Persistent state stores: delivery, history, memory, quality, tasks, and session data." actionLabel="View Stores" actionHref="/opencode-plugin/stores/" badgeLabels={["State"]} badgeVariants={["pass"]} />
-        <Card title="Gates (6)" description="Quality gates that enforce standards: verification, review, security, performance, and more." actionLabel="View Gates" actionHref="/opencode-plugin/gates/" badgeLabels={["Quality"]} badgeVariants={["warn"]} />
-        <Card title="Agents (3)" description="Specialist agents: Builder (implementation), Reviewer (verification), Lead (coordination)." actionLabel="View Agents" actionHref="/opencode-plugin/agents/" badgeLabels={["Roles"]} badgeVariants={["info"]} />
+        <Card 
+          title="Tools (23)" 
+          description="Discrete capabilities exposed to the agent: task management, memory, verification, delivery tracking, and more." 
+          actionLabel="View Tools" 
+          actionHref={withBase('/opencode-plugin/tools/')} 
+          badgeLabels={["Core"]} 
+          badgeVariants={["info"]} 
+        />
+        <Card 
+          title="Stores (6)" 
+          description="Persistent state stores: delivery, history, memory, quality, tasks, and session data." 
+          actionLabel="View Stores" 
+          actionHref={withBase('/opencode-plugin/stores/')} 
+          badgeLabels={["State"]} 
+          badgeVariants={["pass"]} 
+        />
+        <Card 
+          title="Gates (7)" 
+          description="Quality gates that enforce standards: verification, review, security, performance, and more." 
+          actionLabel="View Gates" 
+          actionHref={withBase('/opencode-plugin/gates/')} 
+          badgeLabels={["Quality"]} 
+          badgeVariants={["warn"]} 
+        />
+        <Card 
+          title="Agents (3)" 
+          description="Specialist agents: Builder (implementation), Reviewer (verification), Lead (coordination)." 
+          actionLabel="View Agents" 
+          actionHref={withBase('/opencode-plugin/agents/')} 
+          badgeLabels={["Roles"]} 
+          badgeVariants={["info"]} 
+        />
       </div>
 
       <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
 
       <h2>Installation</h2>
-      <CodeBlock code={installCode} language="bash" />
+      {opencodePluginProduct.installation.map(inst => (
+        <>
+          <h3>{inst.name}</h3>
+          <CodeBlock code={inst.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+          <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-sm);">{inst.description}</p>
+          {inst.prerequisites.length > 0 && (
+            <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);"><strong>Prerequisites:</strong> {inst.prerequisites.join(', ')}</p>
+          )}
+          {inst.dependencies.length > 0 && (
+            <ul style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);">
+              {inst.dependencies.map(dep => (
+                <li><strong>{dep.name}</strong> ({dep.type}): {dep.description}</li>
+              ))}
+            </ul>
+          )}
+        </>
+      ))}
 
       <h2 style="margin-top: var(--space-2xl);">Quick Start</h2>
-      <CodeBlock code={quickStartCode} language="bash" />
+      <CodeBlock 
+        code={`
+# In your OpenCode session
+vstack_status        # Show system status
+vstack_task create "Implement feature X"  # Create a task
+vstack_agent dispatch builder  # Dispatch builder agent
+vstack_check verify  # Run verification gates
+`.trim()} 
+        language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
     </Container>
   </Section>
 </Doc>

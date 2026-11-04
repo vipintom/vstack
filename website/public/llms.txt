@@ -1,0 +1,123 @@
+# vstack — Engineering Playbook + OpenCode Runtime + OpenChamber Visualization
+
+> **Summary:** vstack is an engineering playbook and agent workflow ecosystem consisting of three independent components: the vstack Playbook (55 skills, 18 workflows, 17 principles), the vstack OpenCode Plugin (23 tools, 3 agents, 6 stores, 7 gates), and vstack OpenChamber (read-only Panel + Dashboard for workflow visualization).
+
+## Project Overview
+
+vstack provides a portable methodology for AI-assisted software development. It separates concerns across three independent repositories:
+
+- **Playbook** — Defines reusable methodology (skills, workflows, principles) — harness-agnostic, zero runtime code
+- **OpenCode Plugin** — Owns authoritative runtime state and publishes projections
+- **OpenChamber** — Read-only visualization, consumes projections for Panel + Dashboard
+
+**Version:** vstack-2026.11.03 (v0.1.0)
+**Release Date:** 2026-11-03
+**License:** MIT
+**Repository:** https://github.com/vipintom/vstack-workflow
+
+## Components
+
+### vstack Playbook
+- **Package:** `npm:@vipintom/vstack`
+- **Repository:** https://github.com/vipintom/vstack-playbook
+- **Skills:** 55 across 13 categories (Foundation, Discovery, Architecture, Planning, Verification, Debug/Recovery, Collaboration, Review, Continuity, Delivery, Extended, Implementation, Utils)
+- **Workflows:** 18
+- **Principles:** 17
+- **Harnesses:** OpenCode, Codex, Claude Code
+
+### vstack OpenCode Plugin
+- **Package:** `npm:@vipintom/vstack-opencode`
+- **Repository:** https://github.com/vipintom/vstack-opencode
+- **Tools:** 23 (delivery, history, memory, tasks, agents, checks, sessions)
+- **Agents:** 3 (Builder, Reviewer, Lead)
+- **Stores:** 6 (delivery, history, memory, quality, tasks, session)
+- **Gates:** 7 (verification enforcement)
+- **Peer Dependency:** `@opencode/plugin@2.2.0`, `@opencode/schema@2.2.0`
+
+### vstack OpenChamber
+- **Distribution:** Git URL or built ZIP
+- **Repository:** https://github.com/vipintom/vstack-openchamber
+- **Features:** Panel (sidebar), Dashboard (full-page)
+- **Requires:** OpenChamber ≥1.24.0, @openchamber/sdk@2.5.3
+- **Read-only:** Never mutates runtime state
+
+## Installation
+
+### Playbook Skills (Recommended)
+```bash
+# OpenCode
+opencode skill install vstack
+
+# Codex
+codex skill add vstack
+
+# Claude Code
+claude skill install vstack
+```
+
+### OpenCode Plugin
+```bash
+npm install @vipintom/vstack-opencode@latest
+opencode skill install vstack
+```
+
+### OpenChamber Extension
+```bash
+# Via Extension Manager (recommended)
+# OpenChamber Settings → Extensions → Install from URL
+# https://github.com/vipintom/vstack-openchamber.git
+```
+
+## Key Documentation URLs
+
+- **Homepage:** https://vipintom.github.io/vstack/
+- **Capability Explorer:** https://vipintom.github.io/vstack/capabilities/
+- **Installation Overview:** https://vipintom.github.io/vstack/install/
+- **Playbook Installation:** https://vipintom.github.io/vstack/install/playbook/
+- **OpenCode Plugin Installation:** https://vipintom.github.io/vstack/install/opencode-plugin/
+- **OpenChamber Installation:** https://vipintom.github.io/vstack/openchamber/installation/
+- **Upgrade Guide:** https://vipintom.github.io/vstack/install/upgrade/
+- **Removal Guide:** https://vipintom.github.io/vstack/install/removal/
+- **Architecture:** https://vipintom.github.io/vstack/architecture/
+- **Compatibility Matrix:** https://vipintom.github.io/vstack/compatibility/
+- **Playbook Skills:** https://vipintom.github.io/vstack/playbook/skills/
+- **Playbook Principles:** https://vipintom.github.io/vstack/playbook/principles/
+- **Playbook Workflows:** https://vipintom.github.io/vstack/playbook/workflows/
+- **OpenCode Tools:** https://vipintom.github.io/vstack/opencode-plugin/tools/
+- **OpenCode Stores:** https://vipintom.github.io/vstack/opencode-plugin/stores/
+- **OpenCode Gates:** https://vipintom.github.io/vstack/opencode-plugin/gates/
+- **OpenCode Agents:** https://vipintom.github.io/vstack/opencode-plugin/agents/
+
+## Architecture
+
+Four independent repositories communicating through versioned projection contracts:
+
+1. **vstack (umbrella)** — Contracts, capability matrix, integrated release metadata
+2. **vstack-playbook** — Defines methodology: 55 Skills, 18 Workflows, 17 Principles
+3. **vstack-opencode** — Owns runtime state: 23 Tools, 3 Agents, 6 Stores, 7 Gates
+4. **vstack-openchamber** — Read-only visualization: Panel + Dashboard
+
+**Shared Project Root:** `.vstack/` — manifest.json, state/, reports/, deliveries/, events.jsonl
+
+## Compatibility
+
+| Component | OpenCode | Codex | Claude Code |
+|---|---|---|---|
+| Playbook Skills | Full | Full | Full |
+| OpenCode Plugin | Full | N/A | N/A |
+| OpenChamber | Requires Plugin | N/A | N/A |
+
+## Provenance
+
+All capabilities and data verified from upstream repositories:
+- Playbook: vipintom/vstack-playbook @ b896c4fd
+- OpenCode: vipintom/vstack-opencode @ 848124ec
+- OpenChamber: vipintom/vstack-openchamber @ 0987a428
+- Umbrella: vipintom/vstack @ HEAD
+
+**Verified:** 2026-11-04
+**Release Context:** vstack-2026.11.03
+
+## License
+
+MIT License — see LICENSE files in respective repositories.

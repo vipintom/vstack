@@ -1,0 +1,221 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import { opencodePluginProduct } from '@data/products';
+import { withBase } from '../../utils/urls';
+---
+
+<Doc title="OpenCode Plugin Installation" description="Install the vstack OpenCode plugin for runtime execution and state management">
+  <Section id="installation" gap="l" aria-labelledby="install-title">
+    <Container>
+      <h1 id="install-title">OpenCode Plugin Installation</h1>
+      <p class="lead">Install the vstack OpenCode Plugin (23 tools, 3 agents, 6 stores, 7 gates) for runtime execution.</p>
+
+      <!-- Overview -->
+      <div class="overview-card">
+        <h3>What You're Installing</h3>
+        <p>The vstack OpenCode Plugin is an <strong>npm package</strong> that provides the vstack runtime within OpenCode. It loads Playbook skills via the Skills CLI and exposes 23 tools under the <code>vstack_*</code> namespace.</p>
+        <ul style="margin: var(--space-md) 0; padding-left: var(--space-xl);">
+          <li><strong>23 Tools</strong> for task, delivery, memory, history, agents, checks</li>
+          <li><strong>3 Agents</strong> (Builder, Reviewer, Lead)</li>
+          <li><strong>6 Stores</strong> (delivery, history, memory, quality, tasks, session)</li>
+          <li><strong>7 Gates</strong> for quality enforcement</li>
+          <li><strong>Projection publishing</strong> for OpenChamber visualization</li>
+        </ul>
+      </div>
+
+      <!-- Prerequisites -->
+      <div class="prerequisites-box">
+        <h3>System Requirements</h3>
+        <ul>
+          <li><strong>OpenCode ≥2.2.0</strong> (exact peer dependency on <code>@opencode/plugin@2.2.0</code> and <code>@opencode/schema@2.2.0</code>)</li>
+          <li><strong>Node.js ≥20</strong></li>
+          <li><strong>Project initialized</strong> with OpenCode (<code>opencode init</code>)</li>
+        </ul>
+      </div>
+
+      <!-- Installation Methods -->
+      <h2>Installation Methods</h2>
+
+      {opencodePluginProduct.installation.map(inst => (
+        <article class="install-method">
+          <header class="method-header">
+            <h3>{inst.name}</h3>
+            <Badge variant={inst.verification === 'documentation-verified' ? 'pass' : 'info'}>{inst.verification}</Badge>
+          </header>
+
+          <CodeBlock code={inst.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+
+          {inst.prerequisites.length > 0 && (
+            <div class="prerequisites">
+              <h4>Prerequisites</h4>
+              <ul>
+                {inst.prerequisites.map(p => <li>{p}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {inst.dependencies.length > 0 && (
+            <details class="dependencies">
+              <summary>Required Dependencies</summary>
+              <ul>
+                {inst.dependencies.map(dep => (
+                  <li><strong>{dep.name}</strong> ({dep.type}): {dep.description} <CodeBlock code={dep.package + (dep.version ? '@' + dep.version : '')} language="bash" inline={true} /></li>
+                ))}
+              </ul>
+            </details>
+          )}
+
+          <div class="doc-link">
+            <a href={inst.documentationUrl} target="_blank" rel="noopener">Documentation →</a>
+          </div>
+        </article>
+      ))}
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Post-Install Setup -->
+      <h2>Post-Install Setup</h2>
+
+      <h3>1. Load Playbook Skills</h3>
+      <p>After installing the plugin, load the Playbook skills:</p>
+      <CodeBlock code={`# Install Playbook skills (recommended)
+opencode skill install vstack
+
+# Verify skills loaded
+opencode skill list | grep vstack`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+
+      <h3 style="margin-top: var(--space-2xl);">2. Initialize Project</h3>
+      <CodeBlock code={`# Initialize OpenCode project (if not done)
+opencode init
+
+# Verify vstack status
+vstack_status
+
+# Check available tools
+vstack_status --tools`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Verification -->
+      <h2>Verification</h2>
+
+      <CodeBlock code={`# Full status check
+vstack_status
+
+# Check tools available
+vstack_status --tools
+
+# Check projections
+vstack_status --projections
+
+# Test basic workflow
+vstack_delivery create --title "Test" --objective "Verify install" --type feature`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Peer Dependency Note -->
+      <div class="warning-box">
+        <h3>⚠️ Critical: Peer Dependencies</h3>
+        <p>The vstack OpenCode Plugin has <strong>exact peer dependencies</strong> on OpenCode:</p>
+        <ul>
+          <li><code>@opencode/plugin@2.2.0</code></li>
+          <li><code>@opencode/schema@2.2.0</code></li>
+        </ul>
+        <p>Your OpenCode version <strong>must be exactly 2.2.0</strong>. If you upgrade OpenCode, you must wait for a compatible vstack release or use the Skills CLI installation which handles version compatibility automatically.</p>
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Navigation -->
+      <div class="nav-links">
+        <a href={withBase('/install/')} class="btn-secondary">← Back to Installation Overview</a>
+        <a href={withBase('/install/playbook/')} class="btn-secondary">← Playbook Skills</a>
+        <a href={withBase('/openchamber/installation/')} class="btn-primary">Next: OpenChamber →</a>
+      </div>
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .lead {
+    font-size: var(--text-lg);
+    color: var(--color-ink-muted);
+    margin: var(--space-md) 0 0;
+  }
+
+  .overview-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+  }
+  .overview-card h3 { margin: 0 0 var(--space-md); }
+
+  .prerequisites-box {
+    background: var(--color-paper-2);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+  }
+  .prerequisites-box h3 { margin: 0 0 var(--space-md); color: var(--color-accent); }
+  .prerequisites-box ul { margin: 0; padding-left: var(--space-xl); }
+  .prerequisites-box li { margin-bottom: var(--space-sm); }
+
+  .install-method {
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+  }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  .method-header h3 { margin: 0; font-size: var(--text-lg); }
+
+  .prerequisites {
+    margin: var(--space-md) 0;
+    padding: var(--space-md);
+    background: var(--color-paper-2);
+    border-radius: var(--radius-md);
+  }
+  .prerequisites h4 { margin: 0 0 var(--space-sm); font-size: var(--text-sm); color: var(--color-ink-muted); }
+  .prerequisites ul { margin: 0; padding-left: var(--space-xl); font-size: var(--text-sm); }
+
+  .dependencies summary { cursor: pointer; color: var(--color-primary); font-size: var(--text-sm); margin-bottom: var(--space-sm); }
+  .dependencies ul { margin: 0; padding-left: var(--space-xl); font-size: var(--text-sm); color: var(--color-ink-muted); }
+  .dependencies li { margin-bottom: var(--space-xs); }
+
+  .doc-link { margin-top: var(--space-md); font-size: var(--text-sm); }
+  .doc-link a { color: var(--color-primary); }
+
+  .warning-box {
+    background: var(--color-warning, oklch(65% 0.18 85 / 0.1));
+    border: 1px solid var(--color-warning, oklch(65% 0.18 85 / 0.3));
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+  }
+  .warning-box h3 { margin: 0 0 var(--space-md); color: var(--color-warning); }
+  .warning-box p { margin: 0 0 var(--space-md); }
+  .warning-box ul { margin: 0; padding-left: var(--space-xl); }
+
+  .nav-links {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+</style>

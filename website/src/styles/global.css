@@ -124,6 +124,17 @@
 
   /* ===== BANNER HEIGHT ===== */
   --banner-height: 64px;
+
+  /* ===== MISSING TOKENS (referenced in components) ===== */
+  --color-border: oklch(25% 0.015 260 / 0.6);
+  --color-surface: oklch(16% 0.015 260);
+  --color-primary: oklch(55% 0.16 35);
+
+  /* Chart tokens for architecture diagram */
+  --chart-1: oklch(55% 0.16 220);  /* Playbook - blue */
+  --chart-2: oklch(55% 0.16 145);  /* OpenCode - green */
+  --chart-3: oklch(55% 0.16 35);   /* OpenChamber - orange */
+  --chart-4: oklch(60% 0.18 280);  /* Umbrella - purple */
 }
 
 /* Light mode - derived, not inverted */
@@ -132,9 +143,17 @@
   --color-paper-2: var(--color-paper-2-light);
   --color-paper-3: var(--color-paper-3-light);
   --color-paper-4: var(--color-paper-4-light);
+  --color-surface: var(--color-paper-3-light);
   --color-ink: var(--color-ink-light);
   --color-ink-muted: var(--color-ink-muted-light);
-  --color-ink-faint: var(--color-ink-faint-light);
+  --color-ink-faint: oklch(40% 0.01 260);
   --color-rule: var(--color-rule-light);
   --color-focus: var(--color-focus-light);
+  --color-primary: oklch(35% 0.16 35);
+  --color-accent: oklch(35% 0.16 35);
+  --color-accent-hover: oklch(40% 0.18 35);
+  --color-success: oklch(45% 0.16 145);
+  --color-warning: oklch(55% 0.18 85);
+  --color-error: oklch(45% 0.22 25);
+  --color-info: oklch(50% 0.18 220);
 }

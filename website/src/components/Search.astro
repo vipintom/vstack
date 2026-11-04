@@ -1,6 +1,7 @@
 ---
 import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
+import { withBase } from '../utils/urls';
 ---
 
 <Section id="search" gap="l" aria-labelledby="search-title">
@@ -17,8 +18,9 @@ import Section from '@components/Section.astro';
     if (!container) return;
 
     try {
-      // Use a variable to avoid Vite/Rollup trying to resolve at build time
-      const pagefindPath = '/_pagefind/pagefind-ui.js';
+      // Use base URL for production /vstack/ path compatibility
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const pagefindPath = `${baseUrl}_pagefind/pagefind-ui.js`;
       const module = await import(pagefindPath);
       const { PagefindUI } = module;
       new PagefindUI({

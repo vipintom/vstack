@@ -30,17 +30,3 @@ const { placeholder = 'Search…', value = '', onInput, class: className = '', '
   .search-clear { position: absolute; right: var(--space-sm); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: none; border: none; color: var(--color-ink-faint); cursor: pointer; border-radius: var(--radius-xs); transition: color var(--dur-micro); }
   .search-clear:hover { color: var(--color-accent); }
 </style>
-
-<script>
-  const input = document.querySelector('.search-input');
-  const clearBtn = document.querySelector('.search-clear');
-  input?.addEventListener('input', (e) => {
-    const target = e.target as HTMLInputElement;
-    clearBtn?.classList.toggle('hidden', !target.value);
-  });
-  clearBtn?.addEventListener('click', () => {
-    input!.value = '';
-    input!.dispatchEvent(new Event('input'));
-    input!.focus();
-  });
-</script>

@@ -9,31 +9,32 @@ import DataTable from '@components/DataTable.astro';
 import SearchInput from '@components/SearchInput.astro';
 import Card from '@components/Card.astro';
 import Search from '@components/Search.astro';
-import { capabilityMatrix, categorySummary, harnessSummary } from '@data/capability-matrix';
-import { withBase } from '../utils/urls';
+import { capabilityData, harnessSummary, capabilityCategories } from '@data/capabilities';
+import { playbookProduct, opencodePluginProduct, openchamberProduct } from '@data/products';
+import { heroContent, architectureSummary, productComparison, gettingStarted, releaseInfo, productIntros } from '@data/editorial';
 import { withBase } from '../utils/urls';
 
-// Pillar card props
+// Pillar card props from canonical data
 const pillarCardProps = [
   {
-    title: 'vstack-playbook',
-    description: 'Portable playbook: 55 skills, 18 workflows, 17 principles. Markdown/YAML content, zero runtime code. Works with OpenCode, Codex, Claude Code.',
+    title: playbookProduct.identity.name,
+    description: playbookProduct.identity.shortDescription,
     actionLabel: 'Explore Playbook',
     actionHref: withBase('/playbook/'),
     badgeLabels: ['55 Skills', '18 Workflows', '17 Principles'],
     badgeVariants: ['info', 'pass', 'warn'],
   },
   {
-    title: 'vstack-opencode',
-    description: 'OpenCode plugin: 23 tools, 3 agents, 6 stores, 7 gates. Persistent state, quality gates, specialist agents. Full TypeScript implementation.',
+    title: opencodePluginProduct.identity.name,
+    description: opencodePluginProduct.identity.shortDescription,
     actionLabel: 'View Plugin',
     actionHref: withBase('/opencode-plugin/'),
     badgeLabels: ['23 Tools', '3 Agents', '7 Gates'],
     badgeVariants: ['info', 'pass', 'warn'],
   },
   {
-    title: 'vstack-openchamber',
-    description: 'Read-only panel for OpenChamber project knowledge. Notes, Todos, Plans visualization. Astro + TypeScript.',
+    title: openchamberProduct.identity.name,
+    description: openchamberProduct.identity.shortDescription,
     actionLabel: 'Open Panel',
     actionHref: withBase('/openchamber/'),
     badgeLabels: ['Notes', 'Todos', 'Plans'],
@@ -41,49 +42,40 @@ const pillarCardProps = [
   },
 ];
 
-// Architecture layer data
-const archLayers = [
-  { name: 'Foundation', skills: ['using-superpowers', 'find-skills', 'vstack-help', 'vstack-unslop'] },
-  { name: 'Discovery', skills: ['vstack-figure-it-out', 'vstack-explore', 'vstack-interrogate', 'vstack-recall', 'vstack-why', 'vstack-how'] },
-  { name: 'Architecture', skills: ['vstack-architect', 'vstack-blueprint', 'vstack-design-audit', 'migration', 'vstack-performance'] },
-  { name: 'Planning', skills: ['vstack-plan-loop', 'vstack-plan-review', 'writing-plans', 'vstack-incremental-build', 'vstack-blueprint'] },
-  { name: 'Verification', skills: ['vstack-tdd', 'vstack-verify-loop', 'verification-before-completion', 'safe-refactor'] },
-  { name: 'Debug/Recovery', skills: ['vstack-debug', 'vstack-recovery', 'systematic-debugging', 'vstack-trace-forensics', 'vstack-runtime-forensics'] },
-  { name: 'Collaboration', skills: ['subagent-driven-development', 'dispatching-parallel-agents', 'vstack-swarm', 'vstack-jury', 'vstack-handoff'] },
-  { name: 'Review', skills: ['vstack-review-loop', 'receiving-code-review', 'requesting-code-review', 'caveman-review'] },
-  { name: 'Continuity', skills: ['vstack-session-pickup', 'vstack-safe-pause', 'vstack-catchup', 'vstack-context-reset', 'vstack-recall', 'vstack-ledger', 'vstack-lessons'] },
-  { name: 'Delivery', skills: ['vstack-ship', 'vstack-pr', 'vstack-ready', 'finishing-a-development-branch', 'devops-engineer'] },
-  { name: 'Extended', skills: ['hallmark', 'frontend-design', 'apollo-federation', 'graphql-schema', 'angular-dashboard', 'vstack-skill-authoring', 'vstack-skill-evaluation'] },
-  { name: 'Implementation', skills: ['test-driven-development', 'vstack-incremental-build', 'data-pipeline', 'fastapi-backend', 'bubbletea'] },
-  { name: 'Utils', skills: ['docker-compose', 'makefile', 'gitignore'] },
-];
+// Architecture layer data from capability categories
+const archLayers = capabilityCategories.map(cat => ({
+  name: cat.name,
+  skills: cat.capabilities.map(c => c.id),
+}));
 
-// Install commands
-const installCommands = [
-  { platform: 'OpenCode', command: 'opencode skill install vstack', description: 'Installs all 55 vstack skills to ~/.config/opencode/skills/vstack/' },
-  { platform: 'Codex', command: 'codex skill add vstack', description: 'Adds vstack skills to Codex workspace (requires Codex skill support)' },
-  { platform: 'Claude Code', command: 'claude skill install vstack', description: 'Installs vstack skills for Claude Code (when available)' },
-];
+// Install commands from canonical data
+const installCommands = playbookProduct.installation.map(inst => ({
+  platform: inst.name.replace('Playbook ', '').replace('OpenCode ', '').replace('Claude Code', 'Claude Code'),
+  command: inst.command,
+  description: inst.description,
+}));
 
-const capabilityRows = capabilityMatrix.map(row => [
-  row.name,
-  row.category,
-  row.opencode,
-  row.codex,
-  row.claude,
-]);
+const capabilityRows = capabilityData.capabilities
+  .filter(c => c.component === 'playbook')
+  .map(row => [
+    row.name,
+    row.category,
+    row.status.opencode,
+    row.status.codex,
+    row.status.claudeCode,
+  ]);
 
-const emptyState = capabilityMatrix.length === 0;
+const emptyState = capabilityData.capabilities.length === 0;
 const matrixSearchId = "matrix-search";
 const matrixCategoryFilterId = "matrix-category-filter";
 
 ---
 
-<Landing title="vstack — Portable engineering playbook" description="55 skills, 18 workflows, 17 principles. Works with OpenCode, Codex, and Claude Code.">
+<Landing title={heroContent.title} description={heroContent.body.split('\n')[1]?.replace('**', '').trim() || 'Portable engineering playbook for AI-assisted development'}>
   <Section id="hero" gap="xl" class="hero-section">
     <Container>
       <div class="hero-content">
-        <h1>vstack</h1>
+        <h1>{heroContent.title}</h1>
         <p class="hero-tagline">Portable engineering playbook for AI-assisted development</p>
         <p class="hero-subtitle">55 skills. 18 workflows. 17 principles. Works with OpenCode, Codex, and Claude Code.</p>
         <div class="hero-actions">
@@ -228,7 +220,7 @@ const matrixCategoryFilterId = "matrix-category-filter";
 
           <!-- Projection labels -->
           <text x="350" y="130" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">projections v1</text>
-          <text x="400" y="135" text-anchor="middle" font-size="10" fill="var(--color-ink-muted">manifest.json</text>
+          <text x="400" y="135" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">manifest.json</text>
           <text x="450" y="130" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">projections v1</text>
 
           <!-- Data flow arrows -->
@@ -244,6 +236,43 @@ const matrixCategoryFilterId = "matrix-category-filter";
           <text x="400" y="397" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">manifest.json · state/ · reports/ · deliveries/ · events.jsonl</text>
         </svg>
       </div>
+
+      <!-- Semantic text alternative for screen readers and non-visual access -->
+      <details class="arch-text-alternative" open>
+        <summary>View text description of architecture diagram</summary>
+        <div class="arch-text-content">
+          <h3>vstack System Architecture — Text Description</h3>
+          
+          <h4>Four Independent Repositories</h4>
+          <ul>
+            <li><strong>vstack (umbrella)</strong> — Contracts, capability matrix, integrated release metadata. Repository: github.com/vipintom/vstack. Coordinates ecosystem-level contracts and release coordination.</li>
+            <li><strong>vstack-playbook</strong> — Defines methodology: 55 Skills, 18 Workflows, 17 Principles, 3 Roles. Package: npm @vipintom/vstack. Repository: github.com/vipintom/vstack-playbook. <em>Defines methodology</em>.</li>
+            <li><strong>vstack-opencode</strong> — Owns runtime state: 23 Tools, 3 Agents (Builder, Reviewer, Lead), 6 Stores, 7 Gates. Package: npm @vipintom/vstack-opencode. Repository: github.com/vipintom/vstack-opencode. <em>Owns runtime state</em>.</li>
+            <li><strong>vstack-openchamber</strong> — Read-only visualization: Panel + Dashboard. Reads projections. Distribution: Git URL / Built ZIP. Repository: github.com/vipintom/vstack-openchamber. <em>Visualizes state</em>.</li>
+          </ul>
+
+          <h4>Relationships</h4>
+          <ul>
+            <li><strong>Umbrella → Playbook:</strong> Projections v1 (dashed arrow) — Umbrella coordinates Playbook's manifest.json and capability matrix</li>
+            <li><strong>Umbrella → OpenCode Plugin:</strong> manifest.json (dashed arrow) — Umbrella provides manifest.json for OpenCode Plugin</li>
+            <li><strong>Umbrella → OpenChamber:</strong> Projections v1 (dashed arrow) — Umbrella coordinates projection protocol</li>
+            <li><strong>Playbook → OpenCode Plugin:</strong> Skills CLI (solid green arrow) — Playbook skills installed via OpenCode Skills CLI into OpenCode Plugin</li>
+            <li><strong>OpenCode Plugin → OpenChamber:</strong> Projections (solid orange arrow) — OpenCode Plugin publishes runtime projections that OpenChamber consumes for visualization</li>
+          </ul>
+
+          <h4>Shared Project Root</h4>
+          <p><strong>.vstack/</strong> — Shared project root directory containing: manifest.json, state/, reports/, deliveries/, events.jsonl. This is the single source of truth for project state, accessed by both OpenCode Plugin (writes) and OpenChamber (reads).</p>
+
+          <h4>Key Architectural Principles</h4>
+          <ul>
+            <li><strong>Methodology separation:</strong> Playbook defines reusable methodology (skills, workflows, principles) — harness-agnostic, zero runtime code</li>
+            <li><strong>Runtime ownership:</strong> OpenCode Plugin owns authoritative runtime state and publishes projections</li>
+            <li><strong>Read-only visualization:</strong> OpenChamber consumes projections for visualization only — never mutates runtime state</li>
+            <li><strong>Release coordination:</strong> Umbrella repository coordinates contracts, compatibility matrix, and integrated release metadata — not a runtime dependency</li>
+            <li><strong>Component independence:</strong> Each component can be used independently; no mandatory installation of all three</li>
+          </ul>
+        </div>
+      </details>
 
       <div class="arch-legend">
         <div class="legend-item">
@@ -391,6 +420,21 @@ const matrixCategoryFilterId = "matrix-category-filter";
   .arch-legend { display: flex; flex-wrap: wrap; gap: var(--gap-columns); justify-content: center; margin-top: var(--space-lg); }
   .legend-item { display: flex; align-items: center; gap: var(--space-sm); font-size: 0.875rem; color: var(--color-ink-muted); }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .arch-text-alternative { margin: var(--space-xl) 0; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .arch-text-alternative summary { padding: var(--space-md) var(--space-lg); font-weight: 600; cursor: pointer; color: var(--color-primary); }
+  .arch-text-alternative summary::marker { content: none; }
+  .arch-text-alternative summary::-webkit-details-marker { display: none; }
+  .arch-text-alternative[open] summary { border-bottom: 1px solid var(--color-border); }
+  .arch-text-content { padding: var(--space-lg); max-width: 800px; margin: 0 auto; }
+  .arch-text-content h3 { margin-top: 0; margin-bottom: var(--space-lg); font-size: var(--text-title); }
+  .arch-text-content h4 { margin-top: var(--space-xl); margin-bottom: var(--space-md); font-size: var(--text-md); color: var(--color-ink); }
+  .arch-text-content ul { margin: var(--space-md) 0; padding-left: var(--space-xl); }
+  .arch-text-content li { margin-bottom: var(--space-sm); line-height: 1.6; }
+  .arch-text-content p { margin: var(--space-md) 0; line-height: 1.6; }
+  .arch-text-content strong { color: var(--color-ink); }
+  .arch-text-content em { color: var(--color-accent); font-style: italic; }
+  @media (max-width: 600px) { .arch-text-content { padding: var(--space-md); } }
 
   .install-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap-columns); }
   .install-card { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-lg); background: var(--color-surface); }

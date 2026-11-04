@@ -1,0 +1,70 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d4aa"/>
+      <stop offset="100%" style="stop-color:#0088cc"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Subtle pattern -->
+  <g opacity="0.03">
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
+    </pattern>
+    <rect width="1200" height="630" fill="url(#grid)"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <circle cx="1000" cy="150" r="200" fill="url(#accent)" opacity="0.1"/>
+  <circle cx="1100" cy="500" r="150" fill="#00d4aa" opacity="0.05"/>
+  
+  <!-- Content -->
+  <g transform="translate(120, 180)">
+    <!-- Wordmark -->
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="white" letter-spacing="-2">vstack</text>
+    
+    <!-- Tagline -->
+    <text x="0" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#a0b0c0" letter-spacing="0.5">
+      Engineering playbook + OpenCode runtime + OpenChamber visualization
+    </text>
+    
+    <!-- Pillars -->
+    <g transform="translate(0, 160)">
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="url(#accent)"/>
+        <text x="24" y="10" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#c0d0e0">Playbook — 55 skills, 18 workflows, 17 principles</text>
+      </g>
+      <g transform="translate(0, 40)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="#00d4aa"/>
+        <text x="24" y="10" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#c0d0e0">OpenCode Plugin — 23 tools, 3 agents, 6 stores</text>
+      </g>
+      <g transform="translate(0, 80)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="#0088cc"/>
+        <text x="24" y="10" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#c0d0e0">OpenChamber — Panel + Dashboard visualization</text>
+      </g>
+    </g>
+    
+    <!-- Version badge -->
+    <g transform="translate(0, 250)">
+      <rect x="0" y="0" width="180" height="36" rx="18" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="90" y="24" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="white" text-anchor="middle">vstack-2026.11.03 • v0.1.0</text>
+    </g>
+  </g>
+  
+  <!-- Right side decorative -->
+  <g transform="translate(800, 200)" opacity="0.15">
+    <text x="0" y="0" font-family="monospace" font-size="14" fill="white">vstack_status</text>
+    <text x="0" y="24" font-family="monospace" font-size="14" fill="#00d4aa">✓ Playbook: 55 skills</text>
+    <text x="0" y="48" font-family="monospace" font-size="14" fill="#00d4aa">✓ Plugin: 23 tools</text>
+    <text x="0" y="72" font-family="monospace" font-size="14" fill="#00d4aa">✓ Chamber: Panel + Dashboard</text>
+    <text x="0" y="110" font-family="monospace" font-size="14" fill="#00d4aa">✓ Projections: v1 schema</text>
+    <text x="0" y="134" font-family="monospace" font-size="14" fill="#00d4aa">✓ Compatibility: 3 harnesses</text>
+  </g>
+</svg>

@@ -22,7 +22,7 @@ const { title, description, sidebarTitle, sidebarItems } = Astro.props;
   <div class="doc-layout">
     {sidebarItems && <DocSidebar title={sidebarTitle || 'Documentation'} items={sidebarItems} />}
     <div class="doc-content">
-      <main>
+      <main id="main-content">
         <slot />
       </main>
     </div>

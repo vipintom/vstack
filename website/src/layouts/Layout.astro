@@ -5,9 +5,13 @@ import { withBase } from '../utils/urls';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  url?: string;
 }
 
-const { title, description = "Engineering playbook + OpenCode runtime + OpenChamber visualization" } = Astro.props;
+const { title, description = "Engineering playbook + OpenCode runtime + OpenChamber visualization", image, url } = Astro.props;
+const canonicalUrl = url || (Astro.url ? new URL(Astro.url.pathname, Astro.site).href : '');
+const ogImage = image || withBase('/og-default.svg');
 ---
 
 <!DOCTYPE html>
@@ -20,9 +24,39 @@ const { title, description = "Engineering playbook + OpenCode runtime + OpenCham
   <meta name="generator" content={Astro.generator} />
   <title>{title} · vstack</title>
   <meta name="description" content={description} />
+  <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+  
+  {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
+  <meta property="og:image" content={ogImage} />
+  {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+  <meta property="og:site_name" content="vstack" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+  
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "vstack",
+    "url": Astro.site?.toString(),
+    "description": "Engineering playbook + OpenCode runtime + OpenChamber visualization",
+    "publisher": {
+      "@type": "Organization",
+      "name": "vstack",
+      "url": Astro.site?.toString()
+    }
+  })} />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist+Variable:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />

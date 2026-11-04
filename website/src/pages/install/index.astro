@@ -3,57 +3,243 @@ import Doc from '@layouts/Doc.astro';
 import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import CodeBlock from '@components/CodeBlock.astro';
-import DataTable from '@components/DataTable.astro';
-import { capabilityMatrix } from '@data/capability-matrix';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import Button from '@components/Button.astro';
+import { playbookProduct, opencodePluginProduct, openchamberProduct } from '@data/products';
+import { withBase } from '../../utils/urls';
 ---
 
-<Doc title="Installation" description="Install vstack skills for your AI harness">
+<Doc title="Installation" description="Install vstack components for your AI harness">
   <Section id="installation" gap="l" aria-labelledby="install-title">
     <Container>
       <h1 id="install-title">Installation</h1>
-      <p class="lead">One command installs all 55 vstack skills to your AI harness.</p>
+      <p class="lead">Install vstack components independently. Each component has its own installation path and prerequisites.</p>
 
-      <h2>OpenCode</h2>
-      <CodeBlock code="opencode skill install vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
-      <p>Installs all 55 vstack skills to <code>~/.config/opencode/skills/vstack/</code></p>
+      <!-- Quick Start Cards -->
+      <h2>Quick Start</h2>
+      <div class="pillar-grid" style="margin-bottom: var(--space-3xl);">
+        <Card
+          title="Playbook Skills"
+          description="55 skills, 18 workflows, 17 principles. Works with OpenCode, Codex, and Claude Code."
+          actionLabel="Install Playbook"
+          actionHref={withBase('/install/playbook/')}
+          badgeLabels={["Core"]}
+          badgeVariants={["info"]}
+        />
+        <Card
+          title="OpenCode Plugin"
+          description="23 tools, 3 agents, 6 stores, 7 gates. Runtime execution and state management."
+          actionLabel="Install Plugin"
+          actionHref={withBase('/install/opencode-plugin/')}
+          badgeLabels={["Runtime"]}
+          badgeVariants={["pass"]}
+        />
+        <Card
+          title="OpenChamber"
+          description="Read-only Panel + Dashboard for workflow visualization. Requires OpenChamber host."
+          actionLabel="Install OpenChamber"
+          actionHref={withBase('/openchamber/installation/')}
+          badgeLabels={["Visualization"]}
+          badgeVariants={["warn"]}
+        />
+      </div>
 
-      <h2 style="margin-top: var(--space-2xl);">Codex</h2>
-      <CodeBlock code="codex skill add vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
-      <p>Adds vstack skills to Codex workspace (requires Codex skill support)</p>
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
 
-      <h2 style="margin-top: var(--space-2xl);">Claude Code</h2>
-      <CodeBlock code="claude skill install vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
-      <p>Installs vstack skills for Claude Code (when available)</p>
+      <!-- Playbook Quick Install -->
+      <h2>Playbook Quick Install</h2>
+      <p>The vstack Playbook installs as skills via your AI harness's skill manager.</p>
 
-      <h2 style="margin-top: var(--space-2xl);">Manual Installation</h2>
-      <p>Download the playbook package and extract it to your skills directory:</p>
-      <CodeBlock code="# Download\ncurl -L -o vstack-playbook.tgz https://github.com/vipintom/vstack-playbook/releases/download/v0.1.0/vstack-playbook-0.1.0.tgz\n\n# Extract\nmkdir -p ~/.config/opencode/skills/vstack\ntar -xzf vstack-playbook.tgz -C ~/.config/opencode/skills/vstack" language="bash" />
+      <div class="install-methods">
+        {playbookProduct.installation.map(inst => (
+          <div class="install-method">
+            <h3>{inst.name}</h3>
+            <CodeBlock code={inst.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+            <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-sm);">{inst.description || ''}</p>
+            {inst.prerequisites.length > 0 && (
+              <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);"><strong>Prerequisites:</strong> {inst.prerequisites.join(', ')}</p>
+            )}
+          </div>
+        ))}
+      </div>
 
-      <h2 style="margin-top: var(--space-2xl);">Verification</h2>
-      <p>Verify the installation by listing available skills:</p>
-      <CodeBlock code="opencode skill list" language="bash" />
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
 
-      <h2 style="margin-top: var(--space-2xl);">Capability Matrix</h2>
-      <p>Single source of truth: 55 skills × 3 harnesses (OpenCode, Codex, Claude Code)</p>
+      <!-- OpenCode Plugin Install -->
+      <h2>OpenCode Plugin Install</h2>
+      <p>The vstack OpenCode Plugin installs as an npm package and requires OpenCode ≥2.2.0.</p>
 
-      <DataTable
-        columns={[
-          { key: 'name', header: 'Skill', sortable: true },
-          { key: 'category', header: 'Category', sortable: true },
-          { key: 'opencode', header: 'OpenCode', sortable: true },
-          { key: 'codex', header: 'Codex', sortable: true },
-          { key: 'claude', header: 'Claude Code', sortable: true },
-        ]}
-        data={capabilityMatrix.map(row => [
-          row.name,
-          row.category,
-          row.opencode,
-          row.codex,
-          row.claude,
-        ])}
-        emptyState={false}
-        emptyMessage="No skills found."
-      />
+      <div class="install-methods">
+        {opencodePluginProduct.installation.map(inst => (
+          <div class="install-method">
+            <h3>{inst.name}</h3>
+            <CodeBlock code={inst.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+            <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-sm);">{inst.description || ''}</p>
+            {inst.prerequisites.length > 0 && (
+              <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);"><strong>Prerequisites:</strong> {inst.prerequisites.join(', ')}</p>
+            )}
+            {inst.dependencies.length > 0 && (
+              <details style="margin-top: var(--space-md);">
+                <summary style="cursor: pointer; color: var(--color-primary); font-size: var(--text-sm);">Required Dependencies</summary>
+                <ul style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);">
+                  {inst.dependencies.map(dep => (
+                    <li><strong>{dep.name}</strong> ({dep.type}): {dep.description}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- OpenChamber Install -->
+      <h2>OpenChamber Install</h2>
+      <p>OpenChamber is a read-only visualization extension. Requires OpenChamber host ≥1.24.0 and vstack projections.</p>
+
+      <div class="install-methods">
+        {openchamberProduct.installation.map(inst => (
+          <div class="install-method">
+            <h3>{inst.name}</h3>
+            <CodeBlock code={inst.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+            <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-sm);">{inst.description || ''}</p>
+            {inst.prerequisites.length > 0 && (
+              <p style="font-size: var(--text-sm); color: var(--color-ink-muted); margin-top: var(--space-xs);"><strong>Prerequisites:</strong> {inst.prerequisites.join(', ')}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Capability Matrix Summary -->
+      <h2>Capability Summary</h2>
+      <p>Single source of truth from vstack-2026.11.03:</p>
+
+      <div class="capability-summary-grid">
+        <div class="summary-card">
+          <h3>Playbook Skills</h3>
+          <div class="summary-stats">
+            <span class="stat"><Badge variant="pass">Full: {playbookProduct.capabilities.byStatus.full}</Badge></span>
+            <span class="stat"><Badge variant="warn">Partial: {playbookProduct.capabilities.byStatus.partial}</Badge></span>
+            <span class="stat"><Badge variant="info">Planned: {playbookProduct.capabilities.byStatus.planned}</Badge></span>
+          </div>
+          <p style="font-size: var(--text-sm); color: var(--color-ink-muted);">Total: {playbookProduct.capabilities.total} skills</p>
+        </div>
+        <div class="summary-card">
+          <h3>OpenCode Tools</h3>
+          <div class="summary-stats">
+            <span class="stat"><Badge variant="pass">Full: {opencodePluginProduct.capabilities.byStatus.full}</Badge></span>
+          </div>
+          <p style="font-size: var(--text-sm); color: var(--color-ink-muted);">Total: {opencodePluginProduct.capabilities.total} tools</p>
+        </div>
+        <div class="summary-card">
+          <h3>OpenChamber</h3>
+          <div class="summary-stats">
+            <span class="stat"><Badge variant="pass">Full: {openchamberProduct.capabilities.byStatus.full}</Badge></span>
+          </div>
+          <p style="font-size: var(--text-sm); color: var(--color-ink-muted);">Total: {openchamberProduct.capabilities.total} interfaces</p>
+        </div>
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Navigation to detailed pages -->
+      <h2>Detailed Installation Guides</h2>
+      <div class="pillar-grid">
+        <Card
+          title="Playbook Skills Installation"
+          description="Harness-specific skill installation (OpenCode, Codex, Claude Code), manual download, and verification."
+          actionLabel="View Guide"
+          actionHref={withBase('/install/playbook/')}
+          badgeLabels={["Detailed"]}
+          badgeVariants={["info"]}
+        />
+        <Card
+          title="OpenCode Plugin Installation"
+          description="npm package installation, peer dependencies, project setup, and verification."
+          actionLabel="View Guide"
+          actionHref={withBase('/install/opencode-plugin/')}
+          badgeLabels={["Detailed"]}
+          badgeVariants={["pass"]}
+        />
+        <Card
+          title="OpenChamber Installation"
+          description="Extension Manager, Git URL, manual build, permissions, and verification."
+          actionLabel="View Guide"
+          actionHref={withBase('/openchamber/installation/')}
+          badgeLabels={["Detailed"]}
+          badgeVariants={["warn"]}
+        />
+      </div>
     </Container>
   </Section>
 </Doc>
+
+<style>
+  .lead {
+    font-size: var(--text-lg);
+    color: var(--color-ink-muted);
+    margin: var(--space-md) 0 0;
+  }
+
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--gap-columns);
+  }
+  @media (max-width: 768px) {
+    .pillar-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .install-methods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+  }
+
+  .install-method {
+    padding: var(--space-lg);
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-lg);
+  }
+
+  .install-method h3 {
+    margin: 0 0 var(--space-md);
+    font-size: var(--text-lg);
+  }
+
+  .capability-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--gap-columns);
+    margin-top: var(--space-lg);
+  }
+
+  .summary-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+  }
+
+  .summary-card h3 {
+    margin: 0 0 var(--space-md);
+    font-size: var(--text-md);
+  }
+
+  .summary-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin-bottom: var(--space-md);
+  }
+</style>

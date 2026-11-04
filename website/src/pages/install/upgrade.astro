@@ -4,27 +4,79 @@ import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import DataTable from '@components/DataTable.astro';
+import Badge from '@components/Badge.astro';
+import { playbookProduct, opencodePluginProduct, openchamberProduct } from '@data/products';
+import { withBase } from '../../utils/urls';
 ---
 
 <Doc title="Upgrade vstack" description="Upgrade vstack skills and components to the latest version">
   <Section id="upgrade" gap="l" aria-labelledby="upgrade-title">
     <Container>
       <h1 id="upgrade-title">Upgrade vstack</h1>
-      <p class="lead">Keep your vstack installation current with the latest skills, workflows, and runtime improvements.</p>
+      <p class="lead">Keep your vstack installation current with the latest skills, workflows, and runtime improvements. Current release: <strong>vstack-2026.11.03</strong> (v0.1.0).</p>
 
-      <h2>OpenCode Plugin Upgrade</h2>
-      <p>The vstack OpenCode plugin is installed as a skill set. Upgrade by reinstalling:</p>
+      <div class="nav-links" style="margin-bottom: var(--space-2xl);">
+        <a href={withBase('/install/')} class="btn-secondary">← Installation Overview</a>
+        <a href={withBase('/install/removal/')} class="btn-secondary">Removal →</a>
+      </div>
 
-      <CodeBlock code={`# Upgrade via Skills CLI (recommended)
+      <!-- Upgrade Commands by Component -->
+      <div class="upgrade-section">
+        <h2>Playbook Skills Upgrade</h2>
+        <p>Upgrade via your AI harness's skill manager (replaces all 55 skills atomically):</p>
+        <CodeBlock code={`# OpenCode (recommended)
 opencode skill install vstack
 
-# Or manually with npm
+# Codex
+codex skill add vstack
+
+# Claude Code
+claude skill install vstack
+
+# Verify
+opencode skill info vstack | grep version`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      </div>
+
+      <div class="upgrade-section">
+        <h2>OpenCode Plugin Upgrade</h2>
+        <p>Upgrade the npm package. <strong>Requires OpenCode restart.</strong></p>
+        <div class="warning-box">
+          <p><strong>⚠️ Peer Dependency:</strong> vstack-opencode@0.1.0 requires exact peer dependencies:</p>
+          <ul>
+            <li><code>@opencode/plugin@2.2.0</code></li>
+            <li><code>@opencode/schema@2.2.0</code></li>
+          </ul>
+          <p>Ensure your OpenCode version matches before upgrading.</p>
+        </div>
+        <CodeBlock code={`# Upgrade plugin
 npm install @vipintom/vstack-opencode@latest
 
-# Verify version
-vstack_status`} language="bash" showCopy={true} copyLabel="Copy" />
+# Or specific version
+npm install @vipintom/vstack-opencode@0.1.0
 
-      <h3>What Gets Upgraded</h3>
+# Reload skills
+opencode skill install vstack
+
+# Verify
+vstack_status`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      </div>
+
+      <div class="upgrade-section">
+        <h2>OpenChamber Extension Upgrade</h2>
+        <p>Update via OpenChamber Extension Manager or reinstall from Git:</p>
+        <CodeBlock code={`# Via Extension Manager (recommended)
+# OpenChamber Settings → Extensions → vstack Workflow → Update
+
+# Or manual Git update
+cd .vstack/openchamber && git pull
+
+# Or download latest ZIP from GitHub Releases`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- What Gets Upgraded -->
+      <h2>What Gets Upgraded</h2>
       <DataTable
         columns={[
           { key: 'component', header: 'Component', sortable: true },
@@ -32,16 +84,19 @@ vstack_status`} language="bash" showCopy={true} copyLabel="Copy" />
           { key: 'notes', header: 'Notes', sortable: false },
         ]}
         data={[
-          ['Skills (55)', 'Replaced with latest', 'Skills CLI handles atomically'],
-          ['OpenCode Plugin', 'npm update', 'Requires OpenCode restart'],
-          ['OpenChamber Extension', 'Reinstall extension', 'Via Extension Manager or Git'],
-          ['Playbook Package', 'npm update @vipintom/vstack', 'If installed as npm dependency'],
+          ['Playbook Skills (55)', 'Replaced with latest', 'Skills CLI handles atomically'],
+          ['OpenCode Plugin', 'npm update', 'Requires OpenCode restart; check peer deps'],
+          ['OpenChamber Extension', 'Reinstall extension', 'Via Extension Manager or Git pull'],
+          ['Playbook npm Package', 'npm update @vipintom/vstack', 'If installed as npm dependency'],
         ]}
         emptyState={false}
       />
 
-      <h2 style="margin-top: var(--space-2xl);">Breaking Changes</h2>
-      <p>Check the <a href="https://github.com/vipintom/vstack-playbook/releases">release notes</a> for breaking changes before upgrading major versions.</p>
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Breaking Changes -->
+      <h2>Breaking Changes</h2>
+      <p>Check the <a href="https://github.com/vipintom/vstack-playbook/releases" target="_blank" rel="noopener">release notes</a> for breaking changes before upgrading major versions.</p>
 
       <DataTable
         columns={[
@@ -55,39 +110,44 @@ vstack_status`} language="bash" showCopy={true} copyLabel="Copy" />
         emptyState={false}
       />
 
-      <h2 style="margin-top: var(--space-2xl);">Migration Steps (Major Versions)</h2>
-      <ol>
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Migration Steps -->
+      <h2>Migration Steps (Major Versions)</h2>
+      <ol class="migration-steps">
         <li><strong>Backup</strong> your <code>.vstack/</code> directory: <code>cp -r .vstack .vstack.backup</code></li>
         <li><strong>Read release notes</strong> for the target version</li>
-        <li><strong>Upgrade plugin:</strong> <code>opencode skill install vstack</code></li>
+        <li><strong>Upgrade Playbook skills:</strong> <code>opencode skill install vstack</code></li>
+        <li><strong>Upgrade OpenCode plugin:</strong> <code>npm install @vipintom/vstack-opencode@latest</code></li>
         <li><strong>Run migrations:</strong> <code>vstack_recovery reconcile --full</code></li>
         <li><strong>Verify:</strong> <code>vstack_status --tools</code></li>
         <li><strong>Test:</strong> Run a simple workflow to confirm</li>
       </ol>
 
-      <h2 style="margin-top: var(--space-2xl);">Rollback Procedure</h2>
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Rollback Procedure -->
+      <h2>Rollback Procedure</h2>
       <p>If upgrade causes issues:</p>
 
-      <CodeBlock code={`# Restore from backup
+      <CodeBlock code={`# 1. Restore project data from backup
 rm -rf .vstack
 mv .vstack.backup .vstack
 
-# Reinstall previous version
+# 2. Reinstall previous version (skills)
 opencode skill install vstack@0.1.0
 
-# Or specific npm version
-npm install @vipintom/vstack-opencode@0.1.0`} language="bash" showCopy={true} copyLabel="Copy" />
+# 3. Reinstall previous plugin version (if needed)
+npm install @vipintom/vstack-opencode@0.1.0
 
-      <h2 style="margin-top: var(--space-2xl);">OpenChamber Extension Upgrade</h2>
-      <ol>
-        <li>Open OpenChamber Settings → Extensions</li>
-        <li>Find "vstack Workflow" extension</li>
-        <li>Click "Update" or "Reinstall"</li>
-        <li>Restart OpenChamber if prompted</li>
-      </ol>
+# 4. Verify rollback
+vstack_status`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
 
-      <h2 style="margin-top: var(--space-2xl);">Verification After Upgrade</h2>
-      <CodeBlock code={`# Check all components
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Verification After Upgrade -->
+      <h2>Verification After Upgrade</h2>
+      <CodeBlock code={`# Full status check
 vstack_status
 vstack_status --tools
 vstack_status --projections
@@ -96,7 +156,71 @@ vstack_status --projections
 opencode skill list | grep vstack
 
 # Test basic workflow
-vstack_delivery create --title "Test" --objective "Verify upgrade" --type feature`} language="bash" showCopy={true} copyLabel="Copy" />
+vstack_delivery create --title "Test" --objective "Verify upgrade" --type feature`} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <!-- Current Versions Reference -->
+      <h2>Current Versions (vstack-2026.11.03)</h2>
+      <DataTable
+        columns={[
+          { key: 'component', header: 'Component', sortable: true },
+          { key: 'version', header: 'Version', sortable: false },
+          { key: 'package', header: 'Package', sortable: false },
+        ]}
+        data={[
+          ['Playbook Skills', playbookProduct.identity.version, playbookProduct.identity.packageName],
+          ['OpenCode Plugin', opencodePluginProduct.identity.version, opencodePluginProduct.identity.packageName],
+          ['OpenChamber', openchamberProduct.identity.version, openchamberProduct.identity.packageName],
+        ]}
+        emptyState={false}
+      />
+
+      <div class="nav-links">
+        <a href={withBase('/install/')} class="btn-secondary">← Installation Overview</a>
+        <a href={withBase('/install/removal/')} class="btn-primary">Removal →</a>
+      </div>
     </Container>
   </Section>
 </Doc>
+
+<style>
+  .lead {
+    font-size: var(--text-lg);
+    color: var(--color-ink-muted);
+    margin: var(--space-md) 0 0;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .upgrade-section {
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+  }
+  .upgrade-section h2 { margin: 0 0 var(--space-md); }
+
+  .warning-box {
+    background: var(--color-warning, oklch(65% 0.18 85 / 0.1));
+    border: 1px solid var(--color-warning, oklch(65% 0.18 85 / 0.3));
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin: var(--space-md) 0;
+  }
+  .warning-box p { margin: 0 0 var(--space-md); }
+  .warning-box ul { margin: 0; padding-left: var(--space-xl); }
+  .warning-box li { margin-bottom: var(--space-xs); }
+
+  .migration-steps {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-xl);
+  }
+  .migration-steps li { margin-bottom: var(--space-md); }
+</style>
