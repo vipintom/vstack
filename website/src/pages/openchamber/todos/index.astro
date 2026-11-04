@@ -4,6 +4,7 @@ import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import { todoExample } from '@data/openchamber-examples';
+import { withBase } from '../../../utils/urls';
 ---
 
 <Doc title="Todos - OpenChamber" description="Task tracking and progress">
@@ -17,7 +18,7 @@ import { todoExample } from '@data/openchamber-examples';
         <CodeBlock code={todoExample} language="json" />
       </div>
 
-      <p style="margin-top: var(--space-xl);"><a href="/openchamber/">← Back to OpenChamber</a></p>
+      <p style="margin-top: var(--space-xl);"><a href={withBase('/openchamber/')}>← Back to OpenChamber</a></p>
     </Container>
   </Section>
 </Doc>

@@ -4,6 +4,7 @@ import Container from '@components/Container.astro';
 import Section from '@components/Section.astro'
 import CodeBlock from '@components/CodeBlock.astro';
 import DataTable from '@components/DataTable.astro';
+import { withBase } from '../../utils/urls';
 ---
 
 <Doc title="OpenChamber Troubleshooting" description="Troubleshooting guide for the vstack OpenChamber extension">
@@ -101,7 +102,7 @@ import DataTable from '@components/DataTable.astro';
       <ul>
         <li><strong>GitHub Issues:</strong> <a href="https://github.com/vipintom/vstack-openchamber/issues">vipintom/vstack-openchamber/issues</a></li>
         <li><strong>OpenChamber Discord:</strong> #extensions channel</li>
-        <li><strong>vstack Documentation:</strong> <a href="/openchamber/">OpenChamber Docs</a></li>
+        <li><strong>vstack Documentation:</strong> <a href={withBase('/openchamber/')}>OpenChamber Docs</a></li>
         <li><strong>OpenCode Plugin Issues:</strong> <a href="https://github.com/vipintom/vstack-opencode/issues">vipintom/vstack-opencode/issues</a> (for projection generation issues)</li>
       </ul>
 

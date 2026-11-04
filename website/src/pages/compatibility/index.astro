@@ -5,6 +5,7 @@ import Section from '@components/Section.astro';
 import DataTable from '@components/DataTable.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import { capabilityMatrix, categorySummary, harnessSummary } from '@data/capability-matrix';
+import { withBase } from '../../utils/urls';
 ---
 
 <Doc title="Compatibility Matrix" description="vstack ecosystem compatibility across harnesses and versions">
@@ -64,11 +65,11 @@ import { capabilityMatrix, categorySummary, harnessSummary } from '@data/capabil
 
       <h2 style="margin-top: var(--space-2xl);">Links</h2>
       <ul>
-        <li><a href="https://github.com/vipintom/vstack-playbook">vstack-playbook repository</a></li>
-        <li><a href="https://github.com/vipintom/vstack-opencode">vstack-opencode repository</a></li>
-        <li><a href="https://github.com/vipintom/vstack-openchamber">vstack-openchamber repository</a></li>
-        <li><a href="https://github.com/vipintom/vstack-workflow">vstack-workflow (this repo)</a></li>
-        <li><a href="/playbook/docs/capability-matrix.md">Capability Matrix (Markdown)</a></li>
+        <li><a href="https://github.com/vipintom/vstack-playbook" target="_blank" rel="noopener">vstack-playbook repository</a></li>
+        <li><a href="https://github.com/vipintom/vstack-opencode" target="_blank" rel="noopener">vstack-opencode repository</a></li>
+        <li><a href="https://github.com/vipintom/vstack-openchamber" target="_blank" rel="noopener">vstack-openchamber repository</a></li>
+        <li><a href="https://github.com/vipintom/vstack-workflow" target="_blank" rel="noopener">vstack-workflow (this repo)</a></li>
+        <li><a href={withBase('/playbook/docs/capability-matrix.md')}>Capability Matrix (Markdown)</a></li>
       </ul>
     </Container>
   </Section>

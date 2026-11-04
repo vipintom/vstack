@@ -4,6 +4,7 @@ import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import { noteExample } from '@data/openchamber-examples';
+import { withBase } from '../../../utils/urls';
 ---
 
 <Doc title="Notes - OpenChamber" description="Project notes and documentation">
@@ -17,7 +18,7 @@ import { noteExample } from '@data/openchamber-examples';
         <CodeBlock code={noteExample} language="json" />
       </div>
 
-      <p style="margin-top: var(--space-xl);"><a href="/openchamber/">← Back to OpenChamber</a></p>
+      <p style="margin-top: var(--space-xl);"><a href={withBase('/openchamber/')}>← Back to OpenChamber</a></p>
     </Container>
   </Section>
 </Doc>

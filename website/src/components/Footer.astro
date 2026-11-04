@@ -1,4 +1,5 @@
 ---
+import { withBase } from '../utils/urls';
 ---
 
 <footer class="footer" role="contentinfo">
@@ -9,32 +10,32 @@
       <p style="font-size: var(--text-sm); color: var(--color-ink-muted); max-width: 20ch;">Engineering playbook + OpenCode runtime + OpenChamber visualization</p>
     </div>
     <nav class="footer-links" aria-label="Playbook">
-      <a href="/playbook/" style="font-weight: 600; color: var(--color-ink);">Playbook</a>
-      <a href="/playbook/principles/">Principles</a>
-      <a href="/playbook/roles/">Roles</a>
-      <a href="/playbook/skills/">Skills</a>
-      <a href="/playbook/workflows/">Workflows</a>
-      <a href="/playbook/resources/">Resources</a>
-      <a href="/playbook/capability-matrix">Capability Matrix</a>
-      <a href="/playbook/install">Install</a>
+      <a href={withBase('/playbook/')} style="font-weight: 600; color: var(--color-ink);">Playbook</a>
+      <a href={withBase('/playbook/principles/')}>Principles</a>
+      <a href={withBase('/playbook/roles/')}>Roles</a>
+      <a href={withBase('/playbook/skills/')}>Skills</a>
+      <a href={withBase('/playbook/workflows/')}>Workflows</a>
+      <a href={withBase('/playbook/resources/')}>Resources</a>
+      <a href={withBase('/playbook/capability-matrix')}>Capability Matrix</a>
+      <a href={withBase('/playbook/install')}>Install</a>
     </nav>
     <nav class="footer-links" aria-label="OpenCode Plugin">
-      <a href="/opencode-plugin/" style="font-weight: 600; color: var(--color-ink);">OpenCode Plugin</a>
-      <a href="/opencode-plugin/tools/">Tools</a>
-      <a href="/opencode-plugin/stores/">Stores</a>
-      <a href="/opencode-plugin/gates/">Gates</a>
-      <a href="/opencode-plugin/agents/">Agents</a>
-      <a href="/opencode-plugin/projections/">Projections</a>
-      <a href="/opencode-plugin/install">Install</a>
+      <a href={withBase('/opencode-plugin/')} style="font-weight: 600; color: var(--color-ink);">OpenCode Plugin</a>
+      <a href={withBase('/opencode-plugin/tools/')}>Tools</a>
+      <a href={withBase('/opencode-plugin/stores/')}>Stores</a>
+      <a href={withBase('/opencode-plugin/gates/')}>Gates</a>
+      <a href={withBase('/opencode-plugin/agents/')}>Agents</a>
+      <a href={withBase('/opencode-plugin/projections/')}>Projections</a>
+      <a href={withBase('/opencode-plugin/install')}>Install</a>
     </nav>
     <nav class="footer-links" aria-label="OpenChamber">
-      <a href="/openchamber/" style="font-weight: 600; color: var(--color-ink);">OpenChamber</a>
-      <a href="/openchamber/dashboard">Dashboard</a>
-      <a href="/openchamber/delivery-detail">Delivery Detail</a>
-      <a href="/openchamber/activity">Activity</a>
-      <a href="/openchamber/memory">Memory</a>
-      <a href="/openchamber/quality">Quality</a>
-      <a href="/openchamber/api">API</a>
+      <a href={withBase('/openchamber/')} style="font-weight: 600; color: var(--color-ink);">OpenChamber</a>
+      <a href={withBase('/openchamber/dashboard')}>Dashboard</a>
+      <a href={withBase('/openchamber/delivery-detail')}>Delivery Detail</a>
+      <a href={withBase('/openchamber/activity')}>Activity</a>
+      <a href={withBase('/openchamber/memory')}>Memory</a>
+      <a href={withBase('/openchamber/quality')}>Quality</a>
+      <a href={withBase('/openchamber/api')}>API</a>
     </nav>
   </div>
   <div class="footer-bottom">
@@ -43,8 +44,8 @@
       <a href="https://github.com/vipintom/vstack-workflow" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.npmjs.com/package/@vipintom/vstack" target="_blank" rel="noopener">npm</a>
       <a href="https://discord.gg/vstack" target="_blank" rel="noopener">Discord</a>
-      <a href="/changelog">Changelog</a>
-      <a href="/license">License</a>
+      <a href={withBase('/changelog')}>Changelog</a>
+      <a href={withBase('/license')}>License</a>
     </nav>
   </div>
 </footer>

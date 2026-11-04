@@ -1,4 +1,7 @@
 ---
+import '../styles/global.css';
+import { withBase } from '../utils/urls';
+
 interface Props {
   title: string;
   description?: string;
@@ -11,8 +14,8 @@ const { title, description = "Engineering playbook + OpenCode runtime + OpenCham
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+  <link rel="icon" href={withBase('/favicon.ico')} />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content={Astro.generator} />
   <title>{title} · vstack</title>

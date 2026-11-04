@@ -4,6 +4,7 @@ import Container from '@components/Container.astro';
 import Section from '@components/Section.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import DataTable from '@components/DataTable.astro';
+import { withBase } from '../../utils/urls';
 ---
 
 <Doc title="OpenCode Plugin Diagnostics" description="Troubleshooting, debugging, and diagnostic tools for the vstack OpenCode plugin">
@@ -182,8 +183,8 @@ vstack_recovery reconcile --full`} language="bash" showCopy={true} copyLabel="Co
       <h2 style="margin-top: var(--space-2xl);">Getting Help</h2>
       <ul>
         <li><strong>GitHub Issues:</strong> <a href="https://github.com/vipintom/vstack-opencode/issues">vipintom/vstack-opencode/issues</a></li>
-        <li><strong>Documentation:</strong> <a href="/opencode-plugin/">OpenCode Plugin Docs</a></li>
-        <li><strong>Playbook:</strong> <a href="/playbook/">Engineering Playbook</a></li>
+        <li><strong>Documentation:</strong> <a href={withBase('/opencode-plugin/')}>OpenCode Plugin Docs</a></li>
+        <li><strong>Playbook:</strong> <a href={withBase('/playbook/')}>Engineering Playbook</a></li>
       </ul>
     </Container>
   </Section>

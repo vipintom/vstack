@@ -1,12 +1,14 @@
 ---
+import { withBase } from '../utils/urls';
+
 // Edge-aligned nav: wordmark left, Install button right, theme toggle
 const isDark = Astro.site && Astro.url ? true : true; // Default to dark, will be corrected by client script
 ---
 
 <nav class="nav" role="navigation" aria-label="Main navigation">
-  <a href="/" class="nav-wordmark" aria-label="vstack home">vstack</a>
+  <a href={withBase('/')} class="nav-wordmark" aria-label="vstack home">vstack</a>
   <div class="nav-actions">
-    <a href="/install" class="btn btn-primary">Install</a>
+    <a href={withBase('/install/')} class="btn btn-primary">Install</a>
     <button class="btn btn-ghost nav-toggle" aria-label="Toggle theme" aria-pressed="true" id="themeToggle">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="12" cy="12" r="5"/>
