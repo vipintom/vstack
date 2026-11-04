@@ -1,0 +1,126 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import DataTable from '@components/DataTable.astro';
+---
+
+<Doc title="Remove vstack" description="Completely remove vstack skills, plugin, and data from your system">
+  <Section id="removal" gap="l" aria-labelledby="removal-title">
+    <Container>
+      <h1 id="removal-title">Remove vstack</h1>
+      <p class="lead">Complete removal procedures for vstack components. Choose the level of removal you need.</p>
+
+      <h2>Quick Removal (Skills Only)</h2>
+      <p>Remove just the vstack skills from your AI harness, keeping project data intact:</p>
+
+      <CodeBlock code={`# OpenCode
+opencode skill remove vstack
+
+# Codex
+codex skill remove vstack
+
+# Claude Code
+claude skill remove vstack`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Full Removal (Plugin + Data)</h2>
+      <p>Remove everything including the OpenCode plugin and all project workflow data:</p>
+
+      <h3>1. Remove OpenCode Plugin</h3>
+      <CodeBlock code={`# Uninstall npm package (if installed globally)
+npm uninstall -g @vipintom/vstack-opencode
+
+# Or from project
+npm uninstall @vipintom/vstack-opencode
+
+# Remove skills
+opencode skill remove vstack`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>2. Remove Project Data (.vstack/)</h3>
+      <p><strong>⚠️ WARNING:</strong> This deletes ALL workflow history, deliveries, tasks, evidence, and memory. Cannot be undone.</p>
+
+      <CodeBlock code={`# In each project directory
+rm -rf .vstack
+
+# Or remove from all projects
+find . -name '.vstack' -type d -exec rm -rf {} +`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>3. Remove OpenChamber Extension</h3>
+      <ol>
+        <li>Open OpenChamber Settings → Extensions</li>
+        <li>Find "vstack Workflow"</li>
+        <li>Click "Remove" or "Uninstall"</li>
+        <li>Restart OpenChamber</li>
+      </ol>
+
+      <h3>4. Remove Global Config (Optional)</h3>
+      <CodeBlock code={`# Remove global vstack config
+rm -rf ~/.config/vstack
+
+# Remove OpenCode skill cache
+rm -rf ~/.config/opencode/skills/vstack`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Selective Removal</h2>
+      <p>Remove only specific components:</p>
+
+      <DataTable
+        columns={[
+          { key: 'component', header: 'Component', sortable: true },
+          { key: 'command', header: 'Removal Command', sortable: false },
+          { key: 'preserves', header: 'Preserves', sortable: false },
+        ]}
+        data={[
+          ['Skills only', 'opencode skill remove vstack', 'Project data, plugin, OpenChamber'],
+          ['Plugin only', 'npm uninstall @vipintom/vstack-opencode', 'Skills, project data, OpenChamber'],
+          ['Project data only', 'rm -rf .vstack', 'Skills, plugin, OpenChamber'],
+          ['OpenChamber only', 'Extension Manager → Remove', 'Skills, plugin, project data'],
+          ['Everything', 'All of the above', 'Nothing'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Verification</h2>
+      <p>Confirm complete removal:</p>
+
+      <CodeBlock code={`# Check skills gone
+opencode skill list | grep -i vstack || echo 'No vstack skills found'
+
+# Check plugin gone
+npm list @vipintom/vstack-opencode 2>&1 | grep -q 'not found' && echo 'Plugin not installed'
+
+# Check project data gone
+ls .vstack 2>&1 | grep -q 'No such file' && echo 'No .vstack directory'
+
+# Check OpenChamber
+echo 'Check OpenChamber Settings → Extensions manually'`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Troubleshooting Removal</h2>
+
+      <DataTable
+        columns={[
+          { key: 'issue', header: 'Issue', sortable: true },
+          { key: 'solution', header: 'Solution', sortable: false },
+        ]}
+        data={[
+          ['Skill remove fails', 'Restart OpenCode/Codex/Claude Code and retry'],
+          ['Plugin files locked', 'Close all OpenCode sessions before npm uninstall'],
+          ['.vstack permission denied', 'sudo rm -rf .vstack (if ownership issue)'],
+          ['Extension won\'t remove', 'Restart OpenChamber, then remove from Settings'],
+          ['Residual config', 'Check ~/.config/vstack, ~/.vstack, project root for leftovers'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Reinstall After Removal</h2>
+      <p>To reinstall fresh after removal:</p>
+
+      <CodeBlock code={`# Fresh install
+opencode skill install vstack
+
+# Verify
+vstack_status
+vstack_status --tools`} language="bash" showCopy={true} copyLabel="Copy" />
+    </Container>
+  </Section>
+</Doc>

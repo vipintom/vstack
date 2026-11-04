@@ -1,0 +1,102 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import DataTable from '@components/DataTable.astro';
+---
+
+<Doc title="Upgrade vstack" description="Upgrade vstack skills and components to the latest version">
+  <Section id="upgrade" gap="l" aria-labelledby="upgrade-title">
+    <Container>
+      <h1 id="upgrade-title">Upgrade vstack</h1>
+      <p class="lead">Keep your vstack installation current with the latest skills, workflows, and runtime improvements.</p>
+
+      <h2>OpenCode Plugin Upgrade</h2>
+      <p>The vstack OpenCode plugin is installed as a skill set. Upgrade by reinstalling:</p>
+
+      <CodeBlock code={`# Upgrade via Skills CLI (recommended)
+opencode skill install vstack
+
+# Or manually with npm
+npm install @vipintom/vstack-opencode@latest
+
+# Verify version
+vstack_status`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>What Gets Upgraded</h3>
+      <DataTable
+        columns={[
+          { key: 'component', header: 'Component', sortable: true },
+          { key: 'upgradeAction', header: 'Upgrade Action', sortable: false },
+          { key: 'notes', header: 'Notes', sortable: false },
+        ]}
+        data={[
+          ['Skills (55)', 'Replaced with latest', 'Skills CLI handles atomically'],
+          ['OpenCode Plugin', 'npm update', 'Requires OpenCode restart'],
+          ['OpenChamber Extension', 'Reinstall extension', 'Via Extension Manager or Git'],
+          ['Playbook Package', 'npm update @vipintom/vstack', 'If installed as npm dependency'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Breaking Changes</h2>
+      <p>Check the <a href="https://github.com/vipintom/vstack-playbook/releases">release notes</a> for breaking changes before upgrading major versions.</p>
+
+      <DataTable
+        columns={[
+          { key: 'version', header: 'Version', sortable: true },
+          { key: 'breaking', header: 'Breaking Changes', sortable: false },
+          { key: 'migration', header: 'Migration Required', sortable: false },
+        ]}
+        data={[
+          ['0.1.0', 'Initial release', 'N/A - fresh install'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Migration Steps (Major Versions)</h2>
+      <ol>
+        <li><strong>Backup</strong> your <code>.vstack/</code> directory: <code>cp -r .vstack .vstack.backup</code></li>
+        <li><strong>Read release notes</strong> for the target version</li>
+        <li><strong>Upgrade plugin:</strong> <code>opencode skill install vstack</code></li>
+        <li><strong>Run migrations:</strong> <code>vstack_recovery reconcile --full</code></li>
+        <li><strong>Verify:</strong> <code>vstack_status --tools</code></li>
+        <li><strong>Test:</strong> Run a simple workflow to confirm</li>
+      </ol>
+
+      <h2 style="margin-top: var(--space-2xl);">Rollback Procedure</h2>
+      <p>If upgrade causes issues:</p>
+
+      <CodeBlock code={`# Restore from backup
+rm -rf .vstack
+mv .vstack.backup .vstack
+
+# Reinstall previous version
+opencode skill install vstack@0.1.0
+
+# Or specific npm version
+npm install @vipintom/vstack-opencode@0.1.0`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">OpenChamber Extension Upgrade</h2>
+      <ol>
+        <li>Open OpenChamber Settings → Extensions</li>
+        <li>Find "vstack Workflow" extension</li>
+        <li>Click "Update" or "Reinstall"</li>
+        <li>Restart OpenChamber if prompted</li>
+      </ol>
+
+      <h2 style="margin-top: var(--space-2xl);">Verification After Upgrade</h2>
+      <CodeBlock code={`# Check all components
+vstack_status
+vstack_status --tools
+vstack_status --projections
+
+# Verify skills loaded
+opencode skill list | grep vstack
+
+# Test basic workflow
+vstack_delivery create --title "Test" --objective "Verify upgrade" --type feature`} language="bash" showCopy={true} copyLabel="Copy" />
+    </Container>
+  </Section>
+</Doc>

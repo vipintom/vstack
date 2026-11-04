@@ -1,0 +1,29 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Nav from '@components/Nav.astro';
+import Container from '@components/Container.astro';
+import Footer from '@components/Footer.astro';
+import Toast from '@components/Toast.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <Nav />
+  <Toast />
+  <main class="index-layout">
+    <Container>
+      <slot />
+    </Container>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .index-layout { padding: var(--space-xl) 0; }
+</style>

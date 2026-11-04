@@ -1,0 +1,130 @@
+---
+interface Props {
+  title: string;
+  items: Array<{ label: string; href: string; active?: boolean; children?: Array<{ label: string; href: string; active?: boolean }> }>;
+  searchPlaceholder?: string;
+}
+const { title, items, searchPlaceholder = 'Filter…' } = Astro.props;
+---
+
+<aside class="doc-sidebar" role="navigation" aria-label={title}>
+  <div class="sidebar-search">
+    <label class="search-label">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="search" class="search-input" placeholder={searchPlaceholder} aria-label={searchPlaceholder} />
+    </label>
+  </div>
+  <nav class="sidebar-nav">
+    {items.map(section => (
+      <div class="sidebar-section">
+        {section.children && section.children.length > 0 ? (
+          <>
+            <h4 class="sidebar-section-title">{section.label}</h4>
+            <ul class="sidebar-list">
+              {section.children.map(item => (
+                <li><a href={item.href} class="sidebar-link {item.active ? 'active' : ''}" aria-current={item.active ? 'page' : undefined}>{item.label}</a></li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <a href={section.href} class="sidebar-link {section.active ? 'active' : ''}" aria-current={section.active ? 'page' : undefined}>{section.label}</a>
+        )}
+      </div>
+    ))}
+  </nav>
+</aside>
+
+<style>
+  .doc-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--banner-height) + var(--space-lg));
+    max-height: calc(100vh - var(--banner-height) - var(--space-2xl));
+    overflow-y: auto;
+    padding: var(--space-md);
+    background: var(--color-paper-2);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-rule);
+  }
+
+  .sidebar-search { margin-bottom: var(--space-lg); }
+  .sidebar-search .search-label { max-width: none; }
+  .sidebar-search .search-input { padding-left: calc(var(--space-md) + 20px); }
+
+  .sidebar-section { margin-bottom: var(--space-lg); }
+  .sidebar-section-title { font: var(--font-body) var(--text-xs) / 1 var(--tracking-body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-faint); margin-bottom: var(--space-xs); }
+  .sidebar-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2xs); }
+  .sidebar-link { display: block; padding: var(--space-xs) var(--space-sm); font: var(--font-body) var(--text-sm) / 1.4 var(--tracking-body); color: var(--color-ink-muted); border-radius: var(--radius-xs); text-decoration: none; transition: color var(--dur-micro), background-color var(--dur-micro); }
+  .sidebar-link:hover { color: var(--color-ink); background: var(--color-paper-3); }
+  .sidebar-link.active { color: var(--color-accent); background: oklch(55% 0.16 35 / 0.1); font-weight: 500; }
+  .sidebar-link:focus-visible { outline-offset: -2px; }
+
+  @media (max-width: 1024px) {
+    .doc-sidebar {
+      position: fixed;
+      left: 0;
+      top: var(--banner-height);
+      width: 320px;
+      max-width: 85vw;
+      max-height: calc(100vh - var(--banner-height));
+      border-radius: 0;
+      border-right: 1px solid var(--color-rule);
+      transform: translateX(-100%);
+      transition: transform var(--dur-short) var(--ease-out);
+      z-index: var(--z-dropdown);
+    }
+    .doc-sidebar.open { transform: translateX(0); }
+  }
+</style>
+
+<script set:html={`;(() => {
+  if (typeof document === 'undefined') return;
+  // Mobile sidebar toggle
+  const sidebar = document.querySelector('.doc-sidebar');
+  if (!sidebar) return;
+  const toggleBtn = document.createElement('button');
+  toggleBtn.className = 'sidebar-toggle btn btn-ghost';
+  toggleBtn.setAttribute('aria-label', 'Toggle sidebar');
+  toggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+  toggleBtn.style.display = 'none';
+
+  // Add toggle to nav (will be inserted by layout)
+  document.addEventListener('DOMContentLoaded', () => {
+    const navActions = document.querySelector('.nav-actions');
+    if (navActions && sidebar) {
+      navActions.insertBefore(toggleBtn, navActions.firstChild);
+      toggleBtn.style.display = 'flex';
+
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // Close on link click
+      sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+        });
+      });
+
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
+          sidebar.classList.remove('open');
+        }
+      });
+    }
+  });
+
+  // Search filter
+  const searchInput = document.querySelector('.sidebar-search .search-input');
+  const links = document.querySelectorAll('.sidebar-link');
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase();
+    links.forEach(link => {
+      const text = link.textContent?.toLowerCase() || '';
+      (link as HTMLElement).style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+})();`}>
+</script>

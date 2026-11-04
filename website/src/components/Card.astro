@@ -1,0 +1,46 @@
+---
+import Badge from './Badge.astro';
+interface Props {
+  title: string;
+  description?: string;
+  repo?: string;
+  metrics?: Array<{ label: string; value: string }>;
+  actionLabel?: string;
+  actionHref?: string;
+  badgeLabels?: string[];
+  badgeVariants?: ('pass' | 'warn' | 'error' | 'info' | 'plan' | 'fail')[];
+  class?: string;
+}
+const { title, description, repo, metrics = [], actionLabel, actionHref, badgeLabels = [], badgeVariants = [], class: className = '' } = Astro.props;
+---
+
+<article class="card {className}">
+  <h3 class="card-title">{title}</h3>
+  {description && <p class="card-desc">{description}</p>}
+  {repo && <p class="card-repo">{repo}</p>}
+  {metrics.length > 0 && (
+    <ul class="card-metrics">
+      {metrics.map(m => <li><strong>{m.value}</strong> {m.label}</li>)}
+    </ul>
+  )}
+  {badgeLabels.length > 0 && (
+    <div class="card-badges">
+      {badgeLabels.map((label, i) => (
+        <Badge variant={badgeVariants[i] || 'pass'} key={i}>{label}</Badge>
+      ))}
+    </div>
+  )}
+  {actionLabel && actionHref && <a href={actionHref} class="btn btn-secondary" style="margin-top: auto; align-self: flex-start;">{actionLabel}</a>}
+</article>
+
+<style>
+  .card { background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-xl); display: flex; flex-direction: column; height: 100%; transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out); }
+  .card:hover { background: var(--color-paper-3); border-color: var(--color-ink-muted); }
+  .card-title { font-family: var(--font-display); font-size: var(--text-title); font-weight: 700; letter-spacing: var(--tracking-display-s); margin: 0 0 var(--space-xs); }
+  .card-desc { font-size: var(--text-sm); color: var(--color-ink-muted); margin: 0 0 var(--space-lg); line-height: 1.5; flex: 1; }
+  .card-repo { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-ink-muted); margin: 0 0 var(--space-lg); }
+  .card-metrics { list-style: none; padding: 0; margin: 0 0 var(--space-xl); display: flex; flex-direction: column; gap: var(--space-xs); }
+  .card-metrics li { font-size: var(--text-sm); color: var(--color-ink-muted); display: flex; align-items: baseline; gap: var(--space-sm); }
+  .card-metrics strong { color: var(--color-ink); font-weight: 500; min-width: 8ch; }
+  .card-badges { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin: var(--space-md) 0 var(--space-lg); }
+</style>

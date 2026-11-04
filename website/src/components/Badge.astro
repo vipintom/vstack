@@ -1,0 +1,21 @@
+---
+interface Props {
+  children: any;
+  variant?: 'pass' | 'warn' | 'error' | 'info' | 'plan' | 'fail';
+  class?: string;
+}
+const { children, variant = 'pass', class: className = '' } = Astro.props;
+const variantClass = `badge-{variant}`;
+---
+
+<span class="badge {variantClass} {className}"><slot /></span>
+
+<style>
+  .badge { display: inline-flex; align-items: center; gap: var(--space-2xs); padding: var(--space-2xs) var(--space-xs); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1; border-radius: var(--radius-xs); white-space: nowrap; }
+  .badge-pass { background: oklch(55% 0.16 145 / 0.15); color: oklch(55% 0.16 145); border: 1px solid oklch(55% 0.16 145 / 0.3); }
+  .badge-warn { background: oklch(65% 0.18 85 / 0.15); color: oklch(65% 0.18 85); border: 1px solid oklch(65% 0.18 85 / 0.3); }
+  .badge-error { background: oklch(55% 0.22 25 / 0.15); color: oklch(55% 0.22 25); border: 1px solid oklch(55% 0.22 25 / 0.3); }
+  .badge-info { background: oklch(60% 0.18 220 / 0.15); color: oklch(60% 0.18 220); border: 1px solid oklch(60% 0.18 220 / 0.3); }
+  .badge-plan { background: oklch(60% 0.18 220 / 0.15); color: oklch(60% 0.18 220); border: 1px solid oklch(60% 0.18 220 / 0.3); }
+  .badge-fail { background: oklch(55% 0.22 25 / 0.15); color: oklch(55% 0.22 25); border: 1px solid oklch(55% 0.22 25 / 0.3); }
+</style>

@@ -1,0 +1,95 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import DataTable from '@components/DataTable.astro';
+---
+
+<Doc title="OpenChamber Protocol Versions" description="Supported projection protocol versions and compatibility matrix for OpenChamber">
+  <Section id="protocol" gap="l" aria-labelledby="protocol-title">
+    <Container>
+      <h1 id="protocol-title">OpenChamber Protocol Versions</h1>
+      <p class="lead">The vstack OpenChamber extension consumes projections following the vstack projection protocol. This page documents supported versions and compatibility.</p>
+
+      <h2>Protocol Version Support</h2>
+
+      <DataTable
+        columns={[
+          { key: 'version', header: 'Protocol Version', sortable: true },
+          { key: 'status', header: 'Support Status', sortable: false },
+          { key: 'schemas', header: 'Schema Files', sortable: false },
+          { key: 'producer', header: 'Producer (OpenCode)', sortable: false },
+          { key: 'consumer', header: 'Consumer (OpenChamber)', sortable: false },
+        ]}
+        data={[
+          ['v1', 'Current', '7 schemas', '≥ 0.1.0', '≥ 0.1.0'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Protocol v1 Schemas</h2>
+      <p>Defined in umbrella repository: <code>contracts/projections/v1/</code></p>
+
+      <DataTable
+        columns={[
+          { key: 'schema', header: 'Schema File', sortable: true },
+          { key: 'description', header: 'Description', sortable: false },
+          { key: 'path', header: 'Projection Path', sortable: false },
+        ]}
+        data={[
+          ['manifest.json', 'Project manifest and version', '.vstack/manifest.json'],
+          ['dashboard-index.json', 'Active deliveries summary', '.vstack/state/index.json'],
+          ['delivery-detail-report.json', 'Full delivery with all related data', '.vstack/reports/deliveries/{id}.json'],
+          ['activity-summary.json', 'Chronological activity timeline', '.vstack/reports/activity/{id}.json'],
+          ['quality-summary.json', 'Check results and review findings', '.vstack/reports/quality/{id}.json'],
+          ['memory-index.json', 'Categorized memory entries', '.vstack/reports/memory-index.json'],
+          ['evidence-record.json', 'Individual evidence record', 'Embedded in delivery report'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Version Detection</h2>
+      <p>The extension reads <code>schemaVersion</code> from <code>.vstack/manifest.json</code>:</p>
+
+      <CodeBlock code="# Check manifest schema version\ncat .vstack/manifest.json | jq .schemaVersion\n\n# Extension only loads if schemaVersion === 1" language="bash" showCopy={true} />
+
+      <h2 style="margin-top: var(--space-2xl);">Graceful Degradation</h2>
+      <ul>
+        <li><strong>schemaVersion mismatch:</strong> Extension shows "Unsupported schema version" error</li>
+        <li><strong>Missing optional fields:</strong> Handled gracefully with defaults</li>
+        <li><strong>Unknown enum values:</strong> Displayed as "unknown" with raw value</li>
+        <li><strong>Extra fields:</strong> Ignored (forward compatible)</li>
+      </ul>
+
+      <h2 style="margin-top: var(--space-2xl);">Future Protocol Versions</h2>
+      <p>When protocol v2 is released:</p>
+      <ol>
+        <li>OpenCode plugin will publish both v1 and v2 projections</li>
+        <li>OpenChamber extension will be updated to support v2</li>
+        <li>During transition, both versions coexist</li>
+        <li>v1 consumers continue working with v1 projections</li>
+      </ol>
+
+      <h2 style="margin-top: var(--space-2xl);">Compatibility Matrix</h2>
+
+      <DataTable
+        columns={[
+          { key: 'openchamber', header: 'OpenChamber Ext', sortable: true },
+          { key: 'opencode', header: 'OpenCode Plugin', sortable: true },
+          { key: 'protocol', header: 'Protocol', sortable: true },
+          { key: 'status', header: 'Compatibility', sortable: false },
+        ]}
+        data={[
+          ['0.1.0', '0.1.0', 'v1', 'Full ✅'],
+          ['0.1.x', '0.1.x', 'v1', 'Full ✅'],
+          ['Future 0.2.0', 'Future 0.2.0', 'v1 + v2', 'Planned'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Validating Projections</h2>
+      <CodeBlock code="# Validate all projections against schemas\nvstack_projection validate --all\n\n# Validate specific delivery\nvstack_projection validate --delivery dlv_abc123\n\n# Check schema version\ncat .vstack/manifest.json | jq .schemaVersion" language="bash" showCopy={true} />
+    </Container>
+  </Section>
+</Doc>

@@ -1,0 +1,52 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import { getCollection } from 'astro:content';
+import { playbookSidebar } from '@data/playbook-sidebar';
+
+const skills = await getCollection('skills');
+const toolCardProps = skills.map(skill => ({
+  title: skill.data.name,
+  description: skill.data.description,
+  actionLabel: 'View',
+  actionHref: '/playbook/skills/' + skill.slug + '/',
+  badgeLabels: [skill.data.category],
+  badgeVariants: ['info'],
+}));
+const emptyState = skills.length === 0;
+
+const docTitle = "Skills - vstack Playbook";
+const docDescription = "All 55 skills in the vstack playbook";
+const docSidebarTitle = "Playbook";
+---
+
+<Doc title={docTitle} description={docDescription} sidebarTitle={docSidebarTitle} sidebarItems={playbookSidebar.skills}>
+  <Section id="skills-index" gap="l" aria-labelledby="skills-title">
+    <Container>
+      <div class="page-header">
+        <h1 id="skills-title">Skills</h1>
+        <p class="lead">55 skills across 13 categories. Each skill is a reusable, harness-agnostic playbook.</p>
+      </div>
+
+      <div class="skills-grid">
+        {toolCardProps.map(props => <Card {...props} />)}
+      </div>
+
+      {emptyState && <p class="empty-state">No skills found.</p>}
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .page-header { margin-bottom: var(--space-xl); }
+  .page-header h1 { margin-bottom: var(--space-xs); }
+  .page-header .lead { margin: 0; }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .empty-state { text-align: center; color: var(--color-ink-muted); padding: var(--space-3xl); }
+</style>

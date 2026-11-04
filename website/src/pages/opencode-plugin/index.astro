@@ -1,0 +1,40 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+
+const installCode = 'npm install @vipintom/vstack-opencode';
+const quickStartCode = '# In your OpenCode session\nvstack_status        # Show system status\nvstack_task create "Implement feature X"  # Create a task\nvstack_agent dispatch builder  # Dispatch builder agent\nvstack_check verify  # Run verification gates';
+---
+
+<Doc title="OpenCode Plugin">
+  <Section id="opencode-plugin" gap="l" aria-labelledby="plugin-title">
+    <Container>
+      <h1 id="plugin-title">OpenCode Plugin</h1>
+      <p class="lead">The vstack runtime for OpenCode. 23 tools, persistent stores, quality gates, and specialist agents.</p>
+
+      <div class="plugin-grid">
+        <Card title="Tools (23)" description="Discrete capabilities exposed to the agent: task management, memory, verification, delivery tracking, and more." actionLabel="View Tools" actionHref="/opencode-plugin/tools/" badgeLabels={["Core"]} badgeVariants={["info"]} />
+        <Card title="Stores" description="Persistent state stores: delivery, history, memory, quality, tasks, and session data." actionLabel="View Stores" actionHref="/opencode-plugin/stores/" badgeLabels={["State"]} badgeVariants={["pass"]} />
+        <Card title="Gates (6)" description="Quality gates that enforce standards: verification, review, security, performance, and more." actionLabel="View Gates" actionHref="/opencode-plugin/gates/" badgeLabels={["Quality"]} badgeVariants={["warn"]} />
+        <Card title="Agents (3)" description="Specialist agents: Builder (implementation), Reviewer (verification), Lead (coordination)." actionLabel="View Agents" actionHref="/opencode-plugin/agents/" badgeLabels={["Roles"]} badgeVariants={["info"]} />
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <h2>Installation</h2>
+      <CodeBlock code={installCode} language="bash" />
+
+      <h2 style="margin-top: var(--space-2xl);">Quick Start</h2>
+      <CodeBlock code={quickStartCode} language="bash" />
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .plugin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .plugin-grid { grid-template-columns: 1fr; } }
+</style>

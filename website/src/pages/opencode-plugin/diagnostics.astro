@@ -1,0 +1,190 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import DataTable from '@components/DataTable.astro';
+---
+
+<Doc title="OpenCode Plugin Diagnostics" description="Troubleshooting, debugging, and diagnostic tools for the vstack OpenCode plugin">
+  <Section id="diagnostics" gap="l" aria-labelledby="diag-title">
+    <Container>
+      <h1 id="diag-title">OpenCode Plugin Diagnostics</h1>
+      <p class="lead">Tools and procedures for diagnosing issues with the vstack OpenCode plugin.</p>
+
+      <h2>Health Checks</h2>
+
+      <CodeBlock code={`# Full system status
+vstack_status
+
+# Detailed tool registry
+vstack_status --tools
+
+# Projection system status
+vstack_status --projections
+
+# Storage/backend status
+vstack_status --storage`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Common Issues</h2>
+
+      <DataTable
+        columns={[
+          { key: 'symptom', header: 'Symptom', sortable: true },
+          { key: 'diagnosis', header: 'Diagnosis', sortable: false },
+          { key: 'resolution', header: 'Resolution', sortable: false },
+        ]}
+        data={[
+          ['Tools not appearing', 'Plugin not loaded', 'Restart OpenCode; check plugin in ~/.config/opencode/plugins/'],
+          ['Permission denied on .vstack/', 'Files capability not granted', 'OpenChamber: Settings → Capabilities → Files → Grant'],
+          ['Projections not updating', 'Publisher interval not running', 'Check vstack_status --projections; restart plugin'],
+          ['Schema validation errors', 'Version mismatch', 'Check contracts/projections/v1/ matches plugin version'],
+          ['Agent dispatch fails', 'Agent adapters not installed', 'Run: opencode skill install vstack'],
+          ['Delivery create fails', 'Invalid profile/type', 'Use valid profile: feature, bugfix, refactor, migration, etc.'],
+          ['Completion blocked', 'Required checks failing', 'Run vstack_check verify; fix failing checks'],
+          ['Memory not persisting', 'Storage path issue', 'Check VSTACK_ROOT or repo root detection'],
+          ['Review findings not showing', 'Projection not published', 'Wait 3s or force publish: vstack_projection publish --all'],
+          ['TypeScript errors in plugin', 'Version mismatch', 'Ensure @opencode/plugin@2.2.0 peer dependency'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Debug Commands</h2>
+
+      <h3>State Inspection</h3>
+      <CodeBlock code={`# Inspect delivery state
+vstack_delivery get --id dlv_abc123
+
+# List all tasks for delivery
+vstack_task list --delivery dlv_abc123
+
+# View memory entries
+vstack_memory list
+
+# Check evidence for task
+vstack_evidence list --task tsk_xyz
+
+# View review sessions
+vstack_review list --delivery dlv_abc123`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>Projection Debugging</h3>
+      <CodeBlock code={`# View raw projection files
+cat .vstack/state/index.json | jq .
+cat .vstack/reports/deliveries/dlv_abc123.json | jq .
+cat .vstack/reports/quality/dlv_abc123.json | jq .
+
+# Validate projection against schema
+vstack_projection validate --all
+
+# Force full republish
+vstack_projection publish --all --force`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>Log Analysis</h3>
+      <CodeBlock code={`# Plugin logs (OpenCode)
+opencode logs --plugin vstack
+
+# Event log (audit trail)
+cat .vstack/events.jsonl | tail -50
+
+# Filter by event type
+cat .vstack/events.jsonl | jq 'select(.type == "delivery.completed")'
+
+# Check for errors
+cat .vstack/events.jsonl | jq 'select(.level == "error")`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h3>Storage Diagnostics</h3>
+      <CodeBlock code={`# Verify .vstack directory structure
+find .vstack -type f -name '*.json' | head -20
+
+# Check file permissions
+ls -la .vstack/
+ls -la .vstack/deliveries/
+
+# Verify atomic write temp files
+ls -la .vstack/**/*.tmp 2>/dev/null || echo 'No temp files (good)'
+
+# Check disk usage
+du -sh .vstack/`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Diagnostic Tools</h2>
+
+      <DataTable
+        columns={[
+          { key: 'tool', header: 'Tool', sortable: true },
+          { key: 'purpose', header: 'Purpose', sortable: false },
+          { key: 'output', header: 'Output', sortable: false },
+        ]}
+        data={[
+          ['vstack_status', 'System health overview', 'JSON: plugin version, tools count, projections status, storage status'],
+          ['vstack_projection', 'Projection management', 'publish, validate, status subcommands'],
+          ['vstack_check', 'Verification gates', 'run, list, verify, discover subcommands'],
+          ['vstack_recovery', 'State recovery', 'reconcile, checkpoint, restore subcommands'],
+          ['vstack_approval', 'Approval management', 'request, grant, deny, list, history'],
+          ['vstack_session_pickup', 'Session continuity', 'reconstruct, validate, diff'],
+        ]}
+        emptyState={false}
+      />
+
+      <h2 style="margin-top: var(--space-2xl);">Enabling Debug Logging</h2>
+
+      <CodeBlock code={`# Environment variable
+VSTACK_LOG_LEVEL=debug opencode
+
+# Or in config.json
+{
+  "logLevel": "debug"
+}`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <p>Debug logs include:</p>
+      <ul>
+        <li>Projection publish cycles</li>
+        <li>File store operations (read/write/lock)</li>
+        <li>Agent dispatch/execution traces</li>
+        <li>Completion gate evaluations</li>
+        <li>Approval scope validations</li>
+      </ul>
+
+      <h2 style="margin-top: var(--space-2xl);">Performance Diagnostics</h2>
+
+      <CodeBlock code={`# Check projection publish time
+vstack_projection status --timing
+
+# Measure tool execution time
+vstack_check verify --timing
+
+# Memory usage
+vstack_memory stats`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Recovery Procedures</h2>
+
+      <h3>Corrupted Projection</h3>
+      <ol>
+        <li>Delete corrupted file: <code>rm .vstack/reports/deliveries/dlv_xxx.json</code></li>
+        <li>Force republish: <code>vstack_projection publish --delivery dlv_xxx --force</code></li>
+        <li>Verify: <code>vstack_projection validate --delivery dlv_xxx</code></li>
+      </ol>
+
+      <h3>Stuck Delivery</h3>
+      <ol>
+        <li>Check completion gates: <code>vstack_delivery can-complete --id dlv_xxx</code></li>
+        <li>Review blocking findings: <code>vstack_review list --delivery dlv_xxx</code></li>
+        <li>Check evidence freshness: <code>vstack_evidence list --delivery dlv_xxx</code></li>
+        <li>Override gate if justified: <code>vstack_delivery update --id dlv_xxx --status completed</code> (requires approval)</li>
+      </ol>
+
+      <h3>Full State Recovery</h3>
+      <CodeBlock code={`# From checkpoint
+vstack_recovery restore --checkpoint latest
+
+# From event log replay
+vstack_recovery reconcile --full`} language="bash" showCopy={true} copyLabel="Copy" />
+
+      <h2 style="margin-top: var(--space-2xl);">Getting Help</h2>
+      <ul>
+        <li><strong>GitHub Issues:</strong> <a href="https://github.com/vipintom/vstack-opencode/issues">vipintom/vstack-opencode/issues</a></li>
+        <li><strong>Documentation:</strong> <a href="/opencode-plugin/">OpenCode Plugin Docs</a></li>
+        <li><strong>Playbook:</strong> <a href="/playbook/">Engineering Playbook</a></li>
+      </ul>
+    </Container>
+  </Section>
+</Doc>

@@ -1,0 +1,68 @@
+---
+// Edge-aligned nav: wordmark left, Install button right, theme toggle
+const isDark = Astro.site && Astro.url ? true : true; // Default to dark, will be corrected by client script
+---
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="/" class="nav-wordmark" aria-label="vstack home">vstack</a>
+  <div class="nav-actions">
+    <a href="/install" class="btn btn-primary">Install</a>
+    <button class="btn btn-ghost nav-toggle" aria-label="Toggle theme" aria-pressed="true" id="themeToggle">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky-nav);
+    height: var(--banner-height);
+    background: var(--color-paper);
+    border-bottom: 1px solid var(--color-rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--gutter);
+  }
+
+  .nav-wordmark {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    font-weight: 700;
+    letter-spacing: var(--tracking-display-s);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .nav-wordmark:hover { color: var(--color-accent); }
+  .nav-wordmark:focus-visible { outline-offset: 4px; }
+
+  .nav-actions { display: flex; align-items: center; gap: var(--space-md); }
+
+  .nav-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; color: var(--color-ink); cursor: pointer; padding: var(--space-sm); border-radius: var(--radius-sm); }
+  .nav-toggle:hover { background: var(--color-paper-2); }
+  .nav-toggle:focus-visible { outline-offset: 2px; }
+
+  @media (max-width: 768px) {
+    .nav-toggle { display: flex; }
+  }
+</style>
+
+<script set:html={`;(() => {
+  if (typeof document === 'undefined') return;
+  // Theme toggle
+  const toggle = document.getElementById('themeToggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    toggle.setAttribute('aria-pressed', !isLight);
+    localStorage.setItem('theme', isLight ? 'dark' : 'light');
+  });
+})();`}>
+</script>

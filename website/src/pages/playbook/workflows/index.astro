@@ -1,0 +1,52 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import { getCollection } from 'astro:content';
+import { playbookSidebar } from '@data/playbook-sidebar';
+
+const workflows = await getCollection('workflows');
+const workflowCardProps = workflows.map(workflow => ({
+  title: workflow.data.name,
+  description: workflow.data.description,
+  actionLabel: 'View',
+  actionHref: '/playbook/workflows/' + workflow.slug + '/',
+  badgeLabels: [workflow.data.riskLevel || 'Medium'],
+  badgeVariants: workflow.data.riskLevel === 'Low' ? ['pass'] : workflow.data.riskLevel === 'High' ? ['warn'] : ['info'],
+}));
+const emptyState = workflows.length === 0;
+
+const docTitle = "Workflows - vstack Playbook";
+const docDescription = "18 workflows for common engineering scenarios";
+const docSidebarTitle = "Playbook";
+---
+
+<Doc title={docTitle} description={docDescription} sidebarTitle={docSidebarTitle} sidebarItems={playbookSidebar.workflows}>
+  <Section id="workflows-index" gap="l" aria-labelledby="workflows-title">
+    <Container>
+      <div class="page-header">
+        <h1 id="workflows-title">Workflows</h1>
+        <p class="lead">18 workflows for common engineering scenarios. Each workflow composes skills into a repeatable process.</p>
+      </div>
+
+      <div class="workflows-grid">
+        {workflowCardProps.map(props => <Card {...props} />)}
+      </div>
+
+      {emptyState && <p class="empty-state">No workflows found.</p>}
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .page-header { margin-bottom: var(--space-xl); }
+  .page-header h1 { margin-bottom: var(--space-xs); }
+  .page-header .lead { margin: 0; }
+
+  .workflows-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .workflows-grid { grid-template-columns: 1fr; } }
+
+  .empty-state { text-align: center; color: var(--color-ink-muted); padding: var(--space-3xl); }
+</style>

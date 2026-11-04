@@ -1,0 +1,17 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Nav from '@components/Nav.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Footer from '@components/Footer.astro';
+import Toast from '@components/Toast.astro';
+---
+
+<Layout title="vstack — Engineering playbook + OpenCode runtime + OpenChamber visualization" description="Three pillars. 55 skills. 18 workflows. One install.">
+  <Nav />
+  <Toast />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+</Layout>

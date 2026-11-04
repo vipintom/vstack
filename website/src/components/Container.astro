@@ -1,0 +1,20 @@
+---
+interface Props {
+  children: any;
+  class?: string;
+}
+const { children, class: className = '' } = Astro.props;
+---
+
+<div class="container {className}">
+  <slot />
+</div>
+
+<style>
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import DataTable from '@components/DataTable.astro';
+import { capabilityMatrix } from '@data/capability-matrix';
+---
+
+<Doc title="Installation" description="Install vstack skills for your AI harness">
+  <Section id="installation" gap="l" aria-labelledby="install-title">
+    <Container>
+      <h1 id="install-title">Installation</h1>
+      <p class="lead">One command installs all 55 vstack skills to your AI harness.</p>
+
+      <h2>OpenCode</h2>
+      <CodeBlock code="opencode skill install vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      <p>Installs all 55 vstack skills to <code>~/.config/opencode/skills/vstack/</code></p>
+
+      <h2 style="margin-top: var(--space-2xl);">Codex</h2>
+      <CodeBlock code="codex skill add vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      <p>Adds vstack skills to Codex workspace (requires Codex skill support)</p>
+
+      <h2 style="margin-top: var(--space-2xl);">Claude Code</h2>
+      <CodeBlock code="claude skill install vstack" language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+      <p>Installs vstack skills for Claude Code (when available)</p>
+
+      <h2 style="margin-top: var(--space-2xl);">Manual Installation</h2>
+      <p>Download the playbook package and extract it to your skills directory:</p>
+      <CodeBlock code="# Download\ncurl -L -o vstack-playbook.tgz https://github.com/vipintom/vstack-playbook/releases/download/v0.1.0/vstack-playbook-0.1.0.tgz\n\n# Extract\nmkdir -p ~/.config/opencode/skills/vstack\ntar -xzf vstack-playbook.tgz -C ~/.config/opencode/skills/vstack" language="bash" />
+
+      <h2 style="margin-top: var(--space-2xl);">Verification</h2>
+      <p>Verify the installation by listing available skills:</p>
+      <CodeBlock code="opencode skill list" language="bash" />
+
+      <h2 style="margin-top: var(--space-2xl);">Capability Matrix</h2>
+      <p>Single source of truth: 55 skills × 3 harnesses (OpenCode, Codex, Claude Code)</p>
+
+      <DataTable
+        columns={[
+          { key: 'name', header: 'Skill', sortable: true },
+          { key: 'category', header: 'Category', sortable: true },
+          { key: 'opencode', header: 'OpenCode', sortable: true },
+          { key: 'codex', header: 'Codex', sortable: true },
+          { key: 'claude', header: 'Claude Code', sortable: true },
+        ]}
+        data={capabilityMatrix.map(row => [
+          row.name,
+          row.category,
+          row.opencode,
+          row.codex,
+          row.claude,
+        ])}
+        emptyState={false}
+        emptyMessage="No skills found."
+      />
+    </Container>
+  </Section>
+</Doc>

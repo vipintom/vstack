@@ -1,0 +1,28 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import { planExample } from '@data/openchamber-examples';
+---
+
+<Doc title="Plans - OpenChamber" description="Project plans and roadmaps">
+  <Section id="plans" gap="l" aria-labelledby="plans-title">
+    <Container>
+      <h1 id="plans-title">Plans</h1>
+      <p class="lead">Project plans and roadmaps from OpenChamber.</p>
+
+      <div class="placeholder-content">
+        <p>Plans content will be populated from OpenChamber project data.</p>
+        <CodeBlock code={planExample} language="json" />
+      </div>
+
+      <p style="margin-top: var(--space-xl);"><a href="/openchamber/">← Back to OpenChamber</a></p>
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .placeholder-content { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-lg); background: var(--color-surface); }
+  .placeholder-content p { margin-top: 0; margin-bottom: var(--space-lg); color: var(--color-ink-muted); }
+</style>

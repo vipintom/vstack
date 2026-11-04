@@ -1,0 +1,42 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Card from '@components/Card.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import { installCode, usageCode } from '@data/openchamber-usage';
+---
+
+<Doc title="OpenChamber" description="Read-only panel for OpenChamber project knowledge. Notes, Todos, Plans visualization. React + TypeScript.">
+  <Section id="openchamber" gap="l" aria-labelledby="openchamber-title">
+    <Container>
+      <h1 id="openchamber-title">OpenChamber</h1>
+      <p class="lead">Read-only visualization panel for OpenChamber project knowledge. View Notes, Todos, and Plans from your OpenChamber projects.</p>
+
+      <div class="pillar-grid">
+        <Card title="Notes" description="Project notes and documentation" actionLabel="View Notes" actionHref="/openchamber/notes/" badgeLabels={["Read-only"]} badgeVariants={["info"]} />
+        <Card title="Todos" description="Task tracking and progress" actionLabel="View Todos" actionHref="/openchamber/todos/" badgeLabels={["Read-only"]} badgeVariants={["pass"]} />
+        <Card title="Plans" description="Project plans and roadmaps" actionLabel="View Plans" actionHref="/openchamber/plans/" badgeLabels={["Read-only"]} badgeVariants={["warn"]} />
+      </div>
+
+      <hr style="margin: var(--space-3xl) 0; border: none; border-top: 1px solid var(--color-rule);">
+
+      <h2>About</h2>
+      <p>OpenChamber is a local-first project knowledge management tool. The vstack-openchamber package provides a read-only React panel that visualizes project Notes, Todos, and Plans stored in OpenChamber's JSON format.</p>
+
+      <h2 style="margin-top: var(--space-2xl);">Installation</h2>
+      <CodeBlock code={installCode} language="bash" />
+
+      <h2 style="margin-top: var(--space-2xl);">Usage</h2>
+      <CodeBlock code={usageCode} language="tsx" />
+
+      <h2 style="margin-top: var(--space-2xl);">Repository</h2>
+      <p><a href="https://github.com/vipintom/vstack-openchamber" target="_blank" rel="noopener">github.com/vipintom/vstack-openchamber</a></p>
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .pillar-grid { grid-template-columns: 1fr; } }
+</style>

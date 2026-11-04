@@ -1,0 +1,53 @@
+---
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+---
+
+<Section id="search" gap="l" aria-labelledby="search-title">
+  <Container>
+    <h2 id="search-title">Search</h2>
+    <div id="search-container"></div>
+  </Container>
+</Section>
+
+<script is:inline>
+  // Load Pagefind dynamically - using import() with a string to avoid build-time resolution
+  async function initSearch() {
+    const container = document.getElementById('search-container');
+    if (!container) return;
+
+    try {
+      // Use a variable to avoid Vite/Rollup trying to resolve at build time
+      const pagefindPath = '/_pagefind/pagefind-ui.js';
+      const module = await import(pagefindPath);
+      const { PagefindUI } = module;
+      new PagefindUI({
+        element: container,
+        showSubResults: true,
+        showImages: false,
+        translations: {
+          placeholder: 'Search vstack documentation...',
+          zeroResults: 'No results found for "[SEARCH_TERM]"',
+          manyResults: 'Found [COUNT] results for "[SEARCH_TERM]"',
+          oneResult: 'Found [COUNT] result for "[SEARCH_TERM]"',
+          filterLabel: 'Filters',
+          clearFilters: 'Clear filters',
+        },
+      });
+    } catch (e) {
+      console.error('Pagefind failed to load:', e);
+      container.innerHTML = '<p class="search-error">Search unavailable. Please try again later.</p>';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearch);
+  } else {
+    initSearch();
+  }
+</script>
+
+<style>
+  #search-container { max-width: 65ch; margin: 0 auto; }
+  .search-error { color: var(--color-ink-muted); text-align: center; padding: var(--space-xl); }
+</style>

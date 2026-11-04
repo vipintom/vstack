@@ -1,0 +1,102 @@
+/* Hallmark · v2.0.0 · custom · idea: "A printed technical specification brought to screen: dense, scannable, reference-grade" · vibe: "technical, dense, precise, dark" · paper: dark / display: grotesk-heavy / accent: warm / hero: banner / posture: restrained */
+
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · weakest: none — content density is the feature */
+
+/* ==========================================================================
+   FLOOR COMPLIANCE — Base Styles
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Floor 34: overflow-x clip on both html and body */
+html, body { overflow-x: clip; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: var(--leading-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-wrap: pretty;
+  scroll-behavior: smooth;
+}
+
+/* Floor 7, 27: prefers-reduced-motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Floor 1, 48: selection themed via tokens */
+::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+
+/* Floor 1: scrollbar themed via tokens */
+:root { scrollbar-color: var(--color-rule) var(--color-paper); }
+
+/* Floor 6, 15, 26a: focus-visible on all interactive */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ==========================================================================
+   TYPOGRAPHY DEFAULTS
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: var(--leading-section);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-md);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-display); letter-spacing: var(--tracking-display); line-height: var(--leading-display); }
+h2 { font-size: var(--text-section); letter-spacing: var(--tracking-display-s); line-height: var(--leading-section); }
+h3 { font-size: var(--text-title); letter-spacing: var(--tracking-body); font-weight: 600; }
+
+.lead { font-size: var(--text-lead); line-height: var(--leading-tight); color: var(--color-ink-muted); margin: 0 0 var(--space-xl); max-width: 65ch; }
+
+p { font-size: var(--text-md); line-height: var(--leading-body); color: var(--color-ink); margin: 0 0 var(--space-lg); max-width: 65ch; }
+
+small, figcaption, .meta, .caption { font-size: var(--text-sm); line-height: var(--leading-body); color: var(--color-ink-muted); }
+
+/* Floor 1, 64: mono for code, tokens, tables */
+code, pre, kbd, samp, .mono { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.5; letter-spacing: var(--tracking-mono); }
+
+pre { background: var(--color-paper-3); border: 1px solid var(--color-rule); border-radius: var(--radius-sm); padding: var(--space-lg); overflow-x: auto; margin: var(--space-lg) 0; }
+pre code { background: transparent; padding: 0; font-size: inherit; }
+
+/* Links */
+a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; transition: color var(--dur-micro) var(--ease-out); }
+a:hover { color: var(--color-accent-hover); }
+a:focus-visible { outline-offset: 4px; }
+
+/* ==========================================================================
+   CONTAINER & GRID
+   ========================================================================== */
+
+.container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 var(--gutter); }
+
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap-columns); }
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+/* Section rhythm — varied gaps per layout.md §3 */
+section { padding: var(--section-gap) 0; }
+section + section { border-top: 1px solid var(--color-rule); }
+
+/* ==========================================================================
+   IMAGE GRID TRACKS — Floor 50
+   ========================================================================== */
+img, video, picture { max-width: 100%; height: auto; }
+.grid > * { min-width: 0; }

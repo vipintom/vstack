@@ -1,0 +1,471 @@
+---
+import Landing from '@layouts/Landing.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Button from '@components/Button.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import Badge from '@components/Badge.astro';
+import DataTable from '@components/DataTable.astro';
+import SearchInput from '@components/SearchInput.astro';
+import Card from '@components/Card.astro';
+import Search from '@components/Search.astro';
+import { capabilityMatrix, categorySummary, harnessSummary } from '@data/capability-matrix';
+
+// Pillar card props
+const pillarCardProps = [
+  {
+    title: 'vstack-playbook',
+    description: 'Portable playbook: 55 skills, 18 workflows, 17 principles. Markdown/YAML content, zero runtime code. Works with OpenCode, Codex, Claude Code.',
+    actionLabel: 'Explore Playbook',
+    actionHref: '/playbook/',
+    badgeLabels: ['55 Skills', '18 Workflows', '17 Principles'],
+    badgeVariants: ['info', 'pass', 'warn'],
+  },
+  {
+    title: 'vstack-opencode',
+    description: 'OpenCode plugin: 23 tools, 3 agents, 6 stores, 7 gates. Persistent state, quality gates, specialist agents. Full TypeScript implementation.',
+    actionLabel: 'View Plugin',
+    actionHref: '/opencode-plugin/',
+    badgeLabels: ['23 Tools', '3 Agents', '7 Gates'],
+    badgeVariants: ['info', 'pass', 'warn'],
+  },
+  {
+    title: 'vstack-openchamber',
+    description: 'Read-only panel for OpenChamber project knowledge. Notes, Todos, Plans visualization. Astro + TypeScript.',
+    actionLabel: 'Open Panel',
+    actionHref: '/openchamber/',
+    badgeLabels: ['Notes', 'Todos', 'Plans'],
+    badgeVariants: ['info', 'pass', 'warn'],
+  },
+];
+
+// Architecture layer data
+const archLayers = [
+  { name: 'Foundation', skills: ['using-superpowers', 'find-skills', 'vstack-help', 'vstack-unslop'] },
+  { name: 'Discovery', skills: ['vstack-figure-it-out', 'vstack-explore', 'vstack-interrogate', 'vstack-recall', 'vstack-why', 'vstack-how'] },
+  { name: 'Architecture', skills: ['vstack-architect', 'vstack-blueprint', 'vstack-design-audit', 'migration', 'vstack-performance'] },
+  { name: 'Planning', skills: ['vstack-plan-loop', 'vstack-plan-review', 'writing-plans', 'vstack-incremental-build', 'vstack-blueprint'] },
+  { name: 'Verification', skills: ['vstack-tdd', 'vstack-verify-loop', 'verification-before-completion', 'safe-refactor'] },
+  { name: 'Debug/Recovery', skills: ['vstack-debug', 'vstack-recovery', 'systematic-debugging', 'vstack-trace-forensics', 'vstack-runtime-forensics'] },
+  { name: 'Collaboration', skills: ['subagent-driven-development', 'dispatching-parallel-agents', 'vstack-swarm', 'vstack-jury', 'vstack-handoff'] },
+  { name: 'Review', skills: ['vstack-review-loop', 'receiving-code-review', 'requesting-code-review', 'caveman-review'] },
+  { name: 'Continuity', skills: ['vstack-session-pickup', 'vstack-safe-pause', 'vstack-catchup', 'vstack-context-reset', 'vstack-recall', 'vstack-ledger', 'vstack-lessons'] },
+  { name: 'Delivery', skills: ['vstack-ship', 'vstack-pr', 'vstack-ready', 'finishing-a-development-branch', 'devops-engineer'] },
+  { name: 'Extended', skills: ['hallmark', 'frontend-design', 'apollo-federation', 'graphql-schema', 'angular-dashboard', 'vstack-skill-authoring', 'vstack-skill-evaluation'] },
+  { name: 'Implementation', skills: ['test-driven-development', 'vstack-incremental-build', 'data-pipeline', 'fastapi-backend', 'bubbletea'] },
+  { name: 'Utils', skills: ['docker-compose', 'makefile', 'gitignore'] },
+];
+
+// Install commands
+const installCommands = [
+  { platform: 'OpenCode', command: 'opencode skill install vstack', description: 'Installs all 55 vstack skills to ~/.config/opencode/skills/vstack/' },
+  { platform: 'Codex', command: 'codex skill add vstack', description: 'Adds vstack skills to Codex workspace (requires Codex skill support)' },
+  { platform: 'Claude Code', command: 'claude skill install vstack', description: 'Installs vstack skills for Claude Code (when available)' },
+];
+
+const capabilityRows = capabilityMatrix.map(row => [
+  row.name,
+  row.category,
+  row.opencode,
+  row.codex,
+  row.claude,
+]);
+
+const emptyState = capabilityMatrix.length === 0;
+const matrixSearchId = "matrix-search";
+const matrixCategoryFilterId = "matrix-category-filter";
+
+---
+
+<Landing title="vstack — Portable engineering playbook" description="55 skills, 18 workflows, 17 principles. Works with OpenCode, Codex, and Claude Code.">
+  <Section id="hero" gap="xl" class="hero-section">
+    <Container>
+      <div class="hero-content">
+        <h1>vstack</h1>
+        <p class="hero-tagline">Portable engineering playbook for AI-assisted development</p>
+        <p class="hero-subtitle">55 skills. 18 workflows. 17 principles. Works with OpenCode, Codex, and Claude Code.</p>
+        <div class="hero-actions">
+          <Button href="/playbook/" variant="primary" size="lg">Explore Playbook</Button>
+          <Button href="/opencode-plugin/" variant="secondary" size="lg">OpenCode Plugin</Button>
+          <Button href="https://github.com/vipintom/vstack-playbook" variant="ghost" size="lg">GitHub</Button>
+        </div>
+        <div class="hero-install">
+          <CodeBlock code="opencode skill install vstack" language="bash" showCopy={true} copyLabel="Copy install command" copySuccess="Copied!" />
+          <p class="install-hint">Run in your project to install all 55 skills</p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <Section id="capability-matrix" gap="l" aria-labelledby="matrix-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="matrix-title">Capability Matrix</h2>
+        <p class="section-lead">Single source of truth: 55 skills × 3 harnesses (OpenCode, Codex, Claude Code)</p>
+      </header>
+
+      <div class="matrix-controls">
+        <SearchInput id={matrixSearchId} placeholder="Filter skills by name..." aria-label="Search skills" />
+        <select id={matrixCategoryFilterId} aria-label="Filter by category">
+          <option value="">All Categories</option>
+          <option value="Foundation">Foundation</option>
+          <option value="Discovery">Discovery</option>
+          <option value="Architecture">Architecture</option>
+          <option value="Planning">Planning</option>
+          <option value="Verification">Verification</option>
+          <option value="Debug/Recovery">Debug/Recovery</option>
+          <option value="Collaboration">Collaboration</option>
+          <option value="Review">Review</option>
+          <option value="Continuity">Continuity</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Extended">Extended</option>
+          <option value="Implementation">Implementation</option>
+          <option value="Utils">Utils</option>
+        </select>
+      </div>
+
+      <DataTable
+        columns={[
+          { key: 'name', header: 'Skill', sortable: true },
+          { key: 'category', header: 'Category', sortable: true },
+          { key: 'opencode', header: 'OpenCode', sortable: true },
+          { key: 'codex', header: 'Codex', sortable: true },
+          { key: 'claude', header: 'Claude Code', sortable: true },
+        ]}
+        data={capabilityRows}
+        searchId={matrixSearchId}
+        categoryFilterId={matrixCategoryFilterId}
+        categoryColumnIndex={1}
+        emptyState={emptyState}
+        emptyMessage="No skills match the current filter."
+      />
+    </Container>
+  </Section>
+
+  <Section id="three-pillars" gap="l" aria-labelledby="pillars-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="pillars-title">Three Pillars</h2>
+        <p class="section-lead">The vstack ecosystem: playbook, OpenCode plugin, and OpenChamber panel</p>
+      </header>
+
+      <div class="pillars-grid">
+        {pillarCardProps.map(props => <Card {...props} />)}
+      </div>
+    </Container>
+  </Section>
+
+  <Section id="system-architecture" gap="l" aria-labelledby="sys-arch-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="sys-arch-title">System Architecture</h2>
+        <p class="section-lead">Four independent repositories communicating through versioned projection contracts</p>
+      </header>
+
+      <div class="arch-diagram" role="img" aria-label="vstack system architecture diagram showing four repositories and their communication">
+        <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" class="arch-svg">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="var(--color-border)" />
+            </marker>
+            <linearGradient id="grad-playbook" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="var(--chart-1)" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="var(--chart-1)" stop-opacity="0.05" />
+            </linearGradient>
+            <linearGradient id="grad-opencode" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="var(--chart-2)" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="var(--chart-2)" stop-opacity="0.05" />
+            </linearGradient>
+            <linearGradient id="grad-openchamber" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="var(--chart-3)" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="var(--chart-3)" stop-opacity="0.05" />
+            </linearGradient>
+            <linearGradient id="grad-umbrella" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="var(--chart-4)" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="var(--chart-4)" stop-opacity="0.05" />
+            </linearGradient>
+          </defs>
+
+          <!-- Umbrella Repository (center top) -->
+          <rect x="275" y="20" width="250" height="100" rx="12" fill="url(#grad-umbrella)" stroke="var(--chart-4)" stroke-width="2" />
+          <text x="400" y="55" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-ink)">vstack (umbrella)</text>
+          <text x="400" y="78" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">Contracts · Matrix · Release</text>
+          <text x="400" y="96" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">github.com/vipintom/vstack</text>
+
+          <!-- Playbook (left) -->
+          <rect x="30" y="160" width="220" height="180" rx="12" fill="url(#grad-playbook)" stroke="var(--chart-1)" stroke-width="2" />
+          <text x="140" y="195" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-ink)">vstack-playbook</text>
+          <text x="140" y="218" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">55 Skills · 18 Workflows</text>
+          <text x="140" y="236" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">17 Principles · 3 Roles</text>
+          <text x="140" y="254" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">npm @vipintom/vstack</text>
+          <text x="140" y="272" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">github.com/vipintom/vstack-playbook</text>
+          <text x="140" y="300" text-anchor="middle" font-size="11" font-weight="500" fill="var(--chart-1)">Defines methodology</text>
+
+          <!-- OpenCode Plugin (center) -->
+          <rect x="290" y="160" width="220" height="180" rx="12" fill="url(#grad-opencode)" stroke="var(--chart-2)" stroke-width="2" />
+          <text x="400" y="195" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-ink)">vstack-opencode</text>
+          <text x="400" y="218" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">23 Tools · 3 Agents</text>
+          <text x="400" y="236" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">6 Stores · 7 Gates</text>
+          <text x="400" y="254" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">npm @vipintom/vstack-opencode</text>
+          <text x="400" y="272" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">github.com/vipintom/vstack-opencode</text>
+          <text x="400" y="300" text-anchor="middle" font-size="11" font-weight="500" fill="var(--chart-2)">Owns runtime state</text>
+
+          <!-- OpenChamber (right) -->
+          <rect x="550" y="160" width="220" height="180" rx="12" fill="url(#grad-openchamber)" stroke="var(--chart-3)" stroke-width="2" />
+          <text x="660" y="195" text-anchor="middle" font-size="16" font-weight="600" fill="var(--color-ink)">vstack-openchamber</text>
+          <text x="660" y="218" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">Panel + Dashboard</text>
+          <text x="660" y="236" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">Read-only projections</text>
+          <text x="660" y="254" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">Git URL / Built ZIP</text>
+          <text x="660" y="272" text-anchor="middle" font-size="11" fill="var(--color-ink-muted)">github.com/vipintom/vstack-openchamber</text>
+          <text x="660" y="300" text-anchor="middle" font-size="11" font-weight="500" fill="var(--chart-3)">Visualizes state</text>
+
+          <!-- Projection flow arrows -->
+          <path d="M 400 120 Q 350 140 300 160" stroke="var(--color-border)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+          <path d="M 400 120 Q 400 140 400 160" stroke="var(--color-border)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+          <path d="M 400 120 Q 450 140 550 160" stroke="var(--color-border)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+
+          <!-- Projection labels -->
+          <text x="350" y="130" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">projections v1</text>
+          <text x="400" y="135" text-anchor="middle" font-size="10" fill="var(--color-ink-muted">manifest.json</text>
+          <text x="450" y="130" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">projections v1</text>
+
+          <!-- Data flow arrows -->
+          <path d="M 250 250 L 290 250" stroke="var(--chart-2)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+          <text x="270" y="240" text-anchor="middle" font-size="10" fill="var(--chart-2)">Skills CLI</text>
+
+          <path d="M 510 250 L 550 250" stroke="var(--chart-3)" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
+          <text x="530" y="240" text-anchor="middle" font-size="10" fill="var(--chart-3)">Projections</text>
+
+          <!-- .vstack directory -->
+          <rect x="290" y="360" width="220" height="35" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,4" />
+          <text x="400" y="385" text-anchor="middle" font-size="12" fill="var(--color-ink-muted)">.vstack/ (shared project root)</text>
+          <text x="400" y="397" text-anchor="middle" font-size="10" fill="var(--color-ink-muted)">manifest.json · state/ · reports/ · deliveries/ · events.jsonl</text>
+        </svg>
+      </div>
+
+      <div class="arch-legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--chart-1)"></span>
+          <span>Playbook — Defines methodology (skills, workflows, principles)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--chart-2)"></span>
+          <span>OpenCode Plugin — Owns authoritative runtime state, publishes projections</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--chart-3)"></span>
+          <span>OpenChamber — Read-only visualization, consumes projections</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--chart-4)"></span>
+          <span>Umbrella — Contracts, compatibility matrix, integrated release metadata</span>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <Section id="architecture" gap="l" aria-labelledby="arch-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="arch-title">Architecture</h2>
+        <p class="section-lead">14 layers from Foundation to Utils — each skill maps to one layer</p>
+      </header>
+
+      <div class="arch-layers">
+        {archLayers.map(layer => (
+          <details class="arch-layer" open={layer.name === 'Foundation' || layer.name === 'Discovery'}>
+            <summary>{layer.name} <span class="layer-count">{layer.skills.length} skills</span></summary>
+            <ul class="layer-skills">
+              {layer.skills.map(skill => <li><a href="/playbook/skills/{skill.toLowerCase()}/">{skill}</a></li>)}
+            </ul>
+          </details>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <Section id="installation" gap="l" aria-labelledby="install-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="install-title">Installation</h2>
+        <p class="section-lead">One command installs all 55 skills to your AI harness</p>
+      </header>
+
+      <div class="install-grid">
+        {installCommands.map(cmd => (
+          <article class="install-card">
+            <h3>{cmd.platform}</h3>
+            <CodeBlock code={cmd.command} language="bash" showCopy={true} copyLabel="Copy" copySuccess="Copied!" />
+            <p>{cmd.description}</p>
+          </article>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <Section id="reference-index" gap="l" aria-labelledby="ref-title">
+    <Container>
+      <header class="section-header">
+        <h2 id="ref-title">Reference Index</h2>
+        <p class="section-lead">Direct links to all documentation</p>
+      </header>
+
+      <div class="ref-grid">
+        <article class="ref-card">
+          <h3>Playbook</h3>
+          <ul>
+            <li><a href="/playbook/skills/">All 55 Skills</a></li>
+            <li><a href="/playbook/workflows/">18 Workflows</a></li>
+            <li><a href="/playbook/principles/">17 Principles</a></li>
+            <li><a href="/playbook/resources/">Resources</a></li>
+            <li><a href="/playbook/docs/capability-matrix.md">Capability Matrix</a></li>
+          </ul>
+        </article>
+        <article class="ref-card">
+          <h3>OpenCode Plugin</h3>
+          <ul>
+            <li><a href="/opencode-plugin/tools/">23 Tools</a></li>
+            <li><a href="/opencode-plugin/agents/">3 Agents</a></li>
+            <li><a href="/opencode-plugin/stores/">6 Stores</a></li>
+            <li><a href="/opencode-plugin/gates/">7 Gates</a></li>
+          </ul>
+        </article>
+        <article class="ref-card">
+          <h3>OpenChamber</h3>
+          <ul>
+            <li><a href="/openchamber/">Panel Overview</a></li>
+            <li><a href="/openchamber/notes/">Notes</a></li>
+            <li><a href="/openchamber/todos/">Todos</a></li>
+            <li><a href="/openchamber/plans/">Plans</a></li>
+          </ul>
+        </article>
+        <article class="ref-card">
+          <h3>Meta</h3>
+          <ul>
+            <li><a href="https://github.com/vipintom/vstack-playbook">Playbook Repo</a></li>
+            <li><a href="https://github.com/vipintom/vstack-opencode">OpenCode Plugin Repo</a></li>
+            <li><a href="https://github.com/vipintom/vstack-openchamber">OpenChamber Repo</a></li>
+            <li><a href="/compatibility/">Compatibility Matrix</a></li>
+          </ul>
+        </article>
+      </div>
+    </Container>
+  </Section>
+
+  <Search />
+</Landing>
+
+<style>
+  .hero-section { text-align: center; padding: var(--space-4xl) 0; }
+  .hero-content h1 { font-size: clamp(3rem, 8vw, 5rem); font-weight: 700; margin-bottom: var(--space-md); background: linear-gradient(135deg, var(--color-ink), var(--color-ink-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-tagline { font-size: clamp(1.25rem, 3vw, 1.75rem); color: var(--color-ink-muted); margin-bottom: var(--space-lg); font-weight: 400; }
+  .hero-subtitle { font-size: 1.125rem; color: var(--color-ink-muted); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
+  .hero-actions { display: flex; gap: var(--gap-columns); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-2xl); }
+  .hero-install { max-width: 600px; margin: 0 auto; }
+  .hero-install .install-hint { font-size: 0.875rem; color: var(--color-ink-muted); margin-top: var(--space-sm); text-align: center; }
+
+  .section-header { text-align: center; margin-bottom: var(--space-xl); }
+  .section-header h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: var(--space-sm); }
+  .section-lead { color: var(--color-ink-muted); max-width: 600px; margin: 0 auto; }
+
+  .matrix-controls { display: flex; gap: var(--gap-columns); margin-bottom: var(--space-xl); flex-wrap: wrap; justify-content: center; }
+  .matrix-controls > * { flex: 1; max-width: 300px; }
+
+  .pillars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .pillars-grid { grid-template-columns: 1fr; } }
+
+  .arch-layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap-columns); }
+  .arch-layer { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-lg); background: var(--color-surface); }
+  .arch-layer summary { font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; }
+  .arch-layer summary::marker { content: none; }
+  .layer-count { color: var(--color-ink-muted); font-size: 0.875rem; }
+  .layer-skills { list-style: none; padding: 0; margin: var(--space-md) 0 0; }
+  .layer-skills li { margin-bottom: var(--space-xs); }
+  .layer-skills a { color: var(--color-primary); text-decoration: none; }
+  .layer-skills a:hover { text-decoration: underline; }
+
+  .arch-diagram { overflow-x: auto; margin: var(--space-xl) 0; }
+  .arch-svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .arch-legend { display: flex; flex-wrap: wrap; gap: var(--gap-columns); justify-content: center; margin-top: var(--space-lg); }
+  .legend-item { display: flex; align-items: center; gap: var(--space-sm); font-size: 0.875rem; color: var(--color-ink-muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .install-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap-columns); }
+  .install-card { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-lg); background: var(--color-surface); }
+  .install-card h3 { margin-top: 0; margin-bottom: var(--space-md); }
+  .install-card p { font-size: 0.875rem; color: var(--color-ink-muted); margin: var(--space-md) 0 0; }
+
+  .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap-columns); }
+  .ref-card { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-lg); background: var(--color-surface); }
+  .ref-card h3 { margin-top: 0; margin-bottom: var(--space-md); font-size: 1.125rem; }
+  .ref-card ul { list-style: none; padding: 0; margin: 0; }
+  .ref-card li { margin-bottom: var(--space-sm); }
+  .ref-card a { color: var(--color-primary); text-decoration: none; }
+  .ref-card a:hover { text-decoration: underline; }
+</style>
+
+<script set:html>
+  // Theme toggle persistence - IIFE to avoid SSR issues
+  (() => {
+    const toggle = document.getElementById('theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const stored = localStorage.getItem('theme');
+    const isDark = stored ? stored === 'dark' : prefersDark.matches;
+
+    document.documentElement.classList.toggle('dark', isDark);
+    if (toggle) toggle.setAttribute('aria-pressed', isDark);
+
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const newDark = !document.documentElement.classList.contains('dark');
+        document.documentElement.classList.toggle('dark', newDark);
+        localStorage.setItem('theme', newDark ? 'dark' : 'light');
+        toggle.setAttribute('aria-pressed', newDark);
+      });
+    }
+  })();
+
+  // Capability matrix search + filter
+  (() => {
+    const searchInput = document.getElementById('matrix-search');
+    const categoryFilter = document.getElementById('matrix-category-filter');
+    const table = document.querySelector('[data-capability-table]');
+    if (!table) return;
+
+    const rows = table.querySelectorAll('tbody tr');
+    const filter = () => {
+      const search = searchInput?.value?.toLowerCase() || '';
+      const category = categoryFilter?.value || '';
+      rows.forEach(row => {
+        const name = row.cells[0]?.textContent?.toLowerCase() || '';
+        const cat = row.cells[1]?.textContent || '';
+        const matchSearch = name.includes(search);
+        const matchCategory = !category || cat === category;
+        row.style.display = (matchSearch && matchCategory) ? '' : 'none';
+      });
+    };
+    searchInput?.addEventListener('input', filter);
+    categoryFilter?.addEventListener('change', filter);
+  })();
+
+  // Copy buttons for code blocks
+  (() => {
+    document.querySelectorAll('[data-copy-btn]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const code = btn.getAttribute('data-code') || '';
+        try {
+          await navigator.clipboard.writeText(code);
+          const original = btn.textContent;
+          btn.textContent = btn.getAttribute('data-success') || 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.remove('copied');
+          }, 2000);
+        } catch (e) {
+          console.error('Copy failed:', e);
+        }
+      });
+    });
+  })();
+</script>

@@ -1,0 +1,37 @@
+---
+import Doc from '@layouts/Doc.astro';
+import Container from '@components/Container.astro';
+import Section from '@components/Section.astro';
+import Card from '@components/Card.astro';
+import Badge from '@components/Badge.astro';
+import { sidebarItems } from '@data/opencode-tools';
+import { toolCardProps, emptyState, docTitle, docDescription, docSidebarTitle } from '@data/opencode-tools-cards';
+---
+
+<Doc title={docTitle} description={docDescription} sidebarTitle={docSidebarTitle} sidebarItems={sidebarItems}>
+  <Section id="tools-index" gap="l" aria-labelledby="tools-title">
+    <Container>
+      <div class="page-header">
+        <h1 id="tools-title">Tools</h1>
+        <p class="lead">23 tools. Each tool is a discrete capability exposed to the agent.</p>
+      </div>
+
+      <div class="tools-grid">
+        {toolCardProps.map(props => <Card {...props} />)}
+      </div>
+
+      {emptyState && <p class="empty-state">No tools found.</p>}
+    </Container>
+  </Section>
+</Doc>
+
+<style>
+  .page-header { margin-bottom: var(--space-xl); }
+  .page-header h1 { margin-bottom: var(--space-xs); }
+  .page-header .lead { margin: 0; }
+
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--gap-columns); }
+  @media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+
+  .empty-state { text-align: center; color: var(--color-ink-muted); padding: var(--space-3xl); }
+</style>
