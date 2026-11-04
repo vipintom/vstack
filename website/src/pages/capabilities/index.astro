@@ -7,6 +7,9 @@ import Badge from '@components/Badge.astro';
 import Button from '@components/Button.astro';
 import { capabilityData, capabilityCategories, harnessSummary, getCapabilitiesByComponent } from '@data/capabilities';
 import { withBase } from '../../utils/urls';
+import OpencodeCapabilities from '@components/OpencodeCapabilities.astro';
+import OpenchamberCapabilities from '@components/OpenchamberCapabilities.astro';
+import HarnessSummary from '@components/HarnessSummary.astro';
 
 // Get all unique categories and statuses
 const allCategories = [...new Set(capabilityData.capabilities.map(c => c.category))].sort();
@@ -18,9 +21,13 @@ const componentLabels = {
   openchamber: 'OpenChamber (2 interfaces)',
 };
 
-// Initial component
+// Initial component - only Playbook rendered server-side
 const initialComponent = 'playbook';
 const initialCapabilities = getCapabilitiesByComponent(initialComponent);
+
+// Lazy-loaded components data
+const opencodeCapabilities = getCapabilitiesByComponent('opencode');
+const openchamberCapabilities = getCapabilitiesByComponent('openchamber');
 
 // Helper to render status badge class
 function statusBadgeClass(status: string): string {
@@ -106,62 +113,72 @@ function statusBadgeClass(status: string): string {
         <span id="active-filters" class="active-filters" hidden></span>
       </div>
 
-      <!-- Capability Grid - Server rendered for all components -->
+      <!-- Capability Grid - Playbook server-rendered, OpenCode/OpenChamber lazy-loaded -->
       <div id="capability-grid" class="capability-grid" aria-label="Capabilities">
-        {['playbook', 'opencode', 'openchamber'].map(component => {
-          const capabilities = getCapabilitiesByComponent(component);
-          return (
-            <div data-component={component} class="component-section" style={component !== 'playbook' ? 'display: none;' : ''}>
-              <h2 class="component-section-title">{componentLabels[component]}</h2>
-              <div class="component-list" role="list" aria-label={componentLabels[component]}>
-                {capabilities.map(cap => (
-                  <div 
-                    class="capability-card" 
-                    role="listitem"
-                    data-capability-id={cap.id}
-                    data-category={cap.category}
-                    data-status={cap.status.opencode}
-                    data-component={cap.component}
-                    data-name={cap.name.toLowerCase()}
-                    data-description={cap.description.toLowerCase()}
-                  >
-                    <header class="card-header">
-                      <div class="card-title-row">
-                        <h3 class="card-name">{cap.name}</h3>
-                        <span class="card-category">{cap.category}</span>
-                      </div>
-                      <p class="card-description">{cap.description}</p>
-                    </header>
-                    <div class="card-status">
-                      <span class="status-label">OpenCode:</span>
-                      <span class="status-badge"><Badge variant={cap.status.opencode}>{cap.status.opencode}</Badge></span>
-                      <span class="status-label">Codex:</span>
-                      <span class="status-badge"><Badge variant={cap.status.codex}>{cap.status.codex}</Badge></span>
-                      <span class="status-label">Claude Code:</span>
-                      <span class="status-badge"><Badge variant={cap.status.claudeCode}>{cap.status.claudeCode}</Badge></span>
-                    </div>
-                    {cap.notes && <p class="card-notes">{cap.notes}</p>}
-                    <footer class="card-footer">
-                      {cap.documentationRef && (
-                        <a href={withBase(cap.documentationRef)} class="doc-link" target="_blank" rel="noopener">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                          </svg>
-                          Documentation
-                        </a>
-                      )}
-                      <button class="detail-btn" data-capability-id={cap.id} aria-label={"View details for " + cap.name} disabled>Details</button>
-                    </footer>
+        <!-- Playbook (server-rendered) -->
+        <div data-component="playbook" class="component-section">
+          <h2 class="component-section-title">{componentLabels.playbook}</h2>
+          <div class="component-list" role="list" aria-label={componentLabels.playbook}>
+            {initialCapabilities.map(cap => (
+              <div 
+                class="capability-card" 
+                role="listitem"
+                data-capability-id={cap.id}
+                data-category={cap.category}
+                data-status={cap.status.opencode}
+                data-component={cap.component}
+                data-name={cap.name.toLowerCase()}
+                data-description={cap.description.toLowerCase()}
+              >
+                <header class="card-header">
+                  <div class="card-title-row">
+                    <h3 class="card-name">{cap.name}</h3>
+                    <span class="card-category">{cap.category}</span>
                   </div>
-                ))}
+                  <p class="card-description">{cap.description}</p>
+                </header>
+                <div class="card-status">
+                  <span class="status-label">OpenCode:</span>
+                  <span class="status-badge"><Badge variant={cap.status.opencode}>{cap.status.opencode}</Badge></span>
+                  <span class="status-label">Codex:</span>
+                  <span class="status-badge"><Badge variant={cap.status.codex}>{cap.status.codex}</Badge></span>
+                  <span class="status-label">Claude Code:</span>
+                  <span class="status-badge"><Badge variant={cap.status.claudeCode}>{cap.status.claudeCode}</Badge></span>
+                </div>
+                {cap.notes && <p class="card-notes">{cap.notes}</p>}
+                <footer class="card-footer">
+                  {cap.documentationRef && (
+                    <a href={withBase(cap.documentationRef)} class="doc-link" target="_blank" rel="noopener">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                      </svg>
+                      Documentation
+                    </a>
+                  )}
+                  <button class="detail-btn" data-capability-id={cap.id} aria-label={"View details for " + cap.name} disabled>Details</button>
+                </footer>
               </div>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+        </div>
+
+        <!-- OpenCode Plugin (lazy-loaded on scroll) -->
+        <OpencodeCapabilities 
+          capabilities={opencodeCapabilities} 
+          componentLabels={componentLabels}
+          client:visible
+        />
+
+        <!-- OpenChamber (lazy-loaded on scroll) -->
+        <OpenchamberCapabilities 
+          capabilities={openchamberCapabilities} 
+          componentLabels={componentLabels}
+          client:visible
+        />
       </div>
 
       <!-- No Results State -->
@@ -191,23 +208,8 @@ function statusBadgeClass(status: string): string {
       <!-- Embedded capability data for future client-side enhancement -->
       <script id="capability-data" type="application/json" set:html={JSON.stringify(capabilityData.capabilities)} />
 
-      <!-- Harness Support Summary -->
-      <details class="harness-summary" open>
-        <summary>Harness Support Summary (Playbook Skills)</summary>
-        <div class="harness-grid">
-          {harnessSummary.map(h => (
-            <article class="harness-card">
-              <h3>{h.harness}</h3>
-              <div class="status-counts">
-                <span class="status-count pass"><Badge variant="pass">Full: {h.full}</Badge></span>
-                <span class="status-count partial"><Badge variant="warn">Partial: {h.partial}</Badge></span>
-                <span class="status-count planned"><Badge variant="info">Planned: {h.planned}</Badge></span>
-                <span class="status-count none"><Badge variant="fail">None: {h.none}</Badge></span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </details>
+      <!-- Harness Support Summary (lazy-loaded) -->
+      <HarnessSummary harnessSummary={harnessSummary} client:visible />
 
       <!-- Source Provenance -->
       <details class="provenance-info">

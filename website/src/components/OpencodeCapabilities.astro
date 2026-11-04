@@ -1,0 +1,61 @@
+---
+import Badge from './Badge.astro';
+import { withBase } from '../utils/urls';
+
+interface Props {
+  capabilities: import('@data/capabilities').CapabilityEntry[];
+  componentLabels: Record<string, string>;
+}
+
+const { capabilities, componentLabels } = Astro.props;
+---
+
+<div data-component="opencode" class="component-section" style="display: none;">
+  <h2 class="component-section-title">{componentLabels.opencode}</h2>
+  <div class="component-list" role="list" aria-label={componentLabels.opencode}>
+    {capabilities.map(cap => (
+      <div 
+        class="capability-card" 
+        role="listitem"
+        data-capability-id={cap.id}
+        data-category={cap.category}
+        data-status={cap.status.opencode}
+        data-component={cap.component}
+        data-name={cap.name.toLowerCase()}
+        data-description={cap.description.toLowerCase()}
+      >
+        <header class="card-header">
+          <div class="card-title-row">
+            <h3 class="card-name">{cap.name}</h3>
+            <span class="card-category">{cap.category}</span>
+          </div>
+          <p class="card-description">{cap.description}</p>
+        </header>
+        <div class="card-status">
+          <span class="status-label">OpenCode:</span>
+          <span class="status-badge"><Badge variant={cap.status.opencode}>{cap.status.opencode}</Badge></span>
+          <span class="status-label">Codex:</span>
+          <span class="status-badge"><Badge variant={cap.status.codex}>{cap.status.codex}</Badge></span>
+          <span class="status-label">Claude Code:</span>
+          <span class="status-badge"><Badge variant={cap.status.claudeCode}>{cap.status.claudeCode}</Badge></span>
+        </div>
+        {cap.notes && <p class="card-notes">{cap.notes}</p>}
+        <footer class="card-footer">
+          {cap.documentationRef && (
+            <a href={withBase(cap.documentationRef)} class="doc-link" target="_blank" rel="noopener">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              Documentation
+            </a>
+          )}
+          <button class="detail-btn" data-capability-id={cap.id} aria-label={"View details for " + cap.name} disabled>Details</button>
+        </footer>
+      </div>
+    ))}
+  </div>
+</div>
