@@ -19,7 +19,7 @@ export const primaryNavigation: NavigationItem[] = [
     href: '/products/',
     children: [
       { label: 'Playbook', href: '/playbook/' },
-      { label: 'OpenCode Plugin', href: '/opencode-plugin/' },
+      { label: 'OpenCode', href: '/opencode-plugin/' },
       { label: 'OpenChamber', href: '/openchamber/' },
       { label: 'Compare', href: '/products/compare/' },
     ]

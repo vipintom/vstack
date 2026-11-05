@@ -2,11 +2,13 @@
 interface Props {
   children: any;
   class?: string;
+  narrow?: boolean;
 }
-const { children, class: className = '' } = Astro.props;
+const { children, class: className = '', narrow = false } = Astro.props;
+const narrowClass = narrow ? 'content-wide' : '';
 ---
 
-<div class="container {className}">
+<div class:list={['container', narrowClass, className]}>
   <slot />
 </div>
 
@@ -16,5 +18,8 @@ const { children, class: className = '' } = Astro.props;
     max-width: var(--container);
     margin: 0 auto;
     padding: 0 var(--gutter);
+  }
+  .container.content-wide {
+    max-width: 1080px;
   }
 </style>

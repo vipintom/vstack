@@ -6,7 +6,7 @@ import SearchPagefind from './SearchPagefind.astro';
 const navItems = [
   { label: 'Products', href: withBase('/products/'), children: [
     { label: 'Playbook', href: withBase('/playbook/') },
-    { label: 'OpenCode Plugin', href: withBase('/opencode-plugin/') },
+    { label: 'OpenCode', href: withBase('/opencode-plugin/') },
     { label: 'OpenChamber', href: withBase('/openchamber/') },
     { label: 'Compare', href: withBase('/products/compare/') },
   ]},
@@ -124,6 +124,7 @@ const navItems = [
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
   }
   .skip-link:focus {
     position: fixed;
@@ -148,7 +149,7 @@ const navItems = [
     font-weight: 500;
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
-    transition: color var(--dur-micro), background-color var(--dur-micro);
+    transition: color var(--dur-micro), background-color var(--dur-micro), transform var(--dur-micro) var(--ease-out);
     white-space: nowrap;
     min-height: 48px;
     min-width: 48px;
@@ -158,6 +159,7 @@ const navItems = [
   }
   .nav-link:hover { color: var(--color-ink); background: var(--color-paper-2); }
   .nav-link:focus-visible { outline-offset: 2px; }
+  .nav-link:active { transform: scale(0.98); }
   .nav-link[aria-current="page"] { color: var(--color-accent); }
 
   .nav-dropdown { position: relative; }
@@ -174,12 +176,13 @@ const navItems = [
     cursor: pointer;
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
-    transition: color var(--dur-micro), background-color var(--dur-micro);
+    transition: color var(--dur-micro), background-color var(--dur-micro), transform var(--dur-micro) var(--ease-out);
     min-height: 48px;
     min-width: 48px;
   }
   .nav-dropdown-toggle:hover { color: var(--color-ink); background: var(--color-paper-2); }
   .nav-dropdown-toggle:focus-visible { outline-offset: 2px; }
+  .nav-dropdown-toggle:active { transform: scale(0.98); }
 
   .nav-dropdown-menu {
     position: absolute;
@@ -190,7 +193,7 @@ const navItems = [
     border: 1px solid var(--color-rule);
     border-radius: var(--radius-md);
     padding: var(--space-sm);
-    min-width: 180px;
+    min-width: max(180px, fit-content);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
@@ -211,13 +214,15 @@ const navItems = [
     font-size: var(--text-sm);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
-    transition: color var(--dur-micro), background-color var(--dur-micro);
+    transition: color var(--dur-micro), background-color var(--dur-micro), transform var(--dur-micro) var(--ease-out);
     min-height: 48px;
     min-width: 48px;
     justify-content: center;
+    white-space: nowrap;
   }
   .nav-dropdown-item:hover { color: var(--color-ink); background: var(--color-paper-3); }
-  .nav-dropdown-item:focus-visible { outline-offset: -2px; }
+  .nav-dropdown-item:focus-visible { outline-offset: 2px; }
+  .nav-dropdown-item:active { transform: scale(0.98); }
 
   .nav-actions { display: flex; align-items: center; gap: var(--space-md); flex-shrink: 0; }
 
@@ -229,9 +234,10 @@ const navItems = [
     justify-content: center;
   }
 
-  .nav-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; color: var(--color-ink); cursor: pointer; padding: var(--space-md); border-radius: var(--radius-sm); min-width: 48px; min-height: 48px; }
+  .nav-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; color: var(--color-ink); cursor: pointer; padding: var(--space-md); border-radius: var(--radius-sm); min-width: 48px; min-height: 48px; transition: background-color var(--dur-micro), transform var(--dur-micro) var(--ease-out); }
   .nav-toggle:hover { background: var(--color-paper-2); }
   .nav-toggle:focus-visible { outline-offset: 2px; }
+  .nav-toggle:active { transform: scale(0.95); }
 
   .nav-search {
     display: flex;
@@ -247,6 +253,10 @@ const navItems = [
   @media (max-width: 768px) {
     .nav-links { display: none; }
     .nav-toggle { display: flex; }
+  }
+  @media (max-width: 420px) {
+    .nav-actions .btn-primary span { display: none; }
+    .nav-actions .btn-primary { min-width: 48px; padding: 0; }
   }
 </style>
 

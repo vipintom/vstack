@@ -47,15 +47,16 @@ const { title, items, searchPlaceholder = 'Filter…' } = Astro.props;
 
   .sidebar-search { margin-bottom: var(--space-lg); }
   .sidebar-search .search-label { max-width: none; }
-  .sidebar-search .search-input { padding-left: calc(var(--space-md) + 20px); }
+  .sidebar-search .search-input { padding-left: calc(var(--space-md) + 20px); height: 40px; }
 
   .sidebar-section { margin-bottom: var(--space-lg); }
-  .sidebar-section-title { font: var(--font-body) var(--text-xs) / 1 var(--tracking-body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-faint); margin-bottom: var(--space-xs); }
+  .sidebar-section-title { font: var(--font-body) var(--text-xs) / 1 var(--tracking-body); font-weight: 600; color: var(--color-ink-faint); margin-bottom: var(--space-xs); }
   .sidebar-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2xs); }
-  .sidebar-link { display: block; padding: var(--space-xs) var(--space-sm); font: var(--font-body) var(--text-sm) / 1.4 var(--tracking-body); color: var(--color-ink-muted); border-radius: var(--radius-xs); text-decoration: none; transition: color var(--dur-micro), background-color var(--dur-micro); }
+  .sidebar-link { display: block; padding: var(--space-xs) var(--space-sm); font: var(--font-body) var(--text-sm) / 1.4 var(--tracking-body); color: var(--color-ink-muted); border-radius: var(--radius-xs); text-decoration: none; transition: color var(--dur-micro), background-color var(--dur-micro), transform var(--dur-micro) var(--ease-out); min-height: 32px; }
   .sidebar-link:hover { color: var(--color-ink); background: var(--color-paper-3); }
-  .sidebar-link.active { color: var(--color-accent); background: oklch(55% 0.16 35 / 0.1); font-weight: 500; }
-  .sidebar-link:focus-visible { outline-offset: -2px; }
+  .sidebar-link.active { color: var(--color-accent); background: var(--color-sidebar-accent); font-weight: 500; }
+  .sidebar-link:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
+  .sidebar-link:active { transform: scale(0.98); }
 
   @media (max-width: 1024px) {
     .doc-sidebar {

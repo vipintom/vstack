@@ -7,8 +7,12 @@ const baseUrl = withBase('/');
 
 <Section id="search" gap="l" aria-labelledby="search-title">
   <Container>
-    <h2 id="search-title">Search</h2>
-    <div id="search-container" data-base-url={baseUrl}></div>
+    <div class="search-wrap">
+      <header class="section-header">
+        <h2 id="search-title">Search</h2>
+      </header>
+      <div id="search-container" data-base-url={baseUrl}></div>
+    </div>
   </Container>
 </Section>
 
@@ -63,6 +67,9 @@ const baseUrl = withBase('/');
 </script>
 
 <style>
-  #search-container { max-width: 65ch; margin: 0 auto; }
+  .search-wrap { background: var(--color-paper-2); border: 1px solid var(--color-rule); border-radius: var(--radius-lg); padding: var(--space-xl); min-height: 300px; display: flex; flex-direction: column; justify-content: center; }
+  .search-wrap .section-header { margin-bottom: var(--space-lg); }
+  .search-wrap .section-header::before { display: none; }
+  #search-container { max-width: 65ch; margin: 0 auto; width: 100%; }
   .search-error { color: var(--color-ink-muted); text-align: center; padding: var(--space-xl); }
 </style>

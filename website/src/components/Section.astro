@@ -6,16 +6,10 @@ interface Props {
   gap?: 's' | 'm' | 'l';
 }
 const { children, id, class: className = '', gap = 'm' } = Astro.props;
-const gapVar = gap === 's' ? 'var(--section-gap-s)' : gap === 'l' ? 'var(--section-gap-l)' : 'var(--section-gap)';
+const gapPx = gap === 's' ? '96px' : gap === 'l' ? '184px' : '144px';
+const gapClass = `gap-${gap}`;
 ---
 
-<section id={id} class="section {className}" style="padding-block: {gapVar};">
+<section id={id} class:list={['section', className, gapClass]} style={`padding-block: ${gapPx}; border-top: 1px solid var(--color-rule);`}>
   <slot />
 </section>
-
-<style>
-  .section {
-    border-top: 1px solid var(--color-rule);
-  }
-  .section:first-of-type { border-top: none; }
-</style>

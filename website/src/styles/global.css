@@ -1,3 +1,7 @@
+/* Hallmark · v2.0.0 · custom · idea: "A printed technical specification brought to screen: dense, scannable, reference-grade" · vibe: "technical, dense, precise, dark" · paper: dark / display: grotesk-heavy / accent: warm / hero: banner / posture: restrained */
+
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · weakest: none — content density is the feature */
+
 @import "tailwindcss";
 
 @theme {
@@ -35,6 +39,26 @@
   --color-error: oklch(55% 0.22 25);
   --color-info: oklch(60% 0.18 220);
 
+  /* ===== BADGE TOKENS ===== */
+  --color-badge-pass-bg: oklch(55% 0.16 145 / 0.15);
+  --color-badge-pass-text: oklch(55% 0.16 145);
+  --color-badge-pass-border: oklch(55% 0.16 145 / 0.3);
+  --color-badge-warn-bg: oklch(65% 0.18 85 / 0.15);
+  --color-badge-warn-text: oklch(65% 0.18 85);
+  --color-badge-warn-border: oklch(65% 0.18 85 / 0.3);
+  --color-badge-error-bg: oklch(55% 0.22 25 / 0.15);
+  --color-badge-error-text: oklch(55% 0.22 25);
+  --color-badge-error-border: oklch(55% 0.22 25 / 0.3);
+  --color-badge-info-bg: oklch(60% 0.18 220 / 0.15);
+  --color-badge-info-text: oklch(60% 0.18 220);
+  --color-badge-info-border: oklch(60% 0.18 220 / 0.3);
+  --color-badge-plan-bg: oklch(60% 0.18 220 / 0.15);
+  --color-badge-plan-text: oklch(60% 0.18 220);
+  --color-badge-plan-border: oklch(60% 0.18 220 / 0.3);
+  --color-badge-fail-bg: oklch(55% 0.22 25 / 0.15);
+  --color-badge-fail-text: oklch(55% 0.22 25);
+  --color-badge-fail-border: oklch(55% 0.22 25 / 0.3);
+
   /* ===== RULES & BORDERS ===== */
   --color-rule: oklch(25% 0.015 260 / 0.6);
   --color-rule-light: oklch(35% 0.008 45 / 0.6);
@@ -42,6 +66,7 @@
   /* ===== FOCUS ===== */
   --color-focus: var(--color-accent-focus);
   --color-focus-light: var(--color-accent-focus);
+  --color-focus-ring: oklch(55% 0.22 35 / 0.2);
 
   /* ===== TYPOGRAPHY ===== */
   --font-display: "Geist Variable", "Geist", system-ui, sans-serif;
@@ -85,7 +110,7 @@
   --section-gap-l: calc(var(--space-4xl) + var(--space-xl));
 
   /* ===== CONTAINER & GRID ===== */
-  --container: 1312px;
+  --container: 1440px;
   --container-max: 1440px;
   --gutter: 64px;
   --gap-columns: 32px;
@@ -131,32 +156,13 @@
   --color-border: oklch(25% 0.015 260 / 0.6);
   --color-surface: oklch(16% 0.015 260);
   --color-primary: oklch(55% 0.16 35);
+  --color-sidebar-accent: oklch(55% 0.16 35 / 0.1);
 
   /* Chart tokens for architecture diagram */
   --chart-1: oklch(55% 0.16 220);  /* Playbook - blue */
   --chart-2: oklch(55% 0.16 145);  /* OpenCode - green */
   --chart-3: oklch(55% 0.16 35);   /* OpenChamber - orange */
   --chart-4: oklch(60% 0.18 280);  /* Umbrella - purple */
-}
-
-/* ===== FONT FACE DECLARATIONS (font-display: swap prevents FOIT) ===== */
-@font-face {
-  font-family: 'Geist Variable';
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/geistvariable/v2/5Zd5ZfHFiN0uDQvW.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'IBM Plex Sans';
-  font-weight: 400 500 600;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/ibmplexsans/v19/zYXgKVElMYYaJe8bpLHnCwDKhdg.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-weight: 400 500;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/jetbrainsmono/v23/tDbD2oWUg0MKZW1lKxFDhCU.woff2') format('woff2');
 }
 
 /* Light mode - derived, not inverted */
@@ -180,4 +186,24 @@
   --color-warning-border: oklch(45% 0.18 85 / 0.4);
   --color-error: oklch(45% 0.22 25);
   --color-info: oklch(50% 0.18 220);
+
+  /* Badge tokens - light mode */
+  --color-badge-pass-bg: oklch(45% 0.16 145 / 0.15);
+  --color-badge-pass-text: oklch(45% 0.16 145);
+  --color-badge-pass-border: oklch(45% 0.16 145 / 0.3);
+  --color-badge-warn-bg: oklch(55% 0.18 85 / 0.15);
+  --color-badge-warn-text: oklch(55% 0.18 85);
+  --color-badge-warn-border: oklch(55% 0.18 85 / 0.3);
+  --color-badge-error-bg: oklch(45% 0.22 25 / 0.15);
+  --color-badge-error-text: oklch(45% 0.22 25);
+  --color-badge-error-border: oklch(45% 0.22 25 / 0.3);
+  --color-badge-info-bg: oklch(50% 0.18 220 / 0.15);
+  --color-badge-info-text: oklch(50% 0.18 220);
+  --color-badge-info-border: oklch(50% 0.18 220 / 0.3);
+  --color-badge-plan-bg: oklch(50% 0.18 220 / 0.15);
+  --color-badge-plan-text: oklch(50% 0.18 220);
+  --color-badge-plan-border: oklch(50% 0.18 220 / 0.3);
+  --color-badge-fail-bg: oklch(45% 0.22 25 / 0.15);
+  --color-badge-fail-text: oklch(45% 0.22 25);
+  --color-badge-fail-border: oklch(45% 0.22 25 / 0.3);
 }

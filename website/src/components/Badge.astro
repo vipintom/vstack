@@ -12,10 +12,10 @@ const variantClass = `badge-{variant}`;
 
 <style>
   .badge { display: inline-flex; align-items: center; gap: var(--space-2xs); padding: var(--space-2xs) var(--space-xs); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1; border-radius: var(--radius-xs); white-space: nowrap; }
-  .badge-pass { background: var(--color-success, oklch(55% 0.16 145 / 0.15)); color: var(--color-success, oklch(55% 0.16 145)); border: 1px solid var(--color-success, oklch(55% 0.16 145 / 0.3)); }
-  .badge-warn { background: var(--color-warning, oklch(65% 0.18 85 / 0.15)); color: var(--color-warning, oklch(65% 0.18 85)); border: 1px solid var(--color-warning, oklch(65% 0.18 85 / 0.3)); }
-  .badge-error { background: var(--color-error, oklch(55% 0.22 25 / 0.15)); color: var(--color-error, oklch(55% 0.22 25)); border: 1px solid var(--color-error, oklch(55% 0.22 25 / 0.3)); }
-  .badge-info { background: var(--color-info, oklch(60% 0.18 220 / 0.15)); color: var(--color-info, oklch(60% 0.18 220)); border: 1px solid var(--color-info, oklch(60% 0.18 220 / 0.3)); }
-  .badge-plan { background: var(--color-info, oklch(60% 0.18 220 / 0.15)); color: var(--color-info, oklch(60% 0.18 220)); border: 1px solid var(--color-info, oklch(60% 0.18 220 / 0.3)); }
-  .badge-fail { background: var(--color-error, oklch(55% 0.22 25 / 0.15)); color: var(--color-error, oklch(55% 0.22 25)); border: 1px solid var(--color-error, oklch(55% 0.22 25 / 0.3)); }
+  .badge-pass { background: var(--color-badge-pass-bg); color: var(--color-badge-pass-text); border: 1px solid var(--color-badge-pass-border); }
+  .badge-warn { background: var(--color-badge-warn-bg); color: var(--color-badge-warn-text); border: 1px solid var(--color-badge-warn-border); }
+  .badge-error { background: var(--color-badge-error-bg); color: var(--color-badge-error-text); border: 1px solid var(--color-badge-error-border); }
+  .badge-info { background: var(--color-badge-info-bg); color: var(--color-badge-info-text); border: 1px solid var(--color-badge-info-border); }
+  .badge-plan { background: var(--color-badge-plan-bg); color: var(--color-badge-plan-text); border: 1px solid var(--color-badge-plan-border); }
+  .badge-fail { background: var(--color-badge-fail-bg); color: var(--color-badge-fail-text); border: 1px solid var(--color-badge-fail-border); }
 </style>

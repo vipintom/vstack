@@ -21,13 +21,14 @@ const displayLang = filename ? `${lang} · ${filename}` : lang;
 
 <style>
   .code-block { position: relative; background: var(--color-paper-3); border: 1px solid var(--color-rule); border-radius: var(--radius-sm); overflow: hidden; margin: var(--space-lg) 0; }
-  .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-xs) var(--space-md); background: var(--color-paper-2); border-bottom: 1px solid var(--color-rule); font-size: var(--text-xs); color: var(--color-ink-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+  .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-xs) var(--space-md); background: var(--color-paper-2); border-bottom: 1px solid var(--color-rule); font-size: var(--text-xs); color: var(--color-ink-faint); font-family: var(--font-body); font-weight: 500; }
   .code-block pre { margin: 0; border: none; border-radius: 0; background: transparent; padding: var(--space-lg); }
   .code-block code { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.5; color: var(--color-ink); }
-  .copy-btn { display: inline-flex; align-items: center; gap: var(--space-2xs); background: none; border: none; color: var(--color-ink-muted); cursor: pointer; padding: var(--space-2xs); font-size: var(--text-xs); border-radius: var(--radius-xs); transition: color var(--dur-micro); }
+  .copy-btn { display: inline-flex; align-items: center; gap: var(--space-2xs); background: none; border: none; color: var(--color-ink-muted); cursor: pointer; padding: var(--space-2xs) var(--space-sm); font-size: var(--text-xs); border-radius: var(--radius-xs); transition: color var(--dur-micro), transform var(--dur-micro) var(--ease-out); min-height: 44px; min-width: 44px; }
   .copy-btn:hover { color: var(--color-accent); }
   .copy-btn.copied { color: var(--color-success); }
-  .copy-btn:focus-visible { outline-offset: -2px; }
+  .copy-btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; transition: none; }
+  .copy-btn:active { transform: scale(0.95); }
   .copy-btn svg { flex-shrink: 0; }
 </style>
 

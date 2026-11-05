@@ -44,8 +44,9 @@ const baseClasses = `btn ${variantClass} ${sizeClass} ${className}`;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    height: 44px;
-    padding: 0 var(--space-lg);
+    min-height: 48px;
+    height: 48px;
+    padding: 0 max(var(--space-xl), 0.75em);
     font-family: var(--font-body);
     font-size: var(--text-sm);
     font-weight: 500;
@@ -55,11 +56,15 @@ const baseClasses = `btn ${variantClass} ${sizeClass} ${className}`;
     border: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
     white-space: nowrap;
   }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
-  .btn-sm { height: 36px; padding: 0 var(--space-md); font-size: var(--text-xs); }
+  .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .btn:active:not(:disabled) { transform: scale(0.98); }
+  .btn-sm { min-height: 40px; height: 40px; padding: 0 max(var(--space-lg), 0.6em); font-size: var(--text-xs); }
+  .btn-sm:active:not(:disabled) { transform: scale(0.98); }
+  .btn-sm:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
   .btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
   .btn-primary:hover:not(:disabled) { background: var(--color-accent-hover); }
