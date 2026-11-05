@@ -1,4 +1,4 @@
-name: Umbrella CI
+name: Docs CI
 
 on:
   pull_request:
@@ -6,145 +6,64 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
-  schedule:
-    - cron: '0 3 * * 1'  # Weekly on Monday 3 AM UTC
 
 permissions:
   contents: read
 
 jobs:
-  validate-contracts:
-    name: Validate Projection Contracts
+  link-check:
+    name: Check local links
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "24"
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Wiki links
+        run: node scripts/check-links.mjs wiki
 
-      - name: Validate contracts
-        run: pnpm run validate:contracts
+      - name: Document links
+        run: node scripts/check-links.mjs docs
 
-  validate-compatibility:
-    name: Validate Compatibility Matrix
+  documentation-only:
+    name: Enforce documentation-only scope
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Validate compatibility
-        run: pnpm run validate:compatibility
-
-  check-component-references:
-    name: Check Component References
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Verify no component directories exist
+      - name: No component directories
         run: |
-          if [ -d "playbook" ] || [ -d "opencode/vstack" ] || [ -d "openchamber/vstack-panel" ] || [ -d "package" ]; then
-            echo "ERROR: Component directories found in umbrella repository"
-            exit 1
-          fi
-          echo "✅ No component directories found"
-
-      - name: Check for placeholder GitHub username
-        run: |
-          if grep -r "<github-username>" --include="*.md" --include="*.json" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules"; then
-            echo "WARNING: Found <github-username> placeholders that need replacement"
-            grep -r "<github-username>" --include="*.md" --include="*.json" --include="*.yaml" --include="*.yml" . | grep -v ".git" | grep -v "node_modules"
-          else
-            echo "✅ No placeholder usernames found"
-          fi
-
-  validate-documentation-links:
-    name: Validate Documentation Links
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Check for broken internal links
-        run: |
-          # Check that key files exist
-          files=(
-            "README.md"
-            "AGENTS.md"
-            "docs/projection-protocol.md"
-            "docs/capability-matrix.md"
-            "docs/vstack-revised-structure-prd.md"
-            "docs/vstack-structure-implementation-plan.md"
-            "contracts/projections/v1/README.md"
-            "contracts/validate-contracts.js"
-            "compatibility/matrix.yaml"
-            "compatibility/integrated-release.json"
-            "compatibility/integrated-release.schema.json"
-            "compatibility/validate-compatibility.js"
-          )
-          for file in "${files[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "ERROR: Missing file: $file"
+          forbidden="website contracts compatibility node_modules wiki-playbook"
+          for path in $forbidden; do
+            if [ -e "$path" ]; then
+              echo "ERROR: $path must not exist in the documentation home"
               exit 1
             fi
           done
-          echo "✅ All key documentation files present"
+          echo "OK: no component directories"
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - name: No runtime files
+        run: |
+          for file in package.json pnpm-lock.yaml opencode.jsonc skills-lock.json; do
+            if [ -f "$file" ]; then
+              echo "ERROR: $file must not exist in the documentation home"
+              exit 1
+            fi
+          done
+          echo "OK: no runtime files"
+
+      - name: No 0.1.0 wiki pages
+        run: |
+          removed="Projections Roles Workflows Tools"
+          for page in $removed; do
+            if [ -f "wiki/$page.md" ]; then
+              echo "ERROR: wiki/$page.md describes a component removed in 0.2.0"
+              exit 1
+            fi
+          done
+          echo "OK: no removed-component pages"
