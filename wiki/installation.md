@@ -50,13 +50,13 @@ the exact discovery path does not.
 npx skills add github:vipintom/vstack-playbook --skill '*' --agent opencode
 ```
 
-This installs the skills only. Read `playbooks/` and `principles/` from the
-clone.
+It copies skill directories only; `playbooks/` and `principles/` are still
+read from the clone.
 
 ### Uninstall
 
-Remove the skill directories you copied, or delete the clone. The pack writes
-nothing outside the target skills directory.
+Reverse whatever you did above. The pack writes nothing outside the target
+skills directory, so removing what it added removes the pack.
 
 ## The recorder
 
@@ -79,8 +79,8 @@ Add the built directory to `opencode.jsonc`:
 ```
 
 A local plugin directory loads files, not package dependencies, so build it
-first. The built recorder has no runtime dependencies beyond the host
-`@opencode/plugin` peer.
+first. After the build there is nothing extra to resolve: the host supplies
+`@opencode/plugin` and the recorder brings no dependencies of its own.
 
 After the package is published:
 
@@ -105,7 +105,7 @@ tool does not exist, the plugin did not load — see
 1. Remove the plugin entry from `opencode.jsonc`.
 2. Delete the installed package directory.
 3. Delete `.vstack/state.json`, `.vstack/history.jsonl` and `.vstack/lock`.
-   Keep `.vstack/deliveries/`: those records are the durable output.
+   Retain `.vstack/deliveries/` — that directory is the output worth keeping.
 
 ## The panel
 
@@ -126,10 +126,10 @@ Then load `panel/` as an unpacked extension.
 
 ### Uninstall
 
-1. Disable and remove **vstack Workflow** in OpenChamber → Settings →
-   Extensions.
+1. Switch **vstack Workflow** off and remove it from OpenChamber's
+   extension list.
 2. Delete the extension directory.
-3. Leave `.vstack/` in the project; the recorder owns it.
+3. `.vstack/` stays in the project; it belongs to the recorder, not the panel.
 
 ## Offline
 

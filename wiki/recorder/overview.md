@@ -8,15 +8,18 @@ It is optional. The pack works without it — see
 
 ## What it does
 
-- Opens one delivery and tracks its playbook, tier and phase.
-- Parks a delivery, opens another, and resumes the parked one.
-- Tracks tasks, each with the check that proves it.
-- Records evidence: claim, command, result, artifact and the task it proves.
-- Records decisions: choice, alternatives, reason, consequence, owner.
-- Records handoffs: state, next action, blockers, tree status.
-- Records a review outcome and a waiver on close.
-- Closes a delivery only when the work is actually complete, and writes a
-  durable Markdown record.
+Six capabilities, each bound to one tool: open and move a delivery, track tasks
+against their checks, record evidence and the task it proves, record decisions
+and handoffs, and close with a durable record.
+
+The canonical list sits with the component that implements it —
+[`vstack-opencode/README.md`](https://github.com/vipintom/vstack-opencode/blob/master/README.md)
+— rather than being restated here. When the two disagree, the repository wins.
+
+What matters for reading the rest of this wiki is the shape of the record: a
+delivery carries a playbook, a tier, a phase, tasks with checks, evidence
+linked to tasks, decisions with alternatives, handoffs with a next action, and
+on close a review outcome and any waiver.
 
 ## What it refuses
 
