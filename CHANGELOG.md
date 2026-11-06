@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > 0.2.0 is recorded in each component repository's `RELEASE-NOTES.md`. The
 > 0.1.0 entries below describe components, counts and packages that no longer
 > exist in that form.
+>
+> **Renamed since 0.1.0.** The 0.1.0 `@vstack/*` package names below are
+> superseded: the recorder publishes as `@vipintom/vstack-opencode` and the
+> panel as `@vipintom/vstack-openchamber`. No `@vstack/*` name is published.
 
 ## [0.1.0] - 2026-11-02
 
