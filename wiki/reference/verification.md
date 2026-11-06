@@ -64,7 +64,7 @@ node -e "const p=require('./vstack-openchamber/package.json'); console.log(p.ope
 # >=1.24.0
 ```
 
-State schema is `1` in both. A newer schema produces an `incompatible` state in
+State schema is `2` in both. A newer schema produces an `incompatible` state in
 the panel, with no partial rendering.
 
 ## This repository

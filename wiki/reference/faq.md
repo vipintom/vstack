@@ -16,7 +16,7 @@ commit messages are the record.
 ## Does the pack work outside OpenCode?
 
 The pack is Markdown. Claude Code and Codex mappings are **experimental in
-0.2.0** — the Markdown works; the exact discovery path does not. Only OpenCode
+0.2.x** — the Markdown works; the exact discovery path does not. Only OpenCode
 is tested end to end. See [compatibility](compatibility.md).
 
 ## Why at most two skills?

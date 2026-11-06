@@ -1,6 +1,6 @@
 # AGENTS.md — vstack documentation home
 
-Version 0.2.0. This repository holds documentation only. There is no code, no
+Version 0.2.2. This repository holds documentation only. There is no code, no
 build, no package manifest, no contract and no runtime here.
 
 ## Layout
@@ -27,7 +27,7 @@ build, no package manifest, no contract and no runtime here.
   release note, or the PRD.
 - Relative links only, so the tree works offline.
 - Public repository, read-only: issues are welcome; pull requests are not
-  accepted in 0.2.0.
+  accepted in 0.2.x.
 
 ## Verification
 
@@ -42,8 +42,8 @@ CI runs the same command on every push. A link that fails here fails the build.
 | Repository | Authoritative for |
 |---|---|
 | `vstack-playbook` | 54 skills, 13 playbooks, 12 principles, the rename map |
-| `vstack-opencode` | The six tools, `.vstack/` state, enforcement, schema 1 |
+| `vstack-opencode` | The six tools, `.vstack/` state, enforcement, schema 2 |
 | `vstack-openchamber` | The seven views, the five honest states |
 
 Compatibility floors: OpenCode V2 with `@opencode/plugin` >= 2.2.0,
-OpenChamber >= 1.24.0, state schema 1.
+OpenChamber >= 1.24.0, state schema 2.

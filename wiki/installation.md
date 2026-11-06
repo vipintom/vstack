@@ -41,7 +41,7 @@ find ~/.config/opencode/skills -maxdepth 2 -name SKILL.md | wc -l
 The first number includes any skills you already had. The second counts every
 skill the harness can see.
 
-Claude Code and Codex mappings are experimental in 0.2.0. The Markdown works;
+Claude Code and Codex mappings are experimental in 0.2.x. The Markdown works;
 the exact discovery path does not.
 
 ### Skills CLI

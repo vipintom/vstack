@@ -15,7 +15,7 @@ compatibility matrix and no release metadata.
 | [`vipintom/vstack-opencode`](https://github.com/vipintom/vstack-opencode) | The recorder: six tools, `.vstack/` state |
 | [`vipintom/vstack-openchamber`](https://github.com/vipintom/vstack-openchamber) | The panel: seven read-only views |
 
-Each is tagged `v0.2.0` and verified independently. The pack works with no
+Each is tagged `v0.2.2` and verified independently. The pack works with no
 software installed at all.
 
 ## Install
@@ -57,4 +57,4 @@ beside it.
 MIT. See [`LICENSE`](LICENSE) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 Public repository, read-only: issues are welcome; pull requests are not
-accepted in 0.2.0.
+accepted in 0.2.x.

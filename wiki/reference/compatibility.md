@@ -9,7 +9,7 @@ Exact floors. No "latest release", no "recent version".
 | Recorder | Node >= 20 | `package.json` engines |
 | Panel | OpenChamber >= 1.24.0 | `package.json` `openchamber.engines.openchamber` |
 | Panel | Node >= 20 | `package.json` engines |
-| Both | State schema `1` | `state.schemaVersion` |
+| Both | State schema `2` | `state.schemaVersion` |
 
 ## Reproduce the floors
 
@@ -28,14 +28,14 @@ node -e "console.log(require('./vstack-opencode/package.json').engines.node)"
 
 | Component | Version | Tag |
 |---|---|---|
-| Pack | 0.2.0 | `v0.2.0` |
-| Recorder | 0.2.0 | `v0.2.0` |
-| Panel | 0.2.0 | `v0.2.0` |
-| Documentation home | 0.2.0 | `v0.2.0` |
+| Pack | 0.2.2 | `v0.2.2` |
+| Recorder | 0.2.2 | `v0.2.2` |
+| Panel | 0.2.2 | `v0.2.2` |
+| Documentation home | 0.2.2 | `v0.2.2` |
 
 ```bash
 node -e "console.log(require('./vstack-opencode/package.json').version)"
-# 0.2.0
+# 0.2.2
 ```
 
 ## What a mismatch looks like
@@ -61,7 +61,7 @@ The pack itself has **no version check to fail**. It is Markdown.
 
 ## Not tested
 
-- Claude Code and Codex mappings — experimental in 0.2.0. The Markdown works;
+- Claude Code and Codex mappings — experimental in 0.2.x. The Markdown works;
   the exact discovery path does not.
 - Any harness other than OpenCode end to end.
 - Browsers other than those the panel is rendered in.

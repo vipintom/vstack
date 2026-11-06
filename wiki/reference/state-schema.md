@@ -1,6 +1,6 @@
 # State schema
 
-Schema version `1`. Defined in `vstack-opencode/src/state/types.ts`.
+Schema version `2`. Defined in `vstack-opencode/src/state/types.ts`.
 
 ```bash
 grep -c 'schemaVersion' vstack-opencode/src/state/types.ts
@@ -93,7 +93,7 @@ line. A broken chain is refused on read.
 ## Compatibility
 
 A panel reading a newer schema reports `incompatible` and renders nothing
-partial. Both components declare schema `1`; see
+partial. Both components declare schema `2`; see
 [compatibility](compatibility.md).
 
 ---

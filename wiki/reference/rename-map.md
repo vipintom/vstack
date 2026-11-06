@@ -53,8 +53,8 @@ These have no 0.1.0 predecessor.
 
 ## Not migrated
 
-0.1.0 contract and projection state is not migrated. The 0.2.0 recorder starts
-at `.vstack/` schema `1`. See [state schema](state-schema.md).
+0.1.0 contract and projection state is not migrated. The 0.2.x recorder starts
+at `.vstack/` schema `2`. See [state schema](state-schema.md).
 
 ---
 
