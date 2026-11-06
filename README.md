@@ -1,5 +1,7 @@
 # vstack
 
+[![Docs CI](https://github.com/vipintom/vstack/actions/workflows/ci.yml/badge.svg)](https://github.com/vipintom/vstack/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Documentation home for the vstack method.
 
 vstack is a portable agentic-development method: a Markdown playbook, an
@@ -43,6 +45,27 @@ Start at [`wiki/index.md`](wiki/index.md). The wiki is organised as:
 The product requirements live in
 [`docs/vstack-0.2.0-prd.md`](docs/vstack-0.2.0-prd.md), with a coverage audit
 beside it.
+
+## Updating
+
+```bash
+git pull
+```
+
+Each component repository versions and tags independently (`v0.2.2`); pull
+them separately. This repository holds no code, so there is nothing to
+rebuild after a pull.
+
+## Troubleshooting
+
+1. A link check fails? Run `node scripts/check-links.mjs wiki` (and `docs`);
+   links here are relative so the tree works offline.
+2. Unsure where a fact lives? The component repositories are authoritative:
+   facts are linked from the wiki, never copied into it.
+3. A number looks stale? Every published number sits beside the command that
+   reproduces it; run the command before editing.
+4. Want to contribute? Issues are welcome; pull requests are not accepted in
+   0.2.x.
 
 ## What this repository is not
 
