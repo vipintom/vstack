@@ -12,7 +12,7 @@ build, no package manifest, no contract and no runtime here.
 | `docs/vstack-0.2.0-prd.md` | Product requirements |
 | `docs/vstack-0.2.0-prd-audit.md` | PRD coverage audit |
 | `scripts/check-links.mjs` | Local Markdown link check |
-| `CHANGELOG.md` | History; it ends at 0.1.0 |
+| `CHANGELOG.md` | History; it ends at 0.1.0, with a rename pointer to `@vipintom/*` |
 
 ## Rules
 
@@ -33,6 +33,7 @@ build, no package manifest, no contract and no runtime here.
 
 ```bash
 node scripts/check-links.mjs wiki
+node scripts/check-links.mjs docs
 ```
 
 CI runs the same command on every push. A link that fails here fails the build.
@@ -42,8 +43,11 @@ CI runs the same command on every push. A link that fails here fails the build.
 | Repository | Authoritative for |
 |---|---|
 | `vstack-playbook` | 54 skills, 13 playbooks, 12 principles, the rename map |
-| `vstack-opencode` | The six tools, `.vstack/` state, enforcement, schema 2 |
-| `vstack-openchamber` | The seven views, the five honest states |
+| `vstack-opencode` | The six tools, `.vstack/` state, enforcement, schema 2; publishes as `@vipintom/vstack-opencode` |
+| `vstack-openchamber` | The seven views, the five honest states; publishes as `@vipintom/vstack-openchamber` |
+
+Single npm scope: `@vipintom`. No `@vstack/*` name is published; the
+CHANGELOG 0.1.0 names stay verbatim as history under the rename pointer.
 
 Compatibility floors: OpenCode V2 with `@opencode/plugin` >= 2.2.0,
 OpenChamber >= 1.24.0, state schema 2.
